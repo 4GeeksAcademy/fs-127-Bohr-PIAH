@@ -1,13 +1,3 @@
-"""
-=============================================================================
-                              MODELO: USER (Usuario)
-=============================================================================
-
-Tabla principal de usuarios.
-- Relacion 1 a 1 con ProfileInfo
-- Relacion 1 a Muchos con Order
-"""
-
 import enum
 import bcrypt
 from sqlalchemy import String, Boolean, DateTime, Enum
@@ -15,24 +5,19 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from api.models import db
 
-class RoleName(enum.Enum):
-    admin = "admin"
-    head = "head"
-    staff = "staff"
-    guest = "guest"
+class Status(enum.Enum):
+    in_process = "in_process"
+    finished = "finished"
 
-
-class User(db.Model):
-    __tablename__ = 'users'
+class Task(db.Model):
+    __tablename__ = 'tasks'
 
     # Columnas
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    first_name: Mapped[str] = mapped_column(String(80), unique=True, nullable=False)
-    last_name: Mapped[str] = mapped_column(String(80), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(String(256), nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean(), default=True, nullable=False)
-    role: Mapped[RoleName] = mapped_column(Enum(RoleName), nullable=False)
+    wp_id: Mapped[int] = mapped_column(ForeignKey(work_package.id), nullable=False)
+    name: Mapped[str] = mapped_column(String(80), nullable=False)
+    task_description: Mapped[str] = mapped_column(String(80), nullable=False)
+    status: Mapped[Status] = mapped_column(Enum(Status), nullable=False)
 
     # Relaciones
     department: Mapped["Department"] = relationship(
@@ -65,13 +50,3 @@ class User(db.Model):
             "last_name": self.last_name,
             "role": self.role
         }
-
-    def serialize_with_profile(self):
-        data = self.serialize()
-        data["profile"] = self.profile.serialize() if self.profile else None
-        return data
-
-    def serialize_with_orders(self):
-        data = self.serialize()
-        data["orders"] = [order.serialize() for order in self.orders]
-        return data
