@@ -15,6 +15,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from api.models import db
 
+
 class RoleName(enum.Enum):
     admin = "admin"
     head = "head"
@@ -27,11 +28,15 @@ class User(db.Model):
 
     # Columnas
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    first_name: Mapped[str] = mapped_column(String(80), unique=True, nullable=False)
-    last_name: Mapped[str] = mapped_column(String(80), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(
+        String(120), unique=True, nullable=False)
+    first_name: Mapped[str] = mapped_column(
+        String(80), unique=True, nullable=False)
+    last_name: Mapped[str] = mapped_column(
+        String(80), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(256), nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean(), default=True, nullable=False)
+    is_active: Mapped[bool] = mapped_column(
+        Boolean(), default=True, nullable=False)
     role: Mapped[RoleName] = mapped_column(Enum(RoleName), nullable=False)
 
     # Relaciones
@@ -40,6 +45,20 @@ class User(db.Model):
         back_populates="user",
         uselist=False,
         cascade="all, delete-orphan"
+    )
+
+    project_links: Mapped[list["UserProject"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    projects: Mapped[list["Project"]] = relationship(
+        secondary="project_members",
+        viewonly=True,
+    )
+
+    tasks_todo: Mapped[list["Task"]] = relationship(
+        back_populates="todo_user",
+        foreign_keys="Task.todo_by",
     )
 
     def set_password(self, password):
