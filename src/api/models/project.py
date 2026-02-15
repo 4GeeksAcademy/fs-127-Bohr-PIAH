@@ -40,7 +40,6 @@ class Project(db.Model):
         cascade="all, delete-orphan",
     )
 
-    # M:N via modelo intermedio
     user_projects: Mapped[List["UserProject"]] = relationship(
         back_populates="project",
         cascade="all, delete-orphan",

@@ -1,4 +1,5 @@
 import enum
+from typing import Optional
 import bcrypt
 from sqlalchemy import ForeignKey, String, Boolean, DateTime, Enum, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship

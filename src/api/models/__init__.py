@@ -19,10 +19,10 @@ db = SQLAlchemy()
 
 # Importamos todos los modelos para que esten disponibles desde el paquete
 # IMPORTANTE: El orden de imports importa por las dependencias entre modelos
-from api.models.associations import article_tags
-from api.models.work_package import Tag
+# from api.models.associations import article_tags
 from api.models.user import User
-from api.models.UserProject import ProfileInfo
-from api.models.project import Article
-from api.models.order import Order
-from api.models.department import OrderItem
+from api.models.work_package import WorkPackage
+from api.models.UserProject import UserProject
+from api.models.project import Project
+# from api.models.order import Order
+from api.models.department import Department
