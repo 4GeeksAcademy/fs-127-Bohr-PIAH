@@ -57,10 +57,10 @@ class User(db.Model):
         foreign_keys="Project.user_id",
     )
 
-    created_projects: Mapped[List["Project"]] = relationship(
-        back_populates="creator",
-        foreign_keys="Project.created_by",
-    )
+    #created_projects: Mapped[List["Project"]] = relationship(
+     #   back_populates="creator",
+     #   foreign_keys="Project.created_by",
+    #)
 
     assigned_tasks: Mapped[List["Task"]] = relationship(
         back_populates="assignee",

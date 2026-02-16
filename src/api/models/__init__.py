@@ -12,11 +12,12 @@ el resto de la aplicacion pueda importarlos facilmente:
     from api.models import db, User, Article, Order, Tag
 """
 
+from api.models.user import User
 from api.models.department import Department
 from api.models.project import Project
 from api.models.UserProject import UserProject
 from api.models.work_package import WorkPackage
-from api.models.user import User
+from api.models.task import Task
 from flask_sqlalchemy import SQLAlchemy
 
 # Inicializamos SQLAlchemy - esto crea la conexion con la base de datos

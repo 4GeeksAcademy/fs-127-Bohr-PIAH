@@ -15,11 +15,11 @@ class Project(db.Model):
         nullable=False,
         index=True,
     )
-    created_by: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="RESTRICT"),
-        nullable=False,
-        index=True,
-    )
+    #created_by: Mapped[int] = mapped_column(
+     #   ForeignKey("users.id", ondelete="RESTRICT"),
+      #  nullable=False,
+     #   index=True,
+    #)
 
     name: Mapped[str] = mapped_column(String(255))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -30,10 +30,10 @@ class Project(db.Model):
         back_populates="owned_projects",
         foreign_keys=[user_id],
     )
-    creator: Mapped["User"] = relationship(
-        back_populates="created_projects",
-        foreign_keys=[created_by],
-    )
+    #creator: Mapped["User"] = relationship(
+     #   back_populates="created_projects",
+     #   foreign_keys=[created_by],
+    #)
 
     work_packages: Mapped[List["WorkPackage"]] = relationship(
         back_populates="project",
