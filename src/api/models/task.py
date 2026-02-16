@@ -57,6 +57,6 @@ class Task(db.Model):
             "wp_id": self.wp_id,
             "name": self.name,
             "task_description": self.task_description,
-            "status": self.status,
+            "status": self.status.value,
             "todo_by": self.todo_by
         }
