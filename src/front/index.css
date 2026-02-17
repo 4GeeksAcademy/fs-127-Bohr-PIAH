@@ -1,0 +1,159 @@
+/* 1. CONFIGURACIÓN DE VERSIONES (Colores y Velocidades) */
+.home-wrapper.v1 {
+    --c-nuc: #74B9FF; --c-orb: #DCDDE1; --c-elec: #B8E994; --bg: #0f172a;
+    --speed: 20s; --glow: 15px;
+}
+.home-wrapper.v2 {
+    --c-nuc: #ff7675; --c-orb: #fab1a0; --c-elec: #fdcb6e; --bg: #1e272e;
+    --speed: 8s; --glow: 30px;
+}
+.home-wrapper.v3 {
+    --c-nuc: #ffffff; --c-orb: #4b5563; --c-elec: #00cec9; --bg: #000000;
+    --speed: 45s; --glow: 10px;
+}
+
+/* 2. CONTENEDOR PRINCIPAL */
+.home-wrapper {
+    background-color: var(--bg);
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: background 1s ease;
+    overflow: hidden;
+    color: white;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* 3. ESCENA DEL ÁTOMO (Evita que el brillo se corte) */
+.atom-scene {
+    position: relative;
+    width: 350px; /* Más grande para que el aura no toque los bordes */
+    height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible; /* CRUCIAL: permite que la luz se salga del cuadro */
+}
+
+.atom-loader {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: floating 4s ease-in-out infinite;
+    overflow: visible;
+}
+
+.atom {
+    width: 100%;
+    height: 100%;
+    overflow: visible !important; /* Evita el recuadro recortado */
+    animation: spin var(--speed) linear infinite;
+}
+
+/* 4. ELEMENTOS DEL ÁTOMO */
+.nucleus { fill: var(--c-nuc); filter: drop-shadow(0 0 15px var(--c-nuc)); transition: fill 0.8s; }
+
+.nucleus-glow { 
+    fill: var(--c-nuc); 
+    filter: blur(var(--glow)); 
+    opacity: 0.5; 
+    animation: pulse 2s infinite; 
+    transition: all 0.8s; 
+}
+
+.orbit-path { 
+    fill: none; 
+    stroke: var(--c-orb); 
+    stroke-width: 4; 
+    opacity: 0.4; 
+    transition: stroke 0.8s; 
+}
+
+.electron { 
+    fill: var(--c-elec); 
+    filter: drop-shadow(0 0 10px var(--c-elec)); 
+}
+
+/* 5. TEXTOS (Resaltados y Claros) */
+.welcome-text {
+    margin-top: 20px;
+    font-size: 2.2rem;          
+    font-weight: 700;           
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: white;
+    text-align: center;
+    line-height: 1.2;             
+    text-shadow: 0 0 10px var(--c-nuc);
+    transition: all 0.8s;
+}
+
+.welcome-text span {
+    display: block;             /* Baja a la siguiente línea */
+    margin-top: 5px;
+    font-size: 0.9rem;          /* Tamaño mucho más pequeño y legible */
+    font-weight: 300;           /* Fuente fina para que sea elegante */
+    letter-spacing: 2px;        /* Menos espacio que el título principal */
+    color: rgba(255, 255, 255, 0.7); /* Un poco más suave para que no compita */
+    text-transform: none;     
+}
+
+.description-text {
+    margin: 25px auto 0 auto;  /* Centrado horizontal perfecto */
+    max-width: 650px;          /* Ancho óptimo para lectura */
+    text-align: center;        /* Texto centrado */
+    line-height: 1.8;          /* Espaciado entre líneas para que respire */
+    font-size: 1.1rem;
+    font-weight: 300;          /* Fuente elegante y fina */
+    color: rgba(255, 255, 255, 0.9); /* Blanco suave para no cansar */
+    padding: 0 30px;           /* Espacio de seguridad en móviles */
+    transition: all 0.8s ease;
+    
+    /* Efecto sutil para resaltar sobre el fondo oscuro */
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Diferencias de texto por versión */
+.home-wrapper.v1 .description-text { color: #f1f1f1; font-weight: 300; }
+
+.home-wrapper.v2 .description-text { 
+    background: rgba(255, 255, 255, 0.05); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    border-radius: 20px; 
+    backdrop-filter: blur(10px);
+}
+
+.home-wrapper.v3 .description-text { 
+    color: var(--c-elec); 
+    font-family: monospace; 
+    border: 1px solid var(--c-elec); 
+}
+
+/* 6. SOMBRA EN EL SUELO */
+.shadow-floor {
+    position: absolute;
+    bottom: 20px;
+    width: 140px;
+    height: 20px;
+    background: radial-gradient(ellipse at center, rgba(116, 185, 255, 0.15) 0%, transparent 70%);
+    animation: shadow-scale 4s ease-in-out infinite;
+}
+
+/* 7. CONTROLES DE PRESENTACIÓN */
+.presentation-controls { position: absolute; top: 40px; display: flex; gap: 15px; }
+.presentation-controls button {
+    padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.3); color: white; cursor: pointer; transition: 0.3s;
+}
+.presentation-controls button.active { background: white; color: black; border-color: white; }
+
+/* 8. ANIMACIONES */
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
+@keyframes pulse { 0%, 100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.4); } }
+@keyframes shadow-scale { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(0.8); opacity: 0.1; } }
