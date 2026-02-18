@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com');
+
+
+
 /* 1. CONFIGURACIÓN DE VERSIONES (Colores y Velocidades) */
 .home-wrapper.v1 {
     --c-nuc: #74B9FF; --c-orb: #DCDDE1; --c-elec: #B8E994; --bg: #0f172a;
@@ -11,6 +15,113 @@
     --c-nuc: #ffffff; --c-orb: #4b5563; --c-elec: #00cec9; --bg: #000000;
     --speed: 45s; --glow: 10px;
 }
+
+/* --- ESTILO VERSIÓN 5 (LOTTIE + CYBER TURQUESA) --- */
+.home-wrapper.v5 {
+    /* Fondo con un ligero degradado circular para iluminar el centro */
+    background: radial-gradient(circle, #102025 0%, #050505 100%) !important;
+    --c-cyber: #27E6D6;
+}
+
+.home-wrapper.v5 .lottie-container {
+    width: 550px; 
+    height: 550px;
+    position: relative;
+    
+    /* líneas finas brillan y parecen más gruesas */
+    filter: 
+        drop-shadow(0 0 1px var(--c-cyber)) 
+        drop-shadow(0 0 5px rgba(39, 230, 214, 0.4));
+    
+    animation: floating 4s ease-in-out infinite;
+}
+
+.home-wrapper.v5 .welcome-text {
+    color: #ffffff !important; 
+    text-shadow: 0 0 10px var(--c-cyber), 0 0 20px var(--c-cyber) !important;
+}
+
+.home-wrapper.v5 .description-text {
+    background: rgba(39, 230, 214, 0.08); /* opacidad */
+    border: 1.5px solid var(--c-cyber); /* Borde un poco más grueso */
+    box-shadow: inset 0 0 15px rgba(39, 230, 214, 0.1); /* Brillo interno */
+}
+
+
+
+/* 2. CONTENEDOR V4 */
+
+/* 2. BOTONES V4 */
+
+
+.home-wrapper.v4 .presentation-controls button {
+    
+    border: 2px solid #27E6D6; 
+    color: #1a202c; 
+    background: rgba(39, 230, 214, 0.05); /* Fondo verde muy clarito */
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+/* Efecto Hover */
+.home-wrapper.v4 .presentation-controls button:hover {
+    background: rgba(39, 230, 214, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Estilo para el botón que está seleccionado (Active) */
+.home-wrapper.v4 .presentation-controls button.active {
+    background: #27E6D6 !important; /* Fondo verde sólido */
+    color: #000000 !important; /* Texto negro para contraste máximo */
+    box-shadow: 0 4px 15px rgba(39, 230, 214, 0.4);
+    border-color: #27E6D6;
+}
+.home-wrapper.v4 {
+    --bg: #F5F7FA; /* Fondo claro */
+    background-color: var(--bg) !important;
+}
+
+.home-wrapper.v4 .description-text {
+ 
+   font-family: 'Inter', sans-serif !important;
+    
+    /* colores oscuros y bordes redondeados */
+    color: #1a202c !important;
+    font-weight: 400; 
+    line-height: 1.7;
+    letter-spacing: -0.01em; 
+    
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    padding: 25px 40px;
+    text-shadow: none !important;
+}
+
+
+.home-wrapper.v4 .welcome-text {
+
+    text-shadow: none !important;
+    color: #27E6D6 !important;
+}
+
+
+.home-wrapper.v4 .welcome-text span {
+    color: #4a5568 !important;      /* Gris oscuro para el eslogan */
+    opacity: 0.9;
+    text-shadow: none !important;
+}
+
+/* El logo Lottie ocupando el mismo espacio central */
+.home-wrapper.v4 .lottie-container {
+    width: 500px; 
+    height: 500px;
+    margin: 0 auto;
+    filter: none; 
+}
+
+
 
 /* 2. CONTENEDOR PRINCIPAL */
 .home-wrapper {
