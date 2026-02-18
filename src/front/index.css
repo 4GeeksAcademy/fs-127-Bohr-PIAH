@@ -1,5 +1,58 @@
 @import url('https://fonts.googleapis.com');
 
+.nav-login-v5 {
+    background: #000000; 
+    border: 2px solid #27E6D6; 
+    color: #27E6D6;
+    border-radius: 50px; 
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    padding: 6px 25px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.nav-login-v5:hover {
+    background: #27E6D6; 
+    color: #000000;
+    box-shadow: 0 0 20px rgba(39, 230, 214, 0.5);
+}
+
+/* Contenedor del átomo en el Nav */
+.atom-nav-container {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.atom-nav-container:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px #74B9FF);
+}
+
+/* El SVG del átomo */
+.atom-nav {
+    width: 100%;
+    height: 100%;
+}
+
+/* Reutilizamos la animación 'spin'  */
+.atom-spin {
+    transform-origin: center;
+    animation: spin 10s linear infinite; 
+}
+
+/* Estilos de las órbitas para el Nav */
+.atom-nav .orbit-path {
+    opacity: 0.3;
+}
+
+.atom-nav .nucleus {
+    filter: drop-shadow(0 0 5px #74B9FF);
+}
 
 
 /* 1. CONFIGURACIÓN DE VERSIONES (Colores y Velocidades) */
@@ -24,9 +77,10 @@
 }
 
 .home-wrapper.v5 .lottie-container {
-    width: 550px; 
-    height: 550px;
-    position: relative;
+    width: 90%;       /* Ocupa el 90% del ancho disponible en móviles */
+    max-width: 550px; /* Pero nunca crezcas más de 550px en monitores grandes */
+    height: auto;     /* Que la altura se ajuste sola */
+    aspect-ratio: 1/1; 
     
     /* líneas finas brillan y parecen más gruesas */
     filter: 
