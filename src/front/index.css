@@ -1,4 +1,4 @@
-/* 1. CONFIGURACIÓN GLOBAL Y VARIABLES */
+/* CONFIGURACIÓN GLOBAL Y VARIABLES */
 :root {
     --c-nuc: #74B9FF;
     --c-orb: #DCDDE1;
@@ -6,10 +6,10 @@
     --bg: #0f172a;
     --speed: 20s;
     --glow: 15px;
-    --c-cyber: #27E6D6; /* Color Turquesa de acción */
+    --c-cyber: #27E6D6; 
 }
 
-/* 2. CONTENEDOR PRINCIPAL */
+/* CONTENEDOR PRINCIPAL */
 .home-wrapper {
     background-color: var(--bg);
     min-height: 100vh;
@@ -23,7 +23,7 @@
     font-family: 'Inter', system-ui, sans-serif;
 }
 
-/* 3. ESCENA DEL ÁTOMO (RESPONSIVE) */
+/* ESCENA DEL ÁTOMO (RESPONSIVE) */
 .atom-scene {
     position: relative;
     width: 80vw;
@@ -53,7 +53,7 @@
     animation: spin var(--speed) linear infinite;
 }
 
-/* 4. ELEMENTOS DEL ÁTOMO */
+/* ELEMENTOS DEL ÁTOMO */
 .nucleus { 
     fill: var(--c-nuc); 
     filter: drop-shadow(0 0 15px var(--c-nuc)); 
@@ -80,7 +80,7 @@
     filter: drop-shadow(0 0 10px var(--c-elec)); 
 }
 
-/* 5. TEXTOS (RESPONSIVE) */
+/* TEXTOS RESPONSIVE */
 .welcome-text {
     margin-top: 20px;
     font-size: clamp(1.5rem, 6vw, 2.2rem);
@@ -114,7 +114,7 @@
     padding: 0 25px;
 }
 
-/* 6. SOMBRA EN EL SUELO */
+/* SOMBRA EN EL SUELO */
 .shadow-floor {
     position: absolute;
     bottom: -10px;
@@ -124,8 +124,8 @@
     animation: shadow-scale 4s ease-in-out infinite;
 }
 
-/* 7. ESTILOS NAVBAR */
-.nav-login-cyber { /* Renombrado de v5 a cyber */
+/* ESTILOS NAVBAR */
+.nav-login-cyber { 
     background: #000000; 
     border: 2px solid var(--c-cyber); 
     color: var(--c-cyber);
@@ -144,18 +144,17 @@
 }
 
 .atom-nav-container {
-    width: 60px;  /* Antes 45px */
-    height: 60px; /* Antes 45px */
+    width: 60px;  
+    height: 60px; 
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform 0.3s ease;
-    margin-left: -10px; /* Opcional: para pegarlo un poco más al borde izquierdo */
+    margin-left: -10px; 
 }
 
-/* Opcional: Si quieres que las órbitas resalten más al ser más grande */
 .atom-nav path {
-    stroke-width: 4; /* Un poquito más grueso para que no se pierda */
+    stroke-width: 4; 
 }
 .atom-nav {
     width: 100%;
@@ -167,7 +166,7 @@
     animation: spin 10s linear infinite; 
 }
 
-/* 8. MEDIA QUERIES (Fuera de las clases) */
+/* MEDIA QUERIES- ajustes pantallas  */
 @media (max-width: 768px) {
     .atom-scene {
         aspect-ratio: 1 / 1; 
@@ -179,14 +178,15 @@
     }
 }
 
-/* 9. ANIMACIONES */
+/* ANIMACIONES */
+
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 @keyframes pulse-simple { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
 @keyframes shadow-scale { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(0.8); opacity: 0.1; } }
 
-/* ICONOS BASE MAIN WEB */
 
+/* ICONOS BASE MAIN WEB */
 .features-grid {
     display: flex;
     justify-content: center;
