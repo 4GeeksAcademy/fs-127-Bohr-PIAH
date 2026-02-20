@@ -6,8 +6,10 @@ from api.models import db, User
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from api.controllers.auth_controller import auth_bp
+from api.controllers.user_controller import user_bp
 
 api = Blueprint('api', __name__)
+api.register_blueprint(user_bp)
 
 # Allow CORS requests to this API
 CORS(api)
