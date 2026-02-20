@@ -1,52 +1,79 @@
 import React, { useEffect } from "react"
 import rigoImageUrl from "../assets/img/rigo-baby.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { useState } from "react";
+import "../index.css";
+import Lottie from "lottie-react";
+import atomo from "../assets/atomoLottie.json"
+import { UserCheck, Orbit, Zap } from 'lucide-react';
 
 export const Home = () => {
+    return (
+        <div className="home-wrapper v1">
+            <div className="atom-scene">
+                <div className="shadow-floor"></div>
+                <div className="atom-loader">
+                    {/* SVG con las 3 órbitas y animaciones */}
+                    <svg viewBox="0 0 120 120" className="atom" xmlns="http://www.w3.org">
+                        <circle cx="60" cy="60" r="12" className="nucleus-glow" />
+                        <circle cx="60" cy="60" r="10" className="nucleus" />
 
-	const { store, dispatch } = useGlobalReducer()
+                        {/* Órbita 1: Horizontal */}
+                        <g className="orbit">
+                            <path id="p1" d="M12,60 a48,25 0 1,0 96,0 a48,25 0 1,0 -96,0" className="orbit-path" />
+                            <circle r="4" className="electron">
+                                <animateMotion dur="2s" repeatCount="indefinite" rotate="auto">
+                                    <mpath href="#p1" />
+                                </animateMotion>
+                            </circle>
+                        </g>
 
-	const loadMessage = async () => {
-		try {
-			const backendUrl = import.meta.env.VITE_BACKEND_URL
+                        {/* Órbita 2: Rotada 60° */}
+                        <g className="orbit" transform="rotate(60 60 60)">
+                            <path id="p2" d="M12,60 a48,25 0 1,0 96,0 a48,25 0 1,0 -96,0" className="orbit-path" />
+                            <circle r="4" className="electron">
+                                <animateMotion dur="2.5s" repeatCount="indefinite" rotate="auto" begin="-0.5s">
+                                    <mpath href="#p2" />
+                                </animateMotion>
+                            </circle>
+                        </g>
 
-			if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file")
+                        {/* Órbita 3: Rotada -60° */}
+                        <g className="orbit" transform="rotate(-60 60 60)">
+                            <path id="p3" d="M12,60 a48,25 0 1,0 96,0 a48,25 0 1,0 -96,0" className="orbit-path" />
+                            <circle r="4" className="electron">
+                                <animateMotion dur="2.2s" repeatCount="indefinite" rotate="auto" begin="-1s">
+                                    <mpath href="#p3" />
+                                </animateMotion>
+                            </circle>
+                        </g>
+                    </svg>
+                </div>
+            </div>
 
-			const response = await fetch(backendUrl + "/api/hello")
-			const data = await response.json()
+            <h2 className="welcome-text">
+                BOHR <br />
+                <span>Estructura Atómica para la Gestión de Proyectos</span>
+            </h2>
 
-			if (response.ok) dispatch({ type: "set_hello", payload: data.message })
+            {/* <p className="description-text">
+                Gestión de proyectos. Asignación de roles simplificada, seguimiento de estados intuitivo y reportes automatizados. Porque gestionar un equipo no debería ser tan complejo como la física cuántica. Todo lo que necesitas, exactamente donde lo necesitas.
+            </p>*/}
 
-			return data
-
-		} catch (error) {
-			if (error.message) throw new Error(
-				`Could not fetch the message from the backend.
-				Please check if the backend is running and the backend port is public.`
-			);
-		}
-
-	}
-
-	useEffect(() => {
-		loadMessage()
-	}, [])
-
-	return (
-		<div className="text-center mt-5">
-			<h1 className="display-4">Hello Rigo!!</h1>
-			<p className="lead">
-				<img src={rigoImageUrl} className="img-fluid rounded-circle mb-3" alt="Rigo Baby" />
-			</p>
-			<div className="alert alert-info">
-				{store.message ? (
-					<span>{store.message}</span>
-				) : (
-					<span className="text-danger">
-						Loading message from the backend (make sure your python 🐍 backend is running)...
-					</span>
-				)}
-			</div>
-		</div>
-	);
-}; 
+            <div className="features-grid">
+                <div className="feature-item">
+                    <UserCheck size={40} strokeWidth={1.5} color="#27E6D6" />
+                    <p>Roles <br /> Simplificados</p>
+                </div>
+                <div className="feature-item">
+                    <Orbit size={40} strokeWidth={1.5} color="#27E6D6" />
+                    <p>Seguimiento <br /> Intuitivo</p>
+                </div>
+                <div className="feature-item">
+                    <Zap size={40} strokeWidth={1.5} color="#27E6D6" />
+                    <p>Reportes <br /> Automatizados</p>
+                </div>
+            </div>
+        </div>
+    );
+};
