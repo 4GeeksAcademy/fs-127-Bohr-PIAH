@@ -12,8 +12,8 @@
 /* 2. CONTENEDOR PRINCIPAL */
 .home-wrapper {
     background-color: var(--bg);
-    height: 100vh;
-    width: 100vw;
+    min-height: 100vh;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -184,3 +184,37 @@
 @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 @keyframes pulse-simple { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
 @keyframes shadow-scale { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(0.8); opacity: 0.1; } }
+
+/* ICONOS BASE MAIN WEB */
+
+.features-grid {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 30px;
+    flex-wrap: wrap; /* Para que en móvil se pongan uno debajo de otro */
+}
+
+.feature-item {
+    text-align: center;
+    width: 150px;
+    transition: transform 0.3s ease;
+}
+
+.feature-item svg {
+    filter: drop-shadow(0 0 8px rgba(39, 230, 214, 0.5));
+    margin-bottom: 12px;
+}
+
+.feature-item p {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.3;
+}
+
+.feature-item:hover {
+    transform: translateY(-5px);
+}
