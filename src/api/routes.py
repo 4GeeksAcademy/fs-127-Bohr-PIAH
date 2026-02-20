@@ -9,13 +9,13 @@ from api.controllers.auth_controller import auth_bp
 from api.controllers.user_controller import user_bp
 
 api = Blueprint('api', __name__)
-api.register_blueprint(user_bp)
 
 # Allow CORS requests to this API
 CORS(api)
 
 # Register authentication blueprint
 api.register_blueprint(auth_bp)
+api.register_blueprint(user_bp)
 
 
 @api.route('/hello', methods=['POST', 'GET'])

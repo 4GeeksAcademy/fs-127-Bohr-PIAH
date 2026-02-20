@@ -67,7 +67,7 @@ class UserService:
             user.set_password(data["password"])
         if "first_name" in data:
             user.set_first_name(data["first_name"])
-        if "password" in data:
+        if "last_name" in data:
             user.set_last_name(data["last_name"])
         if "role" in data:
             user.set_role(data["role"])
