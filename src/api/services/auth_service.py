@@ -12,7 +12,8 @@ class AuthService:
     @staticmethod
     def signup(data):
         """Registrar un nuevo usuario con password hasheado."""
-        required_fields = ["email", "username", "password"]
+        # Cambiado: eliminado 'username', añadido 'first_name' y 'last_name' para que coincida con el modelo User
+        required_fields = ["email", "first_name", "last_name", "password"]
         for field in required_fields:
             if field not in data or not data[field]:
                 abort(400, description=f"El campo '{field}' es obligatorio")
@@ -20,13 +21,12 @@ class AuthService:
         if User.query.filter_by(email=data["email"]).first():
             abort(409, description="Ya existe un usuario con ese email")
 
-        if User.query.filter_by(username=data["username"]).first():
-            abort(409, description="Ya existe un usuario con ese username")
-
         try:
+            # Cambiado: eliminado 'username', añadido 'first_name' y 'last_name'
             new_user = User(
                 email=data["email"],
-                username=data["username"],
+                first_name=data["first_name"],
+                last_name=data["last_name"],
                 is_active=True
             )
             new_user.set_password(data["password"])
