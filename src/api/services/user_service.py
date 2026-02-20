@@ -22,13 +22,11 @@ class UserService:
 
     @staticmethod
     def create(data):
-        # Validar campos obligatorios
         required_fields = ["email", "username", "password"]
         for field in required_fields:
             if field not in data or not data[field]:
                 abort(400, description=f"El campo '{field}' es obligatorio")
 
-        # Verificar duplicados
         if User.query.filter_by(email=data["email"]).first():
             abort(409, description="Ya existe un usuario con ese email")
 
@@ -55,7 +53,6 @@ class UserService:
         if user is None:
             abort(404, description=f"Usuario con id {user_id} no encontrado")
 
-        # Verificar duplicados si se cambia email o username
         if "email" in data and data["email"] != user.email:
             if User.query.filter_by(email=data["email"]).first():
                 abort(409, description="Ya existe un usuario con ese email")
@@ -95,13 +92,11 @@ class UserService:
 
     @staticmethod
     def create_with_profile(data):
-        # Validar campos obligatorios del usuario
         required_fields = ["email", "username", "password"]
         for field in required_fields:
             if field not in data or not data[field]:
                 abort(400, description=f"El campo '{field}' es obligatorio")
 
-        # Verificar duplicados
         if User.query.filter_by(email=data["email"]).first():
             abort(409, description="Ya existe un usuario con ese email")
         if User.query.filter_by(username=data["username"]).first():
@@ -115,7 +110,6 @@ class UserService:
             )
             new_user.set_password(data["password"])
 
-            # Crear el perfil asociado
             profile_data = data.get("profile", {})
             new_profile = ProfileInfo(
                 first_name=profile_data.get("first_name"),

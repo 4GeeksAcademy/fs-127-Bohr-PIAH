@@ -9,7 +9,7 @@ export const Layout = () => {
         <ScrollToTop>
              <Navbar />
                 <Outlet />
-            <Footer />
+           {/*  <Footer />*/}
         </ScrollToTop>
     )
 }
