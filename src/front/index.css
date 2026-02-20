@@ -9,7 +9,7 @@
     --c-cyber: #27E6D6; 
 }
 
-/* CONTENEDOR PRINCIPAL */
+/* CONTENEDOR PRINCIPAL (body) */
 .home-wrapper {
     background-color: var(--bg);
     min-height: 100vh;
