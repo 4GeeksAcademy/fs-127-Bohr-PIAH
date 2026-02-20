@@ -102,17 +102,45 @@
     color: rgba(255, 255, 255, 0.7);
     text-transform: none;     
 }
+/* ESTILO PARA TITULOS */
 
-.description-text {
-    margin: 20px auto 0 auto;
-    max-width: 600px;
+.view-title {
+    color: var(--c-cyber);
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(39, 230, 214, 0.4); 
+    margin-bottom: 30px;
     text-align: center;
-    line-height: 1.7;
-    font-size: 1rem;
-    font-weight: 300;
-    color: #f1f1f1;
-    padding: 0 25px;
 }
+
+/* ESTILOS PARA ICONOS ANIMADOS */
+
+/* alineacion de iconos en fila horizontal y centrados */
+.action-grid {
+    display: flex;
+    gap: 50px;
+    justify-content: center;
+    margin-top: 50px;
+}
+/* efectos de icono */
+.action-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(39, 230, 214, 0.02);
+    border: 1px solid transparent;
+}
+/* efecto de hoover */
+.action-item:hover {
+    background: rgba(39, 230, 214, 0.05);
+    border: 1px solid rgba(39, 230, 214, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(39, 230, 214, 0.1);
+}
+
 
 /* SOMBRA EN EL SUELO */
 .shadow-floor {
