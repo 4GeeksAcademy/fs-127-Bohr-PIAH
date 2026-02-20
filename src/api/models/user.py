@@ -34,7 +34,7 @@ class User(db.Model):
     is_active: Mapped[bool] = mapped_column(Boolean(), default=True, nullable=False)
     role: Mapped[RoleName] = mapped_column(Enum(RoleName), nullable=False)
 
-    # Relaciones
+    #Relaciones
     department: Mapped["Department"] = relationship(
         "department",
         back_populates="user",
