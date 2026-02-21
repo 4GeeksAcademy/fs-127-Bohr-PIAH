@@ -86,7 +86,7 @@ export const Home = () => {
                         </p>
                     </div>
 
-                        <div className="feature-item" onClick={() => scrollToSection(rolesSectionRef)} style={{ cursor: 'pointer' }}>
+                        <div className="feature-item" onClick={() => scrollToSection(seguimientoRef)} style={{ cursor: 'pointer' }}>
                         <Orbit size={40} strokeWidth={1.5} color="#27E6D6" />
                         <p className="feature-title">Seguimiento Intuitivo</p>
                         <p className="feature-description">
@@ -95,7 +95,7 @@ export const Home = () => {
                         </p>
                     </div>
 
-                        <div className="feature-item" onClick={() => scrollToSection(rolesSectionRef)} style={{ cursor: 'pointer' }}>
+                        <div className="feature-item" onClick={() => scrollToSection(reportesRef)} style={{ cursor: 'pointer' }}>
                         <Zap size={40} strokeWidth={1.5} color="#27E6D6" />
                         <p className="feature-title">Reportes Automatizados</p>
                         <p className="feature-description">
@@ -104,7 +104,7 @@ export const Home = () => {
                         </p>
                     </div>
 
-                        <div className="feature-item" onClick={() => scrollToSection(rolesSectionRef)} style={{ cursor: 'pointer' }}>
+                        <div className="feature-item" onClick={() => scrollToSection(kanbanRef)} style={{ cursor: 'pointer' }}>
                         <Columns3 size={40} strokeWidth={1.5} color='#27E6D6' />
                         <p className="feature-title">Kanban Drag & Drop</p>
                         <p className="feature-description">
@@ -112,7 +112,7 @@ export const Home = () => {
                         </p>
 
                     </div>
-                        <div className="feature-item" onClick={() => scrollToSection(rolesSectionRef)} style={{ cursor: 'pointer' }}>
+                        <div className="feature-item" onClick={() => scrollToSection(alertasRef)} style={{ cursor: 'pointer' }}>
                         <UserPlus size={40} strokeWidth={1.5} color="#27E6D6" />
                         <p className="feature-title">Colaboración Externa</p>
                         <p className="feature-description">
@@ -122,7 +122,7 @@ export const Home = () => {
                     </div>
 
 
-                      <div className="feature-item" onClick={() => scrollToSection(rolesSectionRef)} style={{ cursor: 'pointer' }}>
+                      <div className="feature-item" onClick={() => scrollToSection(alertasRef)} style={{ cursor: 'pointer' }}>
                         <BellRing size={40} strokeWidth={1.5} color="#27E6D6" />
                         <p className="feature-title">Notificaciones</p>
                         <p className="feature-description">
@@ -170,7 +170,7 @@ export const Home = () => {
                 </div>
             </div>
 
-            <div className="section-sub-title" ref={rolesSectionRef}>SEGUIMIENTO INTUITIVO</div>
+            <div className="section-sub-title" ref={seguimientoRef}>SEGUIMIENTO INTUITIVO</div>
             <p className="roles-section-description">
                 Monitoree el avance con reportes diarios y progreso semanal <br />
                 individualizado para cada miembro del proyecto.
@@ -207,7 +207,7 @@ export const Home = () => {
                 </div>
             </div>
 
-            <div className="section-sub-title" ref={rolesSectionRef}>REPORTES AUTOMATIZADOS</div>
+            <div className="section-sub-title" ref={reportesRef}>REPORTES AUTOMATIZADOS</div>
             <p className="roles-section-description">
                 Genere informes detallados con un solo clic. <br />
                 Visualice métricas de éxito y porcentajes de avance.
@@ -245,7 +245,7 @@ export const Home = () => {
                 </div>
             </div>
 
-            <div className="section-sub-title"ref={rolesSectionRef}>KANBAN DRAG & DROP</div>
+            <div className="section-sub-title"ref={kanbanRef}>KANBAN DRAG & DROP</div>
             <p className="roles-section-description">
                 Mueva tareas con soltura entre estados. <br />
                 Organice su flujo de trabajo de forma visual y dinámica.
@@ -294,7 +294,7 @@ export const Home = () => {
                 </div>
             </div>
 
-            <div className="section-sub-title"ref={rolesSectionRef}>COLABORACIÓN Y ALERTAS</div>
+            <div className="section-sub-title"ref={alertasRef}>COLABORACIÓN Y ALERTAS</div>
             <p className="roles-section-description">
                 Invite a terceros y clientes con un solo clic. <br />
                 Manténgase informado con notificaciones en tiempo real.
