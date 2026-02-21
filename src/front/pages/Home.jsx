@@ -5,9 +5,26 @@ import { useState } from "react";
 import "../index.css";
 import Lottie from "lottie-react";
 import atomo from "../assets/atomoLottie.json"
-import { UserCheck, Orbit, Zap, Columns3, UserPlus, BellRing, ShieldCheck, Briefcase, User, ClipboardList, BarChart3, UserCog, Milestone, Gauge, FileDown, PieChart, FastForward, LayoutDashboard, Move, CheckSquare, ArrowUpCircle, Users, Bell, Clock} from 'lucide-react';
+import { UserCheck, Orbit, Zap, Columns3, UserPlus, BellRing, ShieldCheck, Briefcase, User, ClipboardList, BarChart3, UserCog, Milestone, Gauge, FileDown, PieChart, FastForward, LayoutDashboard, Move, CheckSquare, ArrowUpCircle, Users, Bell, Clock } from 'lucide-react';
+import { useRef } from "react";
+
+
 
 export const Home = () => {
+
+    const rolesRef = useRef(null);
+    const seguimientoRef = useRef(null);
+    const reportesRef = useRef(null);
+    const kanbanRef = useRef(null);
+    const alertasRef = useRef(null);
+    const rolesSectionRef = useRef(null);
+
+
+    const scrollToSection = (ref) => {
+        ref.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+
     return (
         <div className="home-wrapper v1">
             <div className="atom-scene">
@@ -59,7 +76,8 @@ export const Home = () => {
             <div className="glass-card-yellow">
                 <div className="features-grid">
 
-                    <div className="feature-item">
+                    <div className="feature-item" onClick={() => scrollToSection(rolesSectionRef)} style={{ cursor: 'pointer' }}>
+                        
                         <UserCheck size={40} strokeWidth={1.5} color="#27E6D6" />
                         <p className="feature-title">Roles Simplificados</p>
                         <p className="feature-description">
@@ -68,7 +86,7 @@ export const Home = () => {
                         </p>
                     </div>
 
-                    <div className="feature-item">
+                        <div className="feature-item" onClick={() => scrollToSection(rolesSectionRef)} style={{ cursor: 'pointer' }}>
                         <Orbit size={40} strokeWidth={1.5} color="#27E6D6" />
                         <p className="feature-title">Seguimiento Intuitivo</p>
                         <p className="feature-description">
@@ -77,7 +95,7 @@ export const Home = () => {
                         </p>
                     </div>
 
-                    <div className="feature-item">
+                        <div className="feature-item" onClick={() => scrollToSection(rolesSectionRef)} style={{ cursor: 'pointer' }}>
                         <Zap size={40} strokeWidth={1.5} color="#27E6D6" />
                         <p className="feature-title">Reportes Automatizados</p>
                         <p className="feature-description">
@@ -86,7 +104,7 @@ export const Home = () => {
                         </p>
                     </div>
 
-                    <div className="feature-item">
+                        <div className="feature-item" onClick={() => scrollToSection(rolesSectionRef)} style={{ cursor: 'pointer' }}>
                         <Columns3 size={40} strokeWidth={1.5} color='#27E6D6' />
                         <p className="feature-title">Kanban Drag & Drop</p>
                         <p className="feature-description">
@@ -94,7 +112,7 @@ export const Home = () => {
                         </p>
 
                     </div>
-                    <div className="feature-item">
+                        <div className="feature-item" onClick={() => scrollToSection(rolesSectionRef)} style={{ cursor: 'pointer' }}>
                         <UserPlus size={40} strokeWidth={1.5} color="#27E6D6" />
                         <p className="feature-title">Colaboración Externa</p>
                         <p className="feature-description">
@@ -104,7 +122,7 @@ export const Home = () => {
                     </div>
 
 
-                    <div className="feature-item">
+                      <div className="feature-item" onClick={() => scrollToSection(rolesSectionRef)} style={{ cursor: 'pointer' }}>
                         <BellRing size={40} strokeWidth={1.5} color="#27E6D6" />
                         <p className="feature-title">Notificaciones</p>
                         <p className="feature-description">
@@ -114,7 +132,7 @@ export const Home = () => {
                 </div>
             </div>
 
-            <div className="section-sub-title">ROLES</div>
+            <div className="section-sub-title" ref={rolesSectionRef}>ROLES</div>
             <p className="roles-section-description">Asigne permisos específicos y garantice que cada miembro del equipo tenga las herramientas necesarias para su función.</p>
 
             <div className="glass-card-yellow">
@@ -152,7 +170,7 @@ export const Home = () => {
                 </div>
             </div>
 
-            <div className="section-sub-title">SEGUIMIENTO INTUITIVO</div>
+            <div className="section-sub-title" ref={rolesSectionRef}>SEGUIMIENTO INTUITIVO</div>
             <p className="roles-section-description">
                 Monitoree el avance con reportes diarios y progreso semanal <br />
                 individualizado para cada miembro del proyecto.
@@ -160,28 +178,27 @@ export const Home = () => {
 
             <div className="glass-card-yellow">
                 <div className="features-grid">
-                    {/* Reportes Diarios */}
+                    
                     <div className="sub-feature">
                         <ClipboardList size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Reportes Diarios</p>
                         <p className="feature-description">Documente el avance <br /> de cada jornada.</p>
                     </div>
 
-                    {/* Progreso Semanal */}
+                    
                     <div className="sub-feature">
                         <BarChart3 size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Progreso Semanal</p>
                         <p className="feature-description">Métricas de rendimiento <br /> y tendencias de equipo.</p>
                     </div>
 
-                    {/* Individual */}
                     <div className="sub-feature">
                         <UserCog size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Individual</p>
                         <p className="feature-description">Seguimiento detallado <br /> por cada integrante.</p>
                     </div>
 
-                    {/* Hitos */}
+                   
                     <div className="sub-feature">
                         <Milestone size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Hitos clave</p>
@@ -190,7 +207,7 @@ export const Home = () => {
                 </div>
             </div>
 
-            <div className="section-sub-title">REPORTES AUTOMATIZADOS</div>
+            <div className="section-sub-title" ref={rolesSectionRef}>REPORTES AUTOMATIZADOS</div>
             <p className="roles-section-description">
                 Genere informes detallados con un solo clic. <br />
                 Visualice métricas de éxito y porcentajes de avance.
@@ -198,28 +215,28 @@ export const Home = () => {
 
             <div className="glass-card-yellow">
                 <div className="features-grid">
-                    {/* Análisis Real-Time */}
+                    
                     <div className="sub-feature">
                         <Gauge size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Análisis Real-Time</p>
                         <p className="feature-description">Datos actualizados al instante <br /> de cada movimiento.</p>
                     </div>
 
-                    {/* Reporte One-Click */}
+                    
                     <div className="sub-feature">
                         <FileDown size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Reporte One-Click</p>
                         <p className="feature-description">Botón inteligente para <br /> exportar PDF del proyecto.</p>
                     </div>
 
-                    {/* Porcentaje de Éxito */}
+                   
                     <div className="sub-feature">
                         <PieChart size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Cálculo de Avance</p>
                         <p className="feature-description">Visualización clara del % <br /> trabajado vs pendiente.</p>
                     </div>
 
-                    {/* Proyección Final */}
+                    
                     <div className="sub-feature">
                         <FastForward size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Proyección</p>
@@ -228,7 +245,7 @@ export const Home = () => {
                 </div>
             </div>
 
-            <div className="section-sub-title">KANBAN DRAG & DROP</div>
+            <div className="section-sub-title"ref={rolesSectionRef}>KANBAN DRAG & DROP</div>
             <p className="roles-section-description">
                 Mueva tareas con soltura entre estados. <br />
                 Organice su flujo de trabajo de forma visual y dinámica.
@@ -236,7 +253,7 @@ export const Home = () => {
 
             <div className="glass-card-yellow">
                 <div className="features-grid">
-                    {/* Tablero de Columnas */}
+                   
                     <div className="sub-feature">
                         <LayoutDashboard size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Flujo Dinámico</p>
@@ -246,7 +263,7 @@ export const Home = () => {
                         </p>
                     </div>
 
-                    {/* Arrastrar y Soltar */}
+                   
                     <div className="sub-feature">
                         <Move size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Drag & Drop</p>
@@ -256,7 +273,7 @@ export const Home = () => {
                         </p>
                     </div>
 
-                    {/* Finalización de tareas */}
+                  
                     <div className="sub-feature">
                         <CheckSquare size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Control Total</p>
@@ -266,7 +283,6 @@ export const Home = () => {
                         </p>
                     </div>
 
-                    {/* Prioridades */}
                     <div className="sub-feature">
                         <ArrowUpCircle size={40} strokeWidth={1.5} color="var(--c-nuc)" />
                         <p className="feature-title">Priorización</p>
@@ -278,46 +294,46 @@ export const Home = () => {
                 </div>
             </div>
 
-<div className="section-sub-title">COLABORACIÓN Y ALERTAS</div>
-<p className="roles-section-description">
-    Invite a terceros y clientes con un solo clic. <br />
-    Manténgase informado con notificaciones en tiempo real.
-</p>
+            <div className="section-sub-title"ref={rolesSectionRef}>COLABORACIÓN Y ALERTAS</div>
+            <p className="roles-section-description">
+                Invite a terceros y clientes con un solo clic. <br />
+                Manténgase informado con notificaciones en tiempo real.
+            </p>
 
-<div className="glass-card-yellow">
-    <div className="features-grid">
-        {/* Invitar */}
-        <div className="sub-feature">
-            <UserPlus size={40} strokeWidth={1.5} color="var(--c-nuc)" />
-            <p className="feature-title">Invitar Terceros</p>
-            <p className="feature-description">Añada colaboradores <br /> externos fácilmente.</p>
-        </div>
+            <div className="glass-card-yellow">
+                <div className="features-grid">
+                 
+                    <div className="sub-feature">
+                        <UserPlus size={40} strokeWidth={1.5} color="var(--c-nuc)" />
+                        <p className="feature-title">Invitar Terceros</p>
+                        <p className="feature-description">Añada colaboradores <br /> externos fácilmente.</p>
+                    </div>
 
-        {/* Clientes */}
-        <div className="sub-feature">
-            <Users size={40} strokeWidth={1.5} color="var(--c-nuc)" />
-            <p className="feature-title">Acceso Clientes</p>
-            <p className="feature-description">Permisos de lectura <br /> para sus clientes.</p>
-        </div>
+                   
+                    <div className="sub-feature">
+                        <Users size={40} strokeWidth={1.5} color="var(--c-nuc)" />
+                        <p className="feature-title">Acceso Clientes</p>
+                        <p className="feature-description">Permisos de lectura <br /> para sus clientes.</p>
+                    </div>
 
-        {/* Alertas */}
-        <div className="sub-feature">
-            <Bell size={40} strokeWidth={1.5} color="var(--c-nuc)" />
-            <p className="feature-title">Alertas</p>
-            <p className="feature-description">Notificaciones de <br /> cambios críticos.</p>
-        </div>
+                   
+                    <div className="sub-feature">
+                        <Bell size={40} strokeWidth={1.5} color="var(--c-nuc)" />
+                        <p className="feature-title">Alertas</p>
+                        <p className="feature-description">Notificaciones de <br /> cambios críticos.</p>
+                    </div>
 
-        {/* Historial */}
-        <div className="sub-feature">
-            <Clock size={40} strokeWidth={1.5} color="var(--c-nuc)" />
-            <p className="feature-title">Historial</p>
-            <p className="feature-description">Registro de toda <br /> la actividad.</p>
-        </div>
-    </div>
-</div>
+                   
+                    <div className="sub-feature">
+                        <Clock size={40} strokeWidth={1.5} color="var(--c-nuc)" />
+                        <p className="feature-title">Historial</p>
+                        <p className="feature-description">Registro de toda <br /> la actividad.</p>
+                    </div>
+                </div>
+            </div>
 
 
-            
+
 
         </div>
     );
