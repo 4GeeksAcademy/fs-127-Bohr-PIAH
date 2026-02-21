@@ -29,7 +29,7 @@
 }
 
 /* ==========================================================================
-   ESCENA DEL ÁTOMO Y ANIMACIONES
+   ÁTOMO Y ANIMACIONES
    ========================================================================== */
 .atom-scene {
   position: relative;
@@ -79,7 +79,7 @@
   font-weight: 700;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: white;
+  color: var(--c-nuc); 
   text-align: center;
   line-height: 1.2;
   text-shadow: 0 0 10px var(--c-nuc);
@@ -113,10 +113,10 @@
   padding: 40px;
   border-radius: 35px;
   background: rgba(184, 233, 148, 0.02);
-  border: 2px solid var(--c-elec);
+  border: 1px solid var(--c-elec);
   box-shadow: 0 0 20px rgba(184, 233, 148, 0.15);
   max-width: 1150px;
-  margin: 60px auto;
+  margin-top: 10px !important;
   transition: all 0.4s ease;
   width: 90%;
 }
@@ -194,7 +194,7 @@
   letter-spacing: 3px;
   font-size: 1.3rem;
   margin-top: 100px !important;
-  margin-bottom: 10px !important;
+  margin-bottom: 5px !important;
   display: block;
   text-align: center;
 }
@@ -205,7 +205,7 @@
   font-size: 0.88rem;
   text-align: center;
   max-width: 650px;
-  margin: 0 auto 30px auto;
+  margin: 0 auto 5px auto;
   line-height: 1.5;
   font-weight: 300;
   font-family: "Inter", sans-serif;
@@ -261,6 +261,53 @@
   stroke: var(--c-nuc) !important;
   filter: drop-shadow(0 0 12px var(--c-nuc));
 }
+/* ==========================================================================
+   ESTILOS NAVBAR (BOTÓN LOGIN Y LOGO)
+   ========================================================================== */
+
+.nav-login-cyber {
+  background: #000000 !important;
+  border: 1px solid var(--c-cyber) !important; /* Línea fina como pediste para lo amarillo */
+  color: var(--c-cyber) !important;
+  border-radius: 50px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  padding: 8px 25px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-login-cyber:hover {
+  background: var(--c-cyber) !important;
+  color: #000000 !important;
+  box-shadow: 0 0 20px rgba(39, 230, 214, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Contenedor del átomo pequeño del Navbar */
+.atom-nav-container {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.atom-nav-container:hover {
+  transform: scale(1.1);
+}
+
+.atom-nav path {
+  stroke-width: 4;
+}
+
 
 /* MEDIA QUERIES */
 @media (max-width: 768px) {
