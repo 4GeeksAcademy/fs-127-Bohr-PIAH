@@ -18,7 +18,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    overflow-x: hidden;
+    overflow-x: auto;
+    padding-bottom: 50px;
     color: white;
     font-family: 'Inter', system-ui, sans-serif;
 }
@@ -221,12 +222,35 @@
     gap: 40px;
     margin-top: 30px;
     flex-wrap: wrap; /* Para que en móvil se pongan uno debajo de otro */
+     max-width: 1000px; /* Añade esto para que se agrupen mejor */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* EFECTOS ENVOLVENTES CONTENEDORES MAIN */
+
+
+.feature-description {
+    font-size: 0.82rem;
+    color: var(--c-orb);
+    opacity: 0.5; 
+    line-height: 1.6;
+    margin-top: 10px;
+    text-align: center;
+    text-transform: none !important; 
+    font-weight: 300; 
+    letter-spacing: 0.3px;
 }
 
 .feature-item {
     text-align: center;
-    width: 150px;
-    transition: transform 0.3s ease;
+    width: 180px;
+    transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.3); /* Fondo oscuro */
+    border: 2px solid rgba(39, 230, 214, 0.3); /* Línea verde turquesa */
+    border-radius: 20px; /* Bordes redondeados */
+    padding: 25px 15px;
+    box-shadow: 0 0 10px rgba(39, 230, 214, 0.1);
 }
 
 .feature-item svg {
@@ -244,5 +268,14 @@
 }
 
 .feature-item:hover {
-    transform: translateY(-5px);
+    ransform: translateY(-8px);
+    background: rgba(39, 230, 214, 0.05); /* Fondo casi invisible para que no sea brusco */
+    border-color: var(--c-cyber); /* Solo resalta la línea */
+    box-shadow: 0 0 20px rgba(39, 230, 214, 0.4); /* Resplandor de la línea */
+    color: white; /* Mantener el texto blanco */
+}
+
+.feature-item:hover svg {
+    stroke: #000000 !important; 
+    filter: none;
 }

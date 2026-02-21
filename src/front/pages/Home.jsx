@@ -5,7 +5,7 @@ import { useState } from "react";
 import "../index.css";
 import Lottie from "lottie-react";
 import atomo from "../assets/atomoLottie.json"
-import { UserCheck, Orbit, Zap } from 'lucide-react';
+import { UserCheck, Orbit, Zap, Columns3, UserPlus, BellRing } from 'lucide-react';
 
 export const Home = () => {
     return (
@@ -53,27 +53,65 @@ export const Home = () => {
 
             <h2 className="welcome-text">
                 BOHR <br />
-                <span>Estructura Atómica para la Gestión de Proyectos</span>
+                <span>GESTION DE PROYECTOS PARA EQUIPOS QUE NO FALLAN</span>
+                 <span>TODO LO QUE NECESITAS PARA LOGRAR EL ÉXITO DE UNA FORMA SENCILLA E INTUITIVA</span>
             </h2>
-
-            {/* <p className="description-text">
-                Gestión de proyectos. Asignación de roles simplificada, seguimiento de estados intuitivo y reportes automatizados. Porque gestionar un equipo no debería ser tan complejo como la física cuántica. Todo lo que necesitas, exactamente donde lo necesitas.
-            </p>*/}
 
             <div className="features-grid">
                 <div className="feature-item">
                     <UserCheck size={40} strokeWidth={1.5} color="#27E6D6" />
-                    <p>Roles <br /> Simplificados</p>
+                    <p className="feature-title">Roles Simplificados</p>
+                    <p className="feature-description">
+                        Admin, jefe de equipo y trabajador. <br />
+                        Acceso con permisos ajustados.
+                    </p>
                 </div>
+
                 <div className="feature-item">
                     <Orbit size={40} strokeWidth={1.5} color="#27E6D6" />
-                    <p>Seguimiento <br /> Intuitivo</p>
+                    <p className="feature-title">Seguimiento Intuitivo</p>
+                    <p className="feature-description">
+                        Reportes diarios y progreso semanal <br />
+                        individual por proyecto.
+                    </p>
                 </div>
+
                 <div className="feature-item">
                     <Zap size={40} strokeWidth={1.5} color="#27E6D6" />
-                    <p>Reportes <br /> Automatizados</p>
+                    <p className="feature-title">Reportes Automatizados</p>
+                    <p className="feature-description">
+                        Análisis de datos en tiempo real. <br />
+                        Próximamente disponible.
+                    </p>
+                </div>
+
+                <div className="feature-item">
+                    <Columns3 size={40} strokeWidth={1.5} color='#27E6D6' />
+                    <p className="feature-title">Kanban Drag & Drop</p>
+                    <p className="feature-description">
+                        Mueva tareas con soltura entre estados.
+                    </p>
+
+                </div>
+                <div className="feature-item">
+                    <UserPlus size={40} strokeWidth={1.5} color="#27E6D6" />
+                    <p className="feature-title">Colaboración Externa</p>
+                    <p className="feature-description">
+                        Invita a terceros y clientes <br />
+                        con un solo clic.
+                    </p>
+                </div>
+
+                {/* Notificaciones */}
+                <div className="feature-item">
+                    <BellRing size={40} strokeWidth={1.5} color="#27E6D6" />
+                    <p className="feature-title">Notificaciones</p>
+                    <p className="feature-description">
+                        Alertas en tiempo real.
+                    </p>
                 </div>
             </div>
+
         </div>
     );
 };
