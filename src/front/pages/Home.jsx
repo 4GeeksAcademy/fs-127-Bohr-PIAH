@@ -5,7 +5,7 @@ import { useState } from "react";
 import "../index.css";
 import Lottie from "lottie-react";
 import atomo from "../assets/atomoLottie.json"
-import { UserCheck, Orbit, Zap, Columns3, UserPlus, BellRing } from 'lucide-react';
+import { UserCheck, Orbit, Zap, Columns3, UserPlus, BellRing, ShieldCheck, Briefcase, User } from 'lucide-react';
 
 export const Home = () => {
     return (
@@ -54,64 +54,103 @@ export const Home = () => {
             <h2 className="welcome-text">
                 BOHR <br />
                 <span>GESTION DE PROYECTOS PARA EQUIPOS QUE NO FALLAN</span>
-                 <span>TODO LO QUE NECESITAS PARA LOGRAR EL ÉXITO DE UNA FORMA SENCILLA E INTUITIVA</span>
+                <span>TODO LO QUE NECESITAS PARA LOGRAR EL ÉXITO DE UNA FORMA SENCILLA E INTUITIVA</span>
             </h2>
+            <div className="glass-card-yellow">
+                <div className="features-grid">
 
-            <div className="features-grid">
-                <div className="feature-item">
-                    <UserCheck size={40} strokeWidth={1.5} color="#27E6D6" />
-                    <p className="feature-title">Roles Simplificados</p>
-                    <p className="feature-description">
-                        Admin, jefe de equipo y trabajador. <br />
-                        Acceso con permisos ajustados.
-                    </p>
-                </div>
+                    <div className="feature-item">
+                        <UserCheck size={40} strokeWidth={1.5} color="#27E6D6" />
+                        <p className="feature-title">Roles Simplificados</p>
+                        <p className="feature-description">
+                            Admin, jefe de equipo y trabajador. <br />
+                            Acceso con permisos ajustados.
+                        </p>
+                    </div>
 
-                <div className="feature-item">
-                    <Orbit size={40} strokeWidth={1.5} color="#27E6D6" />
-                    <p className="feature-title">Seguimiento Intuitivo</p>
-                    <p className="feature-description">
-                        Reportes diarios y progreso semanal <br />
-                        individual por proyecto.
-                    </p>
-                </div>
+                    <div className="feature-item">
+                        <Orbit size={40} strokeWidth={1.5} color="#27E6D6" />
+                        <p className="feature-title">Seguimiento Intuitivo</p>
+                        <p className="feature-description">
+                            Reportes diarios y progreso semanal <br />
+                            individual por proyecto.
+                        </p>
+                    </div>
 
-                <div className="feature-item">
-                    <Zap size={40} strokeWidth={1.5} color="#27E6D6" />
-                    <p className="feature-title">Reportes Automatizados</p>
-                    <p className="feature-description">
-                        Análisis de datos en tiempo real. <br />
-                        Próximamente disponible.
-                    </p>
-                </div>
+                    <div className="feature-item">
+                        <Zap size={40} strokeWidth={1.5} color="#27E6D6" />
+                        <p className="feature-title">Reportes Automatizados</p>
+                        <p className="feature-description">
+                            Análisis de datos en tiempo real. <br />
+                            Próximamente disponible.
+                        </p>
+                    </div>
 
-                <div className="feature-item">
-                    <Columns3 size={40} strokeWidth={1.5} color='#27E6D6' />
-                    <p className="feature-title">Kanban Drag & Drop</p>
-                    <p className="feature-description">
-                        Mueva tareas con soltura entre estados.
-                    </p>
+                    <div className="feature-item">
+                        <Columns3 size={40} strokeWidth={1.5} color='#27E6D6' />
+                        <p className="feature-title">Kanban Drag & Drop</p>
+                        <p className="feature-description">
+                            Mueva tareas con soltura entre estados.
+                        </p>
 
-                </div>
-                <div className="feature-item">
-                    <UserPlus size={40} strokeWidth={1.5} color="#27E6D6" />
-                    <p className="feature-title">Colaboración Externa</p>
-                    <p className="feature-description">
-                        Invita a terceros y clientes <br />
-                        con un solo clic.
-                    </p>
-                </div>
+                    </div>
+                    <div className="feature-item">
+                        <UserPlus size={40} strokeWidth={1.5} color="#27E6D6" />
+                        <p className="feature-title">Colaboración Externa</p>
+                        <p className="feature-description">
+                            Invita a terceros y clientes <br />
+                            con un solo clic.
+                        </p>
+                    </div>
 
-                {/* Notificaciones */}
-                <div className="feature-item">
-                    <BellRing size={40} strokeWidth={1.5} color="#27E6D6" />
-                    <p className="feature-title">Notificaciones</p>
-                    <p className="feature-description">
-                        Alertas en tiempo real.
-                    </p>
+
+                    <div className="feature-item">
+                        <BellRing size={40} strokeWidth={1.5} color="#27E6D6" />
+                        <p className="feature-title">Notificaciones</p>
+                        <p className="feature-description">
+                            Alertas en tiempo real.
+                        </p>
+                    </div>
                 </div>
             </div>
 
+            <div className="section-sub-title">ROLES</div>
+            <p className="roles-section-description">Asigne permisos específicos y garantice que cada miembro del equipo tenga las herramientas necesarias para su función.</p>
+            
+            <div className="glass-card-yellow">
+
+            <div className="features-grid">
+
+                <div className="sub-feature">
+                    <ShieldCheck size={40} strokeWidth={1.5} color="var(--c-nuc)" />
+                    <p className="feature-title">Administrador</p>
+                    <p className="feature-description">
+                        Control total del sistema, <br />
+                        gestión de usuarios y analíticas.
+                    </p>
+                </div>
+
+                <div className="sub-feature">
+                    <Briefcase size={40} strokeWidth={1.5} color="var(--c-nuc)" />
+                    <p className="feature-title">Jefe de Equipo</p>
+                    <p className="feature-description">
+                        Gestionar el equipo, <br />
+                        crear proyectos.
+                    </p>
+                </div>
+
+
+                <div className="sub-feature">
+                    <User size={40} strokeWidth={1.5} color="var(--c-nuc)" />
+                    <p className="feature-title">Trabajador</p>
+                    <p className="feature-description">
+                        Modifica tareas asignadas, <br />
+                        ve el progreso del proyecto.
+                    </p>
+                </div>
+
+            </div>
+            </div>
         </div>
     );
 };

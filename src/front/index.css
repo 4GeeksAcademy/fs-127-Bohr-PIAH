@@ -1,281 +1,271 @@
-/* CONFIGURACIÓN GLOBAL Y VARIABLES */
+
+/* ==========================================================================
+   CONFIGURACIÓN GLOBAL Y VARIABLES 
+   ========================================================================== */
 :root {
-    --c-nuc: #74B9FF;
-    --c-orb: #DCDDE1;
-    --c-elec: #B8E994;
-    --bg: #0f172a;
-    --speed: 20s;
-    --glow: 15px;
-    --c-cyber: #27E6D6; 
+  --c-nuc: #74b9ff;
+  --c-orb: #dcdde1;
+  --c-elec: #b8e994;
+  --bg: #0f172a;
+  --speed: 20s;
+  --glow: 15px;
+  --c-cyber: #27e6d6;
 }
 
-/* CONTENEDOR PRINCIPAL (body) */
+/* CONTENEDOR PRINCIPAL */
 .home-wrapper {
-    background-color: var(--bg);
-    min-height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow-x: auto;
-    padding-bottom: 50px;
-    color: white;
-    font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg);
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; 
+  overflow-y: auto; 
+  padding-top: 40px;
+  padding-bottom: 100px;
+  color: white;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
-/* ESCENA DEL ÁTOMO (RESPONSIVE) */
+/* ==========================================================================
+   ESCENA DEL ÁTOMO Y ANIMACIONES
+   ========================================================================== */
 .atom-scene {
-    position: relative;
-    width: 80vw;
-    height: 80vw;
-    max-width: 380px;
-    max-height: 380px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: visible;
-    margin-bottom: 20px;
+  position: relative;
+  width: 80vw;
+  height: 80vw;
+  max-width: 380px;
+  max-height: 380px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  margin-bottom: 20px;
 }
 
 .atom-loader {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: floating 4s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: floating 4s ease-in-out infinite;
 }
 
 .atom {
-    width: 100%;
-    height: 100%;
-    overflow: visible !important;
-    animation: spin var(--speed) linear infinite;
+  width: 100%;
+  height: 100%;
+  overflow: visible !important;
+  animation: spin var(--speed) linear infinite;
 }
 
-/* ELEMENTOS DEL ÁTOMO */
-.nucleus { 
-    fill: var(--c-nuc); 
-    filter: drop-shadow(0 0 15px var(--c-nuc)); 
-}
-
-.nucleus-glow { 
-    fill: var(--c-nuc); 
-    filter: blur(var(--glow)); 
-    opacity: 0.4; 
-    animation: pulse-simple 3s ease-in-out infinite; 
-    transition: all 0.8s; 
-    pointer-events: none;
-}
-
-.orbit-path { 
-    fill: none; 
-    stroke: var(--c-orb); 
-    stroke-width: 4; 
-    opacity: 0.4; 
-}
-
-.electron { 
-    fill: var(--c-elec); 
-    filter: drop-shadow(0 0 10px var(--c-elec)); 
-}
-
-/* TEXTOS RESPONSIVE */
-.welcome-text {
-    margin-top: 20px;
-    font-size: clamp(1.5rem, 6vw, 2.2rem);
-    font-weight: 700;           
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: white;
-    text-align: center;
-    line-height: 1.2;             
-    text-shadow: 0 0 10px var(--c-nuc);
-}
-
-.welcome-text span {
-    display: block;
-    margin-top: 5px;
-    font-size: 0.9rem;
-    font-weight: 300;
-    letter-spacing: 2px;
-    color: rgba(255, 255, 255, 0.7);
-    text-transform: none;     
-}
-/* ESTILO PARA TITULOS */
-
-.view-title {
-    color: var(--c-cyber);
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(39, 230, 214, 0.4); 
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-/* ESTILOS PARA ICONOS ANIMADOS */
-
-/* alineacion de iconos en fila horizontal y centrados */
-.action-grid {
-    display: flex;
-    gap: 50px;
-    justify-content: center;
-    margin-top: 50px;
-}
-/* efectos de icono */
-.action-item {
-    cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 20px;
-    border-radius: 15px;
-    background: rgba(39, 230, 214, 0.02);
-    border: 1px solid transparent;
-}
-/* efecto de hoover */
-.action-item:hover {
-    background: rgba(39, 230, 214, 0.05);
-    border: 1px solid rgba(39, 230, 214, 0.2);
-    transform: translateY(-5px);
-    box-shadow: 0 0 20px rgba(39, 230, 214, 0.1);
-}
-
-
-/* SOMBRA EN EL SUELO */
-.shadow-floor {
-    position: absolute;
-    bottom: -10px;
-    width: 120px;
-    height: 15px;
-    background: radial-gradient(ellipse at center, rgba(116, 185, 255, 0.15) 0%, transparent 70%);
-    animation: shadow-scale 4s ease-in-out infinite;
-}
-
-/* ESTILOS NAVBAR */
-.nav-login-cyber { 
-    background: #000000; 
-    border: 2px solid var(--c-cyber); 
-    color: var(--c-cyber);
-    border-radius: 50px; 
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    padding: 6px 25px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.nav-login-cyber:hover {
-    background: var(--c-cyber); 
-    color: #000000;
-    box-shadow: 0 0 20px rgba(39, 230, 214, 0.5);
-}
-
-.atom-nav-container {
-    width: 60px;  
-    height: 60px; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s ease;
-    margin-left: -10px; 
-}
-
-.atom-nav path {
-    stroke-width: 4; 
-}
-.atom-nav {
-    width: 100%;
-    height: 100%;
-}
-
-.atom-spin {
-    transform-origin: center;
-    animation: spin 10s linear infinite; 
-}
-
-/* MEDIA QUERIES- ajustes pantallas  */
-@media (max-width: 768px) {
-    .atom-scene {
-        aspect-ratio: 1 / 1; 
-        width: 75vw;
-        height: 75vw;
-    }
-    .nucleus-glow {
-        filter: blur(8px);
-    }
-}
-
-/* ANIMACIONES */
+.nucleus { fill: var(--c-nuc); filter: drop-shadow(0 0 15px var(--c-nuc)); }
+.nucleus-glow { fill: var(--c-nuc); filter: blur(var(--glow)); opacity: 0.4; animation: pulse-simple 3s ease-in-out infinite; transition: all 0.8s; pointer-events: none; }
+.orbit-path { fill: none; stroke: var(--c-orb); stroke-width: 4; opacity: 0.4; }
+.electron { fill: var(--c-elec); filter: drop-shadow(0 0 10px var(--c-elec)); }
 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 @keyframes pulse-simple { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
 @keyframes shadow-scale { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(0.8); opacity: 0.1; } }
 
+/* ==========================================================================
+   TEXTOS PRINCIPALES (WELCOME)
+   ========================================================================== */
+.welcome-text {
+  margin-top: 20px;
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: white;
+  text-align: center;
+  line-height: 1.2;
+  text-shadow: 0 0 10px var(--c-nuc);
+}
 
-/* ICONOS BASE MAIN WEB */
+.welcome-text span {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.9rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: none;
+}
+
+/* ==========================================================================
+   LAYOUT: GRIDS Y ENVOLTORIOS AMARILLOS
+   ========================================================================== */
 .features-grid {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin-top: 30px;
-    flex-wrap: wrap; /* Para que en móvil se pongan uno debajo de otro */
-     max-width: 1000px; /* Añade esto para que se agrupen mejor */
-    margin-left: auto;
-    margin-right: auto;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* EFECTOS ENVOLVENTES CONTENEDORES MAIN */
-
-
-.feature-description {
-    font-size: 0.82rem;
-    color: var(--c-orb);
-    opacity: 0.5; 
-    line-height: 1.6;
-    margin-top: 10px;
-    text-align: center;
-    text-transform: none !important; 
-    font-weight: 300; 
-    letter-spacing: 0.3px;
+.glass-card-yellow {
+  padding: 40px;
+  border-radius: 35px;
+  background: rgba(184, 233, 148, 0.02);
+  border: 2px solid var(--c-elec);
+  box-shadow: 0 0 20px rgba(184, 233, 148, 0.15);
+  max-width: 1150px;
+  margin: 60px auto;
+  transition: all 0.4s ease;
+  width: 90%;
 }
 
+.glass-card-yellow:hover {
+  box-shadow: 0 0 35px rgba(184, 233, 148, 0.3);
+  background: rgba(184, 233, 148, 0.04);
+}
+
+/* ==========================================================================
+   CONTENEDORES PRINCIPALES (VERDES)
+   ========================================================================== */
 .feature-item {
-    text-align: center;
-    width: 180px;
-    transition: all 0.3s ease;
-    background: rgba(0, 0, 0, 0.3); /* Fondo oscuro */
-    border: 2px solid rgba(39, 230, 214, 0.3); /* Línea verde turquesa */
-    border-radius: 20px; /* Bordes redondeados */
-    padding: 25px 15px;
-    box-shadow: 0 0 10px rgba(39, 230, 214, 0.1);
+  text-align: center;
+  width: 180px;
+  transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(39, 230, 214, 0.3); 
+  border-radius: 20px;
+  padding: 25px 15px;
+  box-shadow: 0 0 10px rgba(39, 230, 214, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .feature-item svg {
-    filter: drop-shadow(0 0 8px rgba(39, 230, 214, 0.5));
-    margin-bottom: 12px;
+  filter: drop-shadow(0 0 8px rgba(39, 230, 214, 0.5));
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
 }
 
-.feature-item p {
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: rgba(255, 255, 255, 0.8);
-    line-height: 1.3;
+.feature-item .feature-title {
+  font-size: 0.9rem; /* Tamaño Principal */
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.3;
+}
+
+.feature-item .feature-description {
+  font-family: "Inter", sans-serif;
+  font-size: 0.82rem; 
+  color: var(--c-orb);
+  opacity: 0.6;
+  line-height: 1.6;
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 300;
 }
 
 .feature-item:hover {
-    ransform: translateY(-8px);
-    background: rgba(39, 230, 214, 0.05); /* Fondo casi invisible para que no sea brusco */
-    border-color: var(--c-cyber); /* Solo resalta la línea */
-    box-shadow: 0 0 20px rgba(39, 230, 214, 0.4); /* Resplandor de la línea */
-    color: white; /* Mantener el texto blanco */
+  transform: translateY(-8px);
+  background: rgba(39, 230, 214, 0.05);
+  border-color: var(--c-cyber);
+  box-shadow: 0 0 20px rgba(39, 230, 214, 0.4);
 }
 
 .feature-item:hover svg {
-    stroke: #000000 !important; 
-    filter: none;
+  stroke: var(--c-cyber) !important;
+  filter: drop-shadow(0 0 12px var(--c-cyber));
+}
+
+/* ==========================================================================
+   CONTENEDORES SECUNDARIOS (AZULES - ROLES)
+   ========================================================================== */
+.section-sub-title {
+  color: var(--c-nuc) !important;
+  text-shadow: 0 0 15px rgba(116, 185, 255, 0.4);
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 1.3rem;
+  margin-top: 100px !important;
+  margin-bottom: 10px !important;
+  display: block;
+  text-align: center;
+}
+
+.roles-section-description {
+  color: var(--c-orb);
+  opacity: 0.7;
+  font-size: 0.88rem;
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto 30px auto;
+  line-height: 1.5;
+  font-weight: 300;
+  font-family: "Inter", sans-serif;
+}
+
+.sub-feature {
+  text-align: center;
+  width: 180px;
+  transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(116, 185, 255, 0.2);
+  border-radius: 20px;
+  padding: 25px 15px;
+  box-shadow: 0 0 10px rgba(116, 185, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sub-feature .feature-title {
+  font-size: 0.8rem; /* Tamaño secundario */
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.sub-feature .feature-description {
+  font-family: "Inter", sans-serif;
+  font-size: 0.78rem;
+  color: var(--c-orb);
+  opacity: 0.6;
+  margin-top: 10px;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.sub-feature svg {
+  filter: drop-shadow(0 0 8px rgba(116, 185, 255, 0.4));
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.sub-feature:hover {
+  transform: translateY(-8px);
+  background: rgba(116, 185, 255, 0.05);
+  border-color: var(--c-nuc);
+  box-shadow: 0 0 20px rgba(116, 185, 255, 0.3);
+}
+
+.sub-feature:hover svg {
+  stroke: var(--c-nuc) !important;
+  filter: drop-shadow(0 0 12px var(--c-nuc));
+}
+
+/* MEDIA QUERIES */
+@media (max-width: 768px) {
+  .atom-scene { width: 75vw; height: 75vw; }
+  .nucleus-glow { filter: blur(8px); }
+  .features-grid { gap: 20px; }
+  .feature-item, .sub-feature { width: 160px; }
 }
