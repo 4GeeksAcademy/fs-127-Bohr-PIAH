@@ -1,0 +1,64 @@
+
+/* FORMULARIO LOGIN CYBER */
+.login-form-cyber {
+    width: 90%;
+    max-width: 380px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(39, 230, 214, 0.2);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(39, 230, 214, 0.1);
+    backdrop-filter: blur(6px);
+}
+
+/* GRUPOS DE INPUT */
+.input-group-cyber {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.input-group-cyber label {
+    color: var(--c-cyber);
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(39, 230, 214, 0.4);
+}
+
+/* INPUTS */
+.input-group-cyber input {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(39, 230, 214, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-group-cyber input:focus {
+    border-color: var(--c-cyber);
+    box-shadow: 0 0 12px rgba(39, 230, 214, 0.4);
+}
+
+/* BOTÓN CYBER */
+.btn-cyber {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 2px solid var(--c-cyber);
+    color: var(--c-cyber);
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cyber:hover {
+    background: var(--c-cyber);
+    color: #000;
+    box-shadow: 0 0 20px rgba(39, 230, 214, 0.5);
+}
