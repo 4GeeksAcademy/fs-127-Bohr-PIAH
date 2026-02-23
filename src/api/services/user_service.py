@@ -35,7 +35,7 @@ class UserService:
             abort(409, description="User with that email already existing")
 
         if data["role"] not in VALID_ROLES:
-            abort(404, description="Role invalid}")
+            abort(404, description=f"Invalid role {data["role"]}")
 
         try:
             new_user = User(

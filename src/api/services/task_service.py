@@ -53,3 +53,49 @@ class TaskService:
         except Exception as error:
             db.session.rollback()
             abort(500, description=f"Error creating task: {str(error)}")
+
+    @staticmethod
+    def update(task_id, data):
+        task = Task.query.get(task_id)
+        if task is None:
+            abort(404, description=f"task with id {task_id} not found")
+
+        if "todo_by" in data:
+            if User.query.filter_by(id=data["todo_by"]).first():
+                abort(404, description="User not found")
+            task.todo_by = data["todo_by"]
+
+        if "name" in data:
+            task.name(data["name"])
+        if "task_description" in data:
+            task.task_description(data["task_description"])
+        if "status" in data:
+            if "satus" not in VALID_STATUSES:
+                abort(404, description=f"Invalid status: {data["status"]}")
+            task.status(data["status"])
+        if "alert" in data:
+            task.alert(data["alert"])
+        if "deadline" in data:
+            task.deadline = data["deadline"]
+
+        try:
+            db.session.commit()
+            return task.serialize()
+        except Exception as error:
+            db.session.rollback()
+            abort(
+                500, description=f"Error updating task: {str(error)}")
+
+    @staticmethod
+    def delete(task_id):
+        task = Task.query.get(task_id)
+        if task is None:
+            abort(404, description=f"Task with id {task_id} not found")
+
+        try:
+            db.session.delete(task)
+            db.session.commit()
+            return {"message": f"Task '{task.name}' delted successfully"}
+        except Exception as error:
+            db.session.rollback()
+            abort(500, description=f"Error deleting task: {str(error)}")
