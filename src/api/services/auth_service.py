@@ -71,3 +71,44 @@ class AuthService:
         if user is None:
             abort(404, description="Usuario no encontrado")
         return user.serialize()
+    
+    @staticmethod
+    def update_user(user_id, data):
+        user = User.query.get(int(user_id))
+        if user is None:
+            abort(404, description="Usuario no encontrado")
+
+        if "email" in data and data["email"]:
+            existing = User.query.filter_by(email=data["email"]).first()
+            if existing and existing.id != user.id:
+                abort(409, description="Ya existe un usuario con ese email")
+            user.email = data["email"]
+
+        if "first_name" in data and data["first_name"]:
+            user.first_name = data["first_name"]
+
+        if "last_name" in data and data["last_name"]:
+            user.last_name = data["last_name"]
+
+        if "password" in data and data["password"]:
+            user.set_password(data["password"])
+
+        try:
+            db.session.commit()
+            return user.serialize()
+        except Exception as error:
+            db.session.rollback()
+            abort(500, description=f"Error al actualizar usuario: {str(error)}")
+
+    @staticmethod
+    def delete_user(user_id):
+        user = User.query.get(int(user_id))
+        if user is None:
+            abort(404, description="Usuario no encontrado")
+
+        try:
+            db.session.delete(user)
+            db.session.commit()
+        except Exception as error:
+            db.session.rollback()
+            abort(500, description=f"Error al eliminar usuario: {str(error)}")
