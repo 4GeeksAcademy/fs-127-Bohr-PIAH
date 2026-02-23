@@ -95,7 +95,7 @@ class TaskService:
         try:
             db.session.delete(task)
             db.session.commit()
-            return {"message": f"Task '{task.name}' delted successfully"}
+            return {"message": f"Task '{task.name}' deleted successfully"}
         except Exception as error:
             db.session.rollback()
             abort(500, description=f"Error deleting task: {str(error)}")
