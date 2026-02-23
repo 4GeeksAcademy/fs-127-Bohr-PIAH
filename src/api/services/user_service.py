@@ -21,7 +21,7 @@ class UserService:
         user = User.query.get(user_id)
         if user is None:
             abort(404, description=f"Usuario con id {user_id} no encontrado")
-        return user.serialize_with_profile()
+        return user.serialize()
 
     @staticmethod
     def create(data):

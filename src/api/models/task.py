@@ -27,8 +27,10 @@ class Task(db.Model):
     task_description: Mapped[Optional[str]
                              ] = mapped_column(Text, nullable=True)
 
-    status: Mapped[str] = mapped_column(
-        String(50), default="to_do", nullable=False)
+    # status: Mapped[str] = mapped_column(
+    #     String(50), default="to_do", nullable=False)
+    status: Mapped[Status] = mapped_column(
+        Enum(RoleName), default="to_do", nullable=False)
     alert: Mapped[bool] = mapped_column(Boolean, default=False)
 
     todo_by: Mapped[Optional[int]] = mapped_column(
@@ -58,5 +60,7 @@ class Task(db.Model):
             "name": self.name,
             "task_description": self.task_description,
             "status": self.status.value,
-            "todo_by": self.todo_by
+            "todo_by": self.todo_by,
+            "created_at": self.created_at,
+            "deadline": self.deadline
         }
