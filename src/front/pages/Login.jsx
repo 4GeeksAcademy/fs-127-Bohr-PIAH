@@ -1,24 +1,17 @@
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 export const Login = () => {
   return (
     <div className="home-wrapper">
 
-      {/* TÍTULO */}
       <h2 className="view-title">Login</h2>
 
-      {/* PANEL DEL LOGIN */}
-      <div className="login-panel">
+      {/* CONTENEDOR DEL LOGIN */}
+      <div className="login-box">
 
         <form className="cyber-form">
 
-          {/* Nombre */}
-          <label className="cyber-label">Nombre</label>
-          <input
-            type="text"
-            className="cyber-input"
-            placeholder="Tu nombre"
-          />
-
-          {/* Correo */}
           <label className="cyber-label">Correo</label>
           <input
             type="email"
@@ -26,7 +19,6 @@ export const Login = () => {
             placeholder="correo@ejemplo.com"
           />
 
-          {/* Password */}
           <label className="cyber-label">Contraseña</label>
           <input
             type="password"
@@ -34,10 +26,14 @@ export const Login = () => {
             placeholder="********"
           />
 
-          {/* Botón */}
           <button type="submit" className="cyber-btn-success login-btn">
             Iniciar sesión
           </button>
+
+          {/* LINK PARA CREAR USUARIO */}
+          <p className="signup-link">
+            ¿No tienes cuenta? <a href="/signup">Crear usuario</a>
+          </p>
 
         </form>
 

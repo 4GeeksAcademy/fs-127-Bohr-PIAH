@@ -1,0 +1,61 @@
+/* FORMULARIO CYBER */
+.signup-form {
+    width: 90%;
+    max-width: 380px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(39, 230, 214, 0.2);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(39, 230, 214, 0.1);
+    backdrop-filter: blur(4px);
+}
+
+/* GRUPOS DE INPUT */
+.form-group-cyber {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.form-group-cyber label {
+    color: var(--c-cyber);
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+}
+
+/* INPUTS */
+.form-group-cyber input {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(39, 230, 214, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    outline: none;
+    transition: 0.3s ease;
+}
+
+.form-group-cyber input:focus {
+    border-color: var(--c-cyber);
+    box-shadow: 0 0 10px rgba(39, 230, 214, 0.4);
+}
+
+/* BOTÓN */
+.btn-cyber {
+    width: 100%;
+    padding: 12px;
+    background: #000;
+    border: 2px solid var(--c-cyber);
+    color: var(--c-cyber);
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn-cyber:hover {
+    background: var(--c-cyber);
+    color: #000;
+    box-shadow: 0 0 20px rgba(39, 230, 214, 0.5);
+}
