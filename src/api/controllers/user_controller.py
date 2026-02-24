@@ -54,19 +54,19 @@ def delete_user(user_id):
     return jsonify(result), 200
 
 
-# POST /api/users/with-profile - Crear usuario con su perfil (protegido)
-@user_bp.route('/with-profile', methods=['POST'])
-@jwt_required()
-def create_user_with_profile():
-    body = request.get_json()
-    if not body:
-        abort(400, description="El body no puede estar vacio")
-    user = UserService.create_with_profile(body)
-    return jsonify(user), 201
+# # POST /api/users/with-profile - Crear usuario con su perfil (protegido)
+# @user_bp.route('/with-profile', methods=['POST'])
+# @jwt_required()
+# def create_user_with_profile():
+#     body = request.get_json()
+#     if not body:
+#         abort(400, description="El body no puede estar vacio")
+#     user = UserService.create_with_profile(body)
+#     return jsonify(user), 201
 
 
-# GET /api/users/<id>/orders - Obtener un usuario con sus ordenes
-@user_bp.route('/<int:user_id>/orders', methods=['GET'])
-def get_user_orders(user_id):
-    user = UserService.get_with_orders(user_id)
-    return jsonify(user), 200
+# # GET /api/users/<id>/orders - Obtener un usuario con sus ordenes
+# @user_bp.route('/<int:user_id>/orders', methods=['GET'])
+# def get_user_orders(user_id):
+#     user = UserService.get_with_orders(user_id)
+#     return jsonify(user), 200
