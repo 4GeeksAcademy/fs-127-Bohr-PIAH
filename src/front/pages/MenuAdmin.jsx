@@ -7,20 +7,10 @@ export const MenuAdmin = () => {
     const [showNewUserForm, setShowNewUserForm] = useState(false);
     const [showNewDpto, setShowNewDpto] = useState(false);
 
-    // Botón: Crear nuevo usuario
-    const handleCreateUser = () => {
-        setShowNewUserForm(true);
-    };
+    const handleCreateUser = () => setShowNewUserForm(true);
+    const handleCreateDepartment = () => setShowNewDpto(true);
 
-    // Botón: Crear nuevo departamento
-    const handleCreateDepartment = () => {
-        setShowNewDpto(true);
-    };
-
-    const handleCancelNewDpto = () => {
-        setShowNewDpto(false);
-    };
-
+    const handleCancelNewDpto = () => setShowNewDpto(false);
     const handleSaveNewDpto = (data) => {
         console.log("Nuevo departamento creado:", data);
         setShowNewDpto(false);
@@ -31,79 +21,80 @@ export const MenuAdmin = () => {
     };
 
     return (
-        <div className="container py-5">
-            {/* ENCABEZADO SUPERIOR */}
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="fw-bold m-0">Panel Administrativo</h2>
+        <div className="home-wrapper">
 
-                <div className="d-flex">
-                    <button className="btn btn-success m-1" onClick={handleCreateDepartment}>
-                        Crear nuevo Departamento
-                    </button>
+            {/* TÍTULO PRINCIPAL */}
+            <h2 className="view-title">Panel Administrativo</h2>
 
-                    
+            {/* BOTONES SUPERIORES */}
+            <div className="action-grid">
+                <div className="action-item" onClick={handleCreateDepartment}>
+                    <p>Crear nuevo Departamento</p>
+                </div>
 
-                    <button className="btn btn-success m-1" onClick={handleCreateUser}>
-                        Crear nuevo usuario
-                    </button>
+                <div className="action-item" onClick={handleCreateUser}>
+                    <p>Crear nuevo Usuario</p>
                 </div>
             </div>
 
-            <div className="p-5"></div>
+            {/* PANEL CLARO */}
+            <div className="projects-panel">
 
-            {/* BOTONES DE PROYECTOS */}
-            <div className="d-flex flex-row p-4 gap-3 bg-light rounded-4">
-                <button
-                    className="btn btn-outline-primary py-4 px-5 fs-5 rounded-4 flex-fill"
-                    onClick={() => handleDptoClick("Departamento uno")}
-                >
-                    Departamento uno
-                </button>
+                {/* RECTÁNGULOS VERTICALES */}
+                <div className="features-grid">
 
-                <button
-                    className="btn btn-outline-primary py-4 px-5 fs-5 rounded-4 flex-fill"
-                    onClick={() => handleDptoClick("Departamento uno")}
-                >
-                    Departamento uno
-                </button>
-
-                <button
-                    className="btn btn-outline-primary py-4 px-5 fs-5 rounded-4 flex-fill"
-                    onClick={() => handleDptoClick("Departamento uno")}
-                >
-                    Departamento uno
-                </button>
-            </div>
-
-            {/* FORMULARIO DE CREACIÓN DE USUARIO */}
-            <div className="container mt-5">
-                <div className="row justify-content-center">
-                    <div className="col-md-6 col-lg-4">
-
-                        {showNewDpto && (
-                        <NewDpto
-                            onCancel={handleCancelNewDpto}
-                            onCreate={handleSaveNewDpto}
-                        />
-                        )}
-
-
-
-
-                        {showNewUserForm && (
-                            <NewUser
-                                onCancel={() => setShowNewUserForm(false)}
-                                onCreate={(data) => {
-                                    console.log("Usuario creado:", data);
-                                    setShowNewUserForm(false);
-                                }}
-                            />
-                        )}
-
-
+                    <div
+                        className="project-rect"
+                        onClick={() => handleDptoClick("Departamento uno")}
+                    >
+                        <svg width="60" height="60">
+                            <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
+                        </svg>
+                        <p>Departamento uno</p>
                     </div>
+
+                    <div
+                        className="project-rect"
+                        onClick={() => handleDptoClick("Departamento dos")}
+                    >
+                        <svg width="60" height="60">
+                            <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
+                        </svg>
+                        <p>Departamento dos</p>
+                    </div>
+
+                    <div
+                        className="project-rect"
+                        onClick={() => handleDptoClick("Departamento tres")}
+                    >
+                        <svg width="60" height="60">
+                            <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
+                        </svg>
+                        <p>Departamento tres</p>
+                    </div>
+
                 </div>
             </div>
+
+            {/* MODAL NUEVO DEPARTAMENTO */}
+            {showNewDpto && (
+                <NewDpto
+                    onCancel={handleCancelNewDpto}
+                    onCreate={handleSaveNewDpto}
+                />
+            )}
+
+            {/* MODAL NUEVO USUARIO */}
+            {showNewUserForm && (
+                <NewUser
+                    onCancel={() => setShowNewUserForm(false)}
+                    onCreate={(data) => {
+                        console.log("Usuario creado:", data);
+                        setShowNewUserForm(false);
+                    }}
+                />
+            )}
+
         </div>
     );
 };

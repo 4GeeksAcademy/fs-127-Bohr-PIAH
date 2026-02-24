@@ -1,54 +1,46 @@
 export const Login = () => {
-    
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6 col-lg-4">
+    <div className="home-wrapper">
 
-          <h2 className="text-center mb-4">Login</h2>
+      {/* TÍTULO */}
+      <h2 className="view-title">Login</h2>
 
-          <form className="p-4 border rounded shadow-sm bg-white">
+      {/* PANEL DEL LOGIN */}
+      <div className="login-panel">
 
-            {/* Nombre */}
-            <div className="mb-3">
-              <label htmlFor="nombre" className="form-label">Nombre</label>
-              <input
-                type="text"
-                className="form-control"
-                id="nombre"
-                placeholder="Tu nombre"
-              />
-            </div>
+        <form className="cyber-form">
 
-            {/* Correo */}
-            <div className="mb-3">
-              <label htmlFor="correo" className="form-label">Correo</label>
-              <input
-                type="email"
-                className="form-control"
-                id="correo"
-                placeholder="correo@ejemplo.com"
-              />
-            </div>
+          {/* Nombre */}
+          <label className="cyber-label">Nombre</label>
+          <input
+            type="text"
+            className="cyber-input"
+            placeholder="Tu nombre"
+          />
 
-            {/* Password */}
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label">Contraseña</label>
-              <input
-                type="password"
-                className="form-control"
-                id="password"
-                placeholder="********"
-              />
-            </div>
+          {/* Correo */}
+          <label className="cyber-label">Correo</label>
+          <input
+            type="email"
+            className="cyber-input"
+            placeholder="correo@ejemplo.com"
+          />
 
-            {/* Botón */}
-            <button type="submit" className="btn btn-primary w-100">
-              Iniciar sesión
-            </button>
+          {/* Password */}
+          <label className="cyber-label">Contraseña</label>
+          <input
+            type="password"
+            className="cyber-input"
+            placeholder="********"
+          />
 
-          </form>
-        </div>
+          {/* Botón */}
+          <button type="submit" className="cyber-btn-success login-btn">
+            Iniciar sesión
+          </button>
+
+        </form>
+
       </div>
     </div>
   );

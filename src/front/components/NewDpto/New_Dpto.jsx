@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./CssNewDpto.css";
 
 export default function New_Dpto({ onCancel, onCreate }) {
     const [formDpto, setFormDpto] = useState({
@@ -6,7 +7,6 @@ export default function New_Dpto({ onCancel, onCreate }) {
         staf: [""],
     });
 
-    // Maneja cambios del nombre del departamento
     const handleChangeDpto = (e) => {
         setFormDpto({
             ...formDpto,
@@ -14,7 +14,6 @@ export default function New_Dpto({ onCancel, onCreate }) {
         });
     };
 
-    // Maneja cambios en cada input del array staf
     const handleStafChange = (index, value) => {
         const newStaf = [...formDpto.staf];
         newStaf[index] = value;
@@ -25,7 +24,6 @@ export default function New_Dpto({ onCancel, onCreate }) {
         });
     };
 
-    // Agrega un nuevo campo de staff
     const addStaf = () => {
         setFormDpto({
             ...formDpto,
@@ -33,88 +31,70 @@ export default function New_Dpto({ onCancel, onCreate }) {
         });
     };
 
-    // Envía el formulario completo
     const handleSubmit = (e) => {
         e.preventDefault();
-        onCreate(formDpto); // envías los datos al padre
+        onCreate(formDpto);
     };
 
     return (
-        <div
-            className="modal-overlay-modern"
-            style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                width: "100vw",
-                height: "100vh",
-                backgroundColor: "rgba(0,0,0,0.5)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                zIndex: 9999
-            }}
-        >
-            <div
-                className="modal-modern"
-                style={{
-                    background: "white",
-                    borderRadius: "12px",
-                    width: "500px",
-                    maxHeight: "90vh",
-                    overflowY: "auto",
-                    padding: "20px",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.3)"
-                }}
-            >
-                <form className="p-3" onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <label className="form-label">Name Department</label>
+        <div className="modal-overlay-cyber">
+            <div className="modal-cyber-box">
+
+                <button className="modal-cyber-close" onClick={onCancel}>
+                    ✕
+                </button>
+
+                <h3 className="modal-cyber-title">Nuevo Departamento</h3>
+
+                <form className="cyber-form" onSubmit={handleSubmit}>
+
+                    {/* Nombre del departamento */}
+                    <label className="cyber-label">Nombre del departamento</label>
+                    <input
+                        type="text"
+                        className="cyber-input"
+                        value={formDpto.department_name}
+                        onChange={handleChangeDpto}
+                        required
+                    />
+
+                    {/* Staff */}
+                    <label className="cyber-label">Staff</label>
+
+                    {formDpto.staf.map((person, index) => (
                         <input
+                            key={index}
                             type="text"
-                            className="form-control"
-                            value={formDpto.department_name}
-                            onChange={handleChangeDpto}
+                            className="cyber-input mb-2"
+                            value={person}
+                            onChange={(e) => handleStafChange(index, e.target.value)}
                             required
                         />
-                    </div>
+                    ))}
 
-                    <div className="mb-3">
-                        <label className="form-label">Staff</label>
+                    <button
+                        type="button"
+                        className="cyber-btn-primary w-100"
+                        onClick={addStaf}
+                    >
+                        Agregar otro
+                    </button>
 
-                        {formDpto.staf.map((person, index) => (
-                            <input
-                                key={index}
-                                type="text"
-                                className="form-control mb-2"
-                                value={person}
-                                onChange={(e) => handleStafChange(index, e.target.value)}
-                                required
-                            />
-                        ))}
-
+                    {/* Botones */}
+                    <div className="modal-cyber-footer">
                         <button
                             type="button"
-                            className="btn btn-primary mt-2"
-                            onClick={addStaf}
-                        >
-                            Agregar otro
-                        </button>
-                    </div>
-
-                    <div className="d-flex justify-content-between mt-4">
-                        <button
-                            type="button"
-                            className="btn btn-secondary"
+                            className="cyber-btn-secondary"
                             onClick={onCancel}
                         >
                             Cancelar
                         </button>
 
-                        <button type="submit" className="btn btn-success">
+                        <button type="submit" className="cyber-btn-success">
                             Crear
                         </button>
                     </div>
+
                 </form>
             </div>
         </div>
