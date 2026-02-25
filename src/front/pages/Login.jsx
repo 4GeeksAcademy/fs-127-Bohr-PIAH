@@ -1,54 +1,42 @@
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 export const Login = () => {
-    
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6 col-lg-4">
+    <div className="home-wrapper">
 
-          <h2 className="text-center mb-4">Login</h2>
+      <h2 className="view-title">Login</h2>
 
-          <form className="p-4 border rounded shadow-sm bg-white">
+      {/* CONTENEDOR DEL LOGIN */}
+      <div className="login-box">
 
-            {/* Nombre */}
-            <div className="mb-3">
-              <label htmlFor="nombre" className="form-label">Nombre</label>
-              <input
-                type="text"
-                className="form-control"
-                id="nombre"
-                placeholder="Tu nombre"
-              />
-            </div>
+        <form className="cyber-form">
 
-            {/* Correo */}
-            <div className="mb-3">
-              <label htmlFor="correo" className="form-label">Correo</label>
-              <input
-                type="email"
-                className="form-control"
-                id="correo"
-                placeholder="correo@ejemplo.com"
-              />
-            </div>
+          <label className="cyber-label">Correo</label>
+          <input
+            type="email"
+            className="cyber-input"
+            placeholder="correo@ejemplo.com"
+          />
 
-            {/* Password */}
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label">Contraseña</label>
-              <input
-                type="password"
-                className="form-control"
-                id="password"
-                placeholder="********"
-              />
-            </div>
+          <label className="cyber-label">Contraseña</label>
+          <input
+            type="password"
+            className="cyber-input"
+            placeholder="********"
+          />
 
-            {/* Botón */}
-            <button type="submit" className="btn btn-primary w-100">
-              Iniciar sesión
-            </button>
+          <button type="submit" className="cyber-btn-success login-btn">
+            Iniciar sesión
+          </button>
 
-          </form>
-        </div>
+          {/* LINK PARA CREAR USUARIO */}
+          <p className="signup-link">
+            ¿No tienes cuenta? <a href="/signup">Crear usuario</a>
+          </p>
+
+        </form>
+
       </div>
     </div>
   );

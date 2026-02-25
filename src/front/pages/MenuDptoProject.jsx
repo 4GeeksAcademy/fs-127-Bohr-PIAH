@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import New_Dpto from "../components/NewDpto/New_Dpto";
 
 export const MenuDptoProject = () => {
 
@@ -11,15 +11,12 @@ export const MenuDptoProject = () => {
     console.log("Entrar a:", projectName);
   };
 
-  // Estado del modal
   const [showModal, setShowModal] = useState(false);
 
-  // Estado del formulario del modal
   const [dptoData, setDptoData] = useState({
     departmentName: "",
   });
 
-  // Función para actualizar campos del modal
   const handleChange = (field, value) => {
     setDptoData(prev => ({
       ...prev,
@@ -28,79 +25,83 @@ export const MenuDptoProject = () => {
   };
 
   return (
-    <div className="container py-5">
+    <div className="home-wrapper">
 
-      {/* ENCABEZADO SUPERIOR */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold m-0">Menu de mis proyectos</h2>
-        <div className="d-flex">
+      {/* TÍTULO PRINCIPAL */}
+      <h2 className="view-title">Menú de mis departamentos</h2>
 
-          <button className="btn btn-success m-1" onClick={handleMenuDptoProject}>
-            Crear nuevo departamento
-          </button>
-          <button className="btn btn-warning m-1" onClick={handleMenuDptoProject}>
-            Crear nuevo Reporte
-          </button>
+      {/* BOTONES SUPERIORES */}
+      <div className="action-grid">
+        <div className="action-item" onClick={handleMenuDptoProject}>
+          <p>Nuevo Departamento</p>
+        </div>
+
+        <div className="action-item" onClick={handleMenuDptoProject}>
+          <p>Nuevo Reporte</p>
         </div>
       </div>
 
-      <div className="p-5"></div>
+      {/* PANEL CLARO */}
+      <div className="projects-panel">
 
-      {/* BOTONES DE PROYECTOS */}
-      <div className="d-flex flex-column p-4 gap-2 bg-light rounded-4">
+        {/* RECTÁNGULOS VERTICALES */}
+        <div className="features-grid">
 
-        <button
-          className="btn btn-outline-primary py-3 fs-5 rounded-4"
-          onClick={() => {
-            handleDptoProjectClick("Proyecto uno");
-            setShowModal(true);
-          }}
-        >
-          Proyecto uno
-        </button>
-
-        <button
-          className="btn btn-outline-primary py-3 fs-5 rounded-4"
-          onClick={() => {
-            handleDptoProjectClick("Proyecto uno");
-            setShowModal(true);
-          }}
-        >
-          Proyecto uno
-        </button>
-
-        <button
-          className="btn btn-outline-primary py-3 fs-5 rounded-4"
-          onClick={() => {
-            handleDptoProjectClick("Proyecto uno");
-            setShowModal(true);
-          }}
-        >
-          Proyecto uno
-        </button>
-
-      </div>
-
-      {/* Render del modal */}
-      <div className="container mt-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6 col-lg-4">
-
-            {showModal && (
-              <ModalProject
-                isOpen={showModal}
-                onClose={() => setShowModal(false)}
-                data={dptoData}
-                onChange={handleChange}
-                onAddUser={() => { }}
-                onDeleteUser={() => { }}
-                onSubmit={() => { }}
-              />
-            )}
-            
+          <div
+            className="project-rect"
+            onClick={() => {
+              handleDptoProjectClick("Departamento uno");
+              setShowModal(true);
+            }}
+          >
+            <svg width="60" height="60">
+              <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
+            </svg>
+            <p>Departamento uno</p>
           </div>
+
+          <div
+            className="project-rect"
+            onClick={() => {
+              handleDptoProjectClick("Departamento dos");
+              setShowModal(true);
+            }}
+          >
+            <svg width="60" height="60">
+              <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
+            </svg>
+            <p>Departamento dos</p>
+          </div>
+
+          <div
+            className="project-rect"
+            onClick={() => {
+              handleDptoProjectClick("Departamento tres");
+              setShowModal(true);
+            }}
+          >
+            <svg width="60" height="60">
+              <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
+            </svg>
+            <p>Departamento tres</p>
+          </div>
+
         </div>
+
       </div>
+
+      {/* MODAL CYBER */}
+      {showModal && (
+        <New_Dpto
+          onCancel={() => setShowModal(false)}
+          onCreate={(data) => {
+            console.log("Departamento creado:", data);
+            setShowModal(false);
+          }}
+        />
+      )}
+
+
     </div>
   );
 };
