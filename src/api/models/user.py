@@ -34,11 +34,6 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String(255))
     role: Mapped[RoleName] = mapped_column(Enum(RoleName), nullable=False)
 
-<<<<<<< feat/task-3.1_pages
-    #Relaciones
-    department: Mapped["Department"] = relationship(
-        "department",
-=======
     department_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("departments.id", ondelete="SET NULL"),
         nullable=True,
@@ -48,7 +43,6 @@ class User(db.Model):
                        ] = relationship(back_populates="users")
 
     user_projects: Mapped[List["UserProject"]] = relationship(
->>>>>>> dev
         back_populates="user",
         cascade="all, delete-orphan",
     )
@@ -103,5 +97,5 @@ class User(db.Model):
             "email": self.email,
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "role": self.role
+            "role": self.role.value
         }

@@ -56,3 +56,23 @@ def delete_me():
     current_user_id = get_jwt_identity()
     AuthService.delete_user(current_user_id)
     return jsonify({"message": "Usuario eliminado correctamente"}), 200
+
+
+# POST /api/auth/forgot-password - Solicitar recuperacion de contraseña
+@auth_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    body = request.get_json()
+    if not body:
+        abort(400, description="El body no puede estar vacio")
+    result = AuthService.forgot_password(body)
+    return jsonify(result), 200
+
+
+# POST /api/auth/reset-password - Restablecer contraseña con token
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    body = request.get_json()
+    if not body:
+        abort(400, description="El body no puede estar vacio")
+    result = AuthService.reset_password(body)
+    return jsonify(result), 200

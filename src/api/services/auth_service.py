@@ -2,9 +2,11 @@
 Servicio de autenticacion - Login, Signup y validacion de tokens
 """
 
+from datetime import timedelta
 from flask import abort
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, decode_token
 from api.models import db, User
+from api.models.user import RoleName
 
 
 class AuthService:
@@ -27,7 +29,7 @@ class AuthService:
                 email=data["email"],
                 first_name=data["first_name"],
                 last_name=data["last_name"],
-                is_active=True
+                role=RoleName.guest
             )
             new_user.set_password(data["password"])
             db.session.add(new_user)
@@ -51,9 +53,6 @@ class AuthService:
         user = User.query.filter_by(email=data["email"]).first()
         if user is None:
             abort(401, description="Email o password incorrectos")
-
-        if not user.is_active:
-            abort(401, description="La cuenta esta desactivada")
 
         if not user.check_password(data["password"]):
             abort(401, description="Email o password incorrectos")
@@ -112,3 +111,44 @@ class AuthService:
         except Exception as error:
             db.session.rollback()
             abort(500, description=f"Error al eliminar usuario: {str(error)}")
+
+    @staticmethod
+    def forgot_password(data):
+        if "email" not in data or not data["email"]:
+            abort(400, description="El email es obligatorio")
+
+        user = User.query.filter_by(email=data["email"]).first()
+        if user is None:
+            abort(404, description="No existe un usuario con ese email")
+
+        reset_token = create_access_token(
+            identity=str(user.id),
+            expires_delta=timedelta(minutes=60),
+            additional_claims={"type": "password_reset"}
+        )
+        return {"reset_token": reset_token}
+
+    @staticmethod
+    def reset_password(data):
+        if "token" not in data or "password" not in data:
+            abort(400, description="Token y password son obligatorios")
+
+        try:
+            decoded = decode_token(data["token"])
+        except Exception:
+            abort(401, description="Token invalido o expirado")
+
+        if decoded.get("type") != "password_reset":
+            abort(401, description="Token invalido")
+
+        user = User.query.get(int(decoded.get("sub")))
+        if user is None:
+            abort(404, description="Usuario no encontrado")
+
+        user.set_password(data["password"])
+        try:
+            db.session.commit()
+            return {"message": "Password actualizado correctamente"}
+        except Exception as error:
+            db.session.rollback()
+            abort(500, description=f"Error al actualizar password: {str(error)}")
