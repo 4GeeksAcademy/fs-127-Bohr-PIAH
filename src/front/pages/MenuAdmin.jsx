@@ -24,52 +24,42 @@ export const MenuAdmin = () => {
         <div className="home-wrapper">
 
             {/* TÍTULO PRINCIPAL */}
-            <h2 className="view-title">Panel Administrativo</h2>
+            <h2 className="welcome-text p-3">Panel Administrativo</h2>
 
             {/* BOTONES SUPERIORES */}
-            <div className="action-grid">
-                <div className="action-item" onClick={handleCreateDepartment}>
-                    <p>Crear nuevo Departamento</p>
+            <div className="action-grid d-flex">
+                <div className="feature-item m-1" onClick={handleCreateDepartment} style={{ cursor: 'pointer' }}>
+                    <p className="feature-title">
+                        <p className="feature-description"> 
+                            Crear nuevo Departamento
+                        </p>
+                    </p>
                 </div>
 
-                <div className="action-item" onClick={handleCreateUser}>
-                    <p>Crear nuevo Usuario</p>
+                <div className="feature-item m-1" onClick={handleCreateUser} style={{ cursor: 'pointer' }}>
+                    <p className="feature-title">
+                        <p className="feature-description">
+                            Crear nuevo Usuario
+                        </p>
+                    </p>
                 </div>
             </div>
 
-            {/* PANEL CLARO */}
+            {/* PANELES POR DEPARTAMENTO*/}
             <div className="projects-panel">
 
                 {/* RECTÁNGULOS VERTICALES */}
                 <div className="features-grid">
-
-                    <div
-                        className="project-rect"
-                        onClick={() => handleDptoClick("Departamento uno")}
-                    >
-                        <svg width="60" height="60">
-                            <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-                        </svg>
+                    
+                    <div className="project-rect" onClick={() => handleDptoClick("Departamento uno")} style={{ cursor: 'pointer' }}>
                         <p>Departamento uno</p>
                     </div>
 
-                    <div
-                        className="project-rect"
-                        onClick={() => handleDptoClick("Departamento dos")}
-                    >
-                        <svg width="60" height="60">
-                            <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-                        </svg>
+                    <div className="project-rect" onClick={() => handleDptoClick("Departamento dos")}  style={{ cursor: 'pointer' }}>
                         <p>Departamento dos</p>
                     </div>
 
-                    <div
-                        className="project-rect"
-                        onClick={() => handleDptoClick("Departamento tres")}
-                    >
-                        <svg width="60" height="60">
-                            <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-                        </svg>
+                    <div className="project-rect" onClick={() => handleDptoClick("Departamento tres")}  style={{ cursor: 'pointer' }}>
                         <p>Departamento tres</p>
                     </div>
 

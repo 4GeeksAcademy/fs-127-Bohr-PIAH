@@ -46,14 +46,14 @@ export const MenuProjects = () => {
   return (
     <div className="home-wrapper">
 
-      <h2 className="view-title">Menú de mis proyectos</h2>
+      <h2 className="welcome-text p-3">Menú de mis proyectos</h2>
 
-      <div className="action-grid">
-        <div className="action-item" onClick={() => setShowModal(true)}>
-          <p>Crear nuevo proyecto</p>
+      <div className="action-grid d-flex">
+        <div className="sub-feature m-1" style={{ cursor: 'pointer' }} onClick={() => setShowModal(true)}>
+          <div className="feature-title">Crear nuevo proyecto</div>
         </div>
 
-        <div className="action-item">
+        <div className="sub-feature m-1" style={{ cursor: 'pointer' }} onClick={() => setShowModal(true)}>
           <p>Crear nuevo reporte</p>
         </div>
       </div>

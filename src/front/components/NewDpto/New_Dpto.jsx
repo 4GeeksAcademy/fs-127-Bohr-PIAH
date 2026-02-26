@@ -74,7 +74,7 @@ export default function New_Dpto({ onCancel, onCreate }) {
 
                     <button
                         type="button"
-                        className="cyber-btn-primary w-100"
+                        className="cyber-btn-success"
                         onClick={addStaf}
                     >
                         Agregar otro

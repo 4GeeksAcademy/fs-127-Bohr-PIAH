@@ -1,144 +1,219 @@
 /* OVERLAY */
 .modal-overlay-cyber {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
 /* CAJA PRINCIPAL */
 .modal-cyber-box {
-    background: rgba(15, 23, 42, 0.9);
-    border: 2px solid var(--c-cyber);
-    border-radius: 12px;
-    width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 25px;
-    box-shadow: 0 0 25px rgba(39, 230, 214, 0.4);
-    animation: cyber-pop 0.25s ease-out;
-    position: relative;
+  background: rgba(15, 23, 42, 0.9);
+  border: 2px solid #4da3ff;
+  border-radius: 12px;
+  width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 25px;
+  box-shadow: 0 0 25px rgba(178, 108, 108, 0.4);
+  animation: cyber-pop 0.25s ease-out;
+  position: relative;
 }
 
 /* ANIMACIÓN */
 @keyframes cyber-pop {
-    from { transform: scale(0.85); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* TITULO */
 .modal-cyber-title {
-    color: var(--c-cyber);
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(39, 230, 214, 0.5);
-    margin-bottom: 20px;
-    text-align: center;
+  color: #4da3ff;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgb(255, 255, 255);
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 /* BOTÓN CERRAR */
 .modal-cyber-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: transparent;
-    border: none;
-    color: var(--c-cyber);
-    font-size: 22px;
-    cursor: pointer;
-    transition: 0.3s;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color:#4da3ff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 .modal-cyber-close:hover {
-    color: white;
-    text-shadow: 0 0 10px var(--c-cyber);
+  color: white;
+  text-shadow: #4da3ff;
 }
 
 /* LABELS */
 .cyber-label {
-    color: var(--c-cyber);
-    font-size: 0.9rem;
-    margin-top: 10px;
-    margin-bottom: 5px;
-    display: block;
+  color: #4da3ff;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  display: block;
 }
 
 /* INPUTS */
 .cyber-input {
-    width: 100%;
-    padding: 10px;
-    background: rgba(39, 230, 214, 0.05);
-    border: 1px solid rgba(39, 230, 214, 0.3);
-    border-radius: 8px;
-    color: white;
-    margin-bottom: 15px;
-    outline: none;
-    transition: 0.3s;
+  width: 100%;
+  padding: 5px;
+  background: rgba(186, 239, 234, 0.05);
+  border: 2px solid #4da3ff;
+  border-radius: 8px;
+  color: white;
+  margin-bottom: 15px;
+  outline: none;
+  transition: 0.3s;
 }
 
 .cyber-input:focus {
-    border-color: var(--c-cyber);
-    box-shadow: 0 0 10px rgba(39, 230, 214, 0.4);
+  border-color: #4da3ff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.97);
 }
 
 /* BOTONES */
 .cyber-btn-primary,
 .cyber-btn-secondary,
 .cyber-btn-success {
-    padding: 10px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    width: 100%;
-    margin-top: 10px;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .cyber-btn-primary {
-    background: transparent;
-    border: 1px solid var(--c-cyber);
-    color: var(--c-cyber);
+  background: transparent;
+  border: 1px solid var(--c-cyber);
+  color: var(--c-cyber);
 }
 
 .cyber-btn-primary:hover {
-    background: var(--c-cyber);
-    color: #000;
+  background: var(--c-cyber);
+  color: #000;
 }
 
 .cyber-btn-secondary {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
 }
 
 .cyber-btn-secondary:hover {
-    background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .cyber-btn-success {
-    background: var(--c-elec);
-    border: none;
-    color: #000;
+  background: #4da3ff;
+  border: none;
+  color: #000;
 }
 
 .cyber-btn-success:hover {
-    box-shadow: 0 0 10px var(--c-elec);
+  box-shadow: 0 0 10px #3bb7ff;
 }
 
 /* FOOTER */
 .modal-cyber-footer {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.project-rect {
+  text-align: center;
+  width:350px;
+  transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(116, 185, 255, 0.2);
+  border-radius: 20px;
+  padding: 25px 15px;
+  box-shadow:0 0 10px rgba(116, 185, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.project-rect p {
+  font-size: 15px;
+  color: white;
+}
+
+
+.project-rect:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 25px rgba(77, 106, 187, 0.512);
+  border-color: var(--c-elec);
+}
+
+/* Nombre del departamento */
+.project-rect {
+  font-family: "Inter", sans-serif;
+  font-size: 0.82rem;
+  opacity: 1;
+  margin-top: 10px;
+  font-weight: 400;
+  text-shadow: 0 0 6px rgba(55, 43, 43, 0.6);
+}
+
+
+/* Staff */
+.staff-list {
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+.staff-item {
+  margin: 0;
+  color: rgb(255, 255, 255);
+}
+
+/* Botón borrar */
+.delete-btn {
+  margin-top: 30px;
+  background: transparent;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  padding: 3px 6px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.25s;
+  gap:8px;
+}
+
+.projects-panel .section-sub-title {
+  display: flex;
+  flex-wrap: wrap;
+  color: rgb(255, 255, 255);
+  gap: 8px;
 }
