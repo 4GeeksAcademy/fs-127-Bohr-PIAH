@@ -1,11 +1,29 @@
 import React from "react";
-import { Zap } from "lucide-react";
+import { Zap, ShieldAlert, Users, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const MainBoard = ({ workModes }) => {
     return (
 
         <main className="col-lg-9 col-md-8">
             <div className="glass-card-yellow p-4 h-100">
+
+                <div className="d-flex gap-3 mb-5 flex-wrap">
+                    <div className="ms-auto d-flex gap-3">
+                        <Link to="/admin" className="text-decoration-none">
+                            <button className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>Get Report
+                            </button>
+                        </Link>
+
+                        <Link to="/team" className="text-decoration-none">
+                            <button className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>Get Work Package
+                            </button>
+                        </Link>
+
+
+                    </div>
+                </div>
+
 
 
                 <div className="accordion accordion-flush" id="projectAccordion">
@@ -64,6 +82,6 @@ export const MainBoard = ({ workModes }) => {
                     ))}
                 </div>
             </div>
-        </main>
+        </main >
     );
 };
