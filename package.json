@@ -54,6 +54,7 @@
 		]
 	},
 	"dependencies": {
+		"@formkit/drag-and-drop": "^0.5.3",
 		"lottie-react": "^2.4.1",
 		"lucide-react": "^0.575.0",
 		"prop-types": "^15.8.1",
