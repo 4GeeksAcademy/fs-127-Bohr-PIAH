@@ -13,6 +13,7 @@ import { MenuProjects } from "./pages/MenuProjects";
 import { MenuAdmin } from "./pages/MenuAdmin";
 import { Login } from "./pages/Login";
 import { MenuDptoProject } from "./pages/MenuDptoProject";
+import { Signup } from "./pages/Signup";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -33,6 +34,7 @@ export const router = createBrowserRouter(
         <Route path="/menuadmin" element={<MenuAdmin />} />
         <Route path="/login" element={<Login />} />
         <Route path="/menudptoproject" element={<MenuDptoProject />} />
+        <Route path="/signup" element={<Signup />} />
       </Route>
     )
 );
