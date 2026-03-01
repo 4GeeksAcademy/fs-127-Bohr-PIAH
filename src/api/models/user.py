@@ -32,17 +32,13 @@ class User(db.Model):
     last_name: Mapped[str] = mapped_column(String(100))
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     password: Mapped[str] = mapped_column(String(255))
-    role: Mapped[RoleName] = mapped_column(Enum(RoleName), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)#añadida
+    role: Mapped[RoleName] = mapped_column(Enum(RoleName), nullable=False, default=RoleName.guest)#cambiado
+    
 
-    department_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("departments.id", ondelete="SET NULL"),
-        nullable=True,
-    )
-
-    department: Mapped[Optional["Department"]
-                       ] = relationship(back_populates="users")
-
-    user_projects: Mapped[List["UserProject"]] = relationship(
+    #Relaciones
+    department: Mapped["Department"] = relationship(
+        "department",
         back_populates="user",
         cascade="all, delete-orphan",
     )
