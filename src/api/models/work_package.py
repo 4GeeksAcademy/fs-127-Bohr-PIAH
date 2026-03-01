@@ -22,3 +22,11 @@ class WorkPackage(db.Model):
         back_populates="work_package",
         cascade="all, delete-orphan",
     )
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "name": self.name,
+            "tasks": self.tasks,
+        }
