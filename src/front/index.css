@@ -312,7 +312,7 @@
 
 .nav-login-cyber {
   background: #000000 !important;
-  border: 1px solid var(--c-cyber) !important; /* Línea fina como pediste para lo amarillo */
+  border: 1px solid var(--c-cyber) !important; 
   color: var(--c-cyber) !important;
   border-radius: 50px;
   font-family: "Inter", sans-serif;

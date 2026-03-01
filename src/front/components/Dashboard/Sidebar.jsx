@@ -1,5 +1,5 @@
 import React from "react";
-import { BohrLogo } from "../BohrLogo"; 
+import { BohrLogo } from "../BohrLogo";
 import { Orbit, UserCheck, Zap } from "lucide-react";
 
 
@@ -8,15 +8,19 @@ export const Sidebar = ({ activeProjects }) => {
         <aside className="col-lg-3 col-md-4">
             <div className="glass-card-yellow p-4 d-flex flex-column gap-3 h-100">
 
+                {/* 3. BOTÓN NEW PROJECT */}
+                <div className="feature-item w-100 d-flex align-items-center gap-3 py-3 px-4" style={{ cursor: 'pointer', minHeight: '80px' }}>
+                    <UserCheck size={32} strokeWidth={1.5} color="#27E6D6" />
+                    <p className="feature-title mb-0" style={{ fontSize: "0.9rem" }}>NEW PROYECT</p>
+                </div>
 
-
-                {/* 2. BOTÓN PROYECTOS */}
+                {/* 2. BOTÓN MY PROYECTS */}
                 <div className="feature-item w-100 d-flex align-items-center gap-3 py-3 px-4 mb-2" style={{ cursor: 'pointer', minHeight: '60px' }}>
                     <Orbit size={28} strokeWidth={1.5} color="#27E6D6" />
                     <p className="feature-title mb-0" style={{ fontSize: "0.9rem" }}>MY PROJECTS</p>
                 </div>
 
-                {/* CONTENEDOR LISTA */}
+                {/* CONTENEDOR LISTA DE LOS PROYECTYOS */}
                 <div className="projects-list-container d-flex flex-column gap-2"
                     style={{ maxHeight: "300px", overflowY: "auto", padding: "10px 15px", margin: "0 10px", borderLeft: "1px solid rgba(39, 230, 214, 0.1)" }}>
 
@@ -32,14 +36,7 @@ export const Sidebar = ({ activeProjects }) => {
                 </div>
 
 
-
-                {/* 3. BOTÓN MI EQUIPO */}
-                <div className="feature-item w-100 d-flex align-items-center gap-3 py-3 px-4" style={{ cursor: 'pointer', minHeight: '80px' }}>
-                    <UserCheck size={32} strokeWidth={1.5} color="#27E6D6" />
-                    <p className="feature-title mb-0" style={{ fontSize: "0.9rem" }}>NEW PROYECT</p>
-                </div>
-
-                {/* 4. BOTÓN REPORTES */}
+                {/* 4. BOTÓN FINALIZADOS */}
                 <div className="feature-item w-100 d-flex align-items-center gap-3 py-3 px-4" style={{ cursor: 'pointer', minHeight: '80px' }}>
                     <Zap size={32} strokeWidth={1.5} color="#27E6D6" />
                     <p className="feature-title mb-0" style={{ fontSize: "0.9rem" }}>FINALIZADOS</p>

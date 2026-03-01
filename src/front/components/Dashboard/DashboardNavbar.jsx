@@ -1,4 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
+import { UserDropdown } from "./UserDropdown";
+
 
 export const DashboardNavbar = () => {
 
@@ -46,27 +48,34 @@ export const DashboardNavbar = () => {
                 </div>
 
                 {/* Botones  */}
-                <div className="d-flex gap-3">
-                    <div className="ml-auto">
+                <div className="d-flex align-items-center gap-3">
+
+                    <div className="ms-auto">
                         <Link to="/report">
                             <button className="nav-login-cyber">
                                 Reports
                             </button>
                         </Link>
                     </div>
-                    <div className="ml-auto">
+                    <div className="ms-auto">
                         <Link to="/team">
                             <button className="nav-login-cyber">
                                 My Team
                             </button>
                         </Link>
                     </div>
-                    <div className="ml-auto">
+                    <div className="ms-auto">
                         <Link to="/admin">
                             <button className="nav-login-cyber">
                                 Admin Panel
                             </button>
                         </Link>
+                    </div>
+
+                     {/* Boton del PROFILE!!  */}
+                     
+                    <div className="ms-2">
+                        <UserDropdown />
                     </div>
                 </div>
             </div>

@@ -2,15 +2,15 @@ import React from "react";
 import { useDragAndDrop } from "@formkit/drag-and-drop/react";
 
 export const KanbanBoard = () => {
-    
+
     const [todoRef, todoTasks] = useDragAndDrop(["Tarea 1", "Tarea 2"], { group: "bohrTasks" });
     const [progressRef, progressTasks] = useDragAndDrop(["Tarea 3"], { group: "bohrTasks" });
     const [reviewRef, reviewTasks] = useDragAndDrop(["Tarea 4"], { group: "bohrTasks" });
     const [doneRef, doneTasks] = useDragAndDrop(["Tarea 5"], { group: "bohrTasks" });
 
 
-      {/* AQUI VENDRIA EL USEEFFECT */}
-    
+    {/* AQUI VENDRIA EL USEEFFECT */ }
+
     const renderColumn = (ref, tasks, title, color, shadow) => (
         <div className={`p-3 rounded-4 border ${color} border-opacity-25 bg-black bg-opacity-25`} style={{ minWidth: "250px", flex: "1" }}>
             <div className="d-flex align-items-center gap-3 mb-3">
@@ -29,8 +29,7 @@ export const KanbanBoard = () => {
             </div>
         </div>
     );
-
-    return (
+ return (
         <div className="accordion-body d-flex flex-row gap-3 align-items-start overflow-auto pb-3">
             {renderColumn(todoRef, todoTasks, "TO DO", "border-info", "#27E6D6")}
             {renderColumn(progressRef, progressTasks, "IN PROGRESS", "border-warning", "#ffc107")}
