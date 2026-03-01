@@ -4,6 +4,7 @@ import "./CssNewDpto.css";
 export default function New_Dpto({ onCancel, onCreate }) {
     const [formDpto, setFormDpto] = useState({
         department_name: "",
+        lider: [""],
         staf: [""],
     });
 
@@ -24,10 +25,27 @@ export default function New_Dpto({ onCancel, onCreate }) {
         });
     };
 
+    const handleLiderChange = (index, value) => {
+        const newLider = [...formDpto.lider];
+        newLider[index] = value;
+
+        setFormDpto({
+            ...formDpto,
+            lider: newLider
+        });
+    };
+
     const addStaf = () => {
         setFormDpto({
             ...formDpto,
             staf: [...formDpto.staf, ""]
+        });
+    };
+
+    const addLider = () => {
+        setFormDpto({
+            ...formDpto,
+            lider: [...formDpto.lider, ""]
         });
     };
 
@@ -58,8 +76,22 @@ export default function New_Dpto({ onCancel, onCreate }) {
                         required
                     />
 
+                    {/* Líder */}
+                    <label className="cyber-label">Líder del equipo</label>
+
+                    {formDpto.lider.map((person, index) => (
+                        <input
+                            key={index}
+                            type="text"
+                            className="cyber-input mb-2"
+                            value={person}
+                            onChange={(e) => handleLiderChange(index, e.target.value)}
+                            required
+                        />
+                    ))}
+
                     {/* Staff */}
-                    <label className="cyber-label">Staff</label>
+                    <label className="cyber-label">Team</label>
 
                     {formDpto.staf.map((person, index) => (
                         <input
@@ -77,7 +109,7 @@ export default function New_Dpto({ onCancel, onCreate }) {
                         className="cyber-btn-success"
                         onClick={addStaf}
                     >
-                        Agregar otro
+                        Agregar miembro
                     </button>
 
                     {/* Botones */}

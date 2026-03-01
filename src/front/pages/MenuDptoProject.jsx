@@ -5,21 +5,18 @@ export const MenuDptoProject = () => {
 
   const [showModal, setShowModal] = useState(false);
 
-  // Lista dinámica de departamentos
-  const [departments, setDepartments] = useState([
-
-  ]);
+  const [departments, setDepartments] = useState([]);
 
   const handleDptoProjectClick = (projectName) => {
     console.log("Entrar a:", projectName);
   };
 
-  // Crear nuevo departamento desde el modal
   const handleCreateDpto = (data) => {
     setDepartments(prev => [
       ...prev,
       {
         name: data.department_name,
+        lider: data.lider,
         staf: data.staf
       }
     ]);
@@ -27,7 +24,6 @@ export const MenuDptoProject = () => {
     setShowModal(false);
   };
 
-  // Borrar departamento
   const deleteDepartment = (index) => {
     setDepartments(prev => prev.filter((_, i) => i !== index));
   };
@@ -38,12 +34,12 @@ export const MenuDptoProject = () => {
       <h2 className="welcome-text p-3">Menú de mis departamentos</h2>
 
       <div className="action-grid d-flex">
-        <div className="sub-feature m-1"
+        <div
+          className="sub-feature m-1"
           style={{ cursor: 'pointer' }}
           onClick={() => setShowModal(true)}
         >
-          <div className="feature-title">Nuevo Departamento
-          </div>
+          <div className="feature-title">Nuevo Departamento</div>
         </div>
 
         <div
@@ -51,10 +47,7 @@ export const MenuDptoProject = () => {
           style={{ cursor: 'pointer' }}
           onClick={() => setShowModal(true)}
         >
-          <div className="feature-title">Crear Reporte
-          </div>
-
-
+          <div className="feature-title">Crear Reporte</div>
         </div>
       </div>
 
@@ -66,18 +59,26 @@ export const MenuDptoProject = () => {
 
               {/* Nombre del departamento */}
               <p
-                style={{ cursor: "pointer", }}
+                className="dept-title"
                 onClick={() => handleDptoProjectClick(dpto.name)}
+                style={{ cursor: "pointer" }}
               >
                 {dpto.name}
               </p>
 
-              {/* Staff */}
+              {/* Líder */}
+              <p className="section-label">Líder</p>
               <div>
-                {dpto.staf.map((person, i) => (
-                  <p key={i} className="staff-item">
-                    • {person}
-                  </p>
+                {dpto.lider?.map((person, i) => (
+                  <p key={i} className="lider-item">• {person}</p>
+                ))}
+              </div>
+
+              {/* Equipo */}
+              <p className="section-label">Equipo</p>
+              <div>
+                {dpto.staf?.map((person, i) => (
+                  <p key={i} className="staff-item">• {person}</p>
                 ))}
               </div>
 
@@ -95,15 +96,13 @@ export const MenuDptoProject = () => {
         </div>
       </div>
 
-      {
-        showModal && (
-          <New_Dpto
-            onCancel={() => setShowModal(false)}
-            onCreate={handleCreateDpto}
-          />
-        )
-      }
+      {showModal && (
+        <New_Dpto
+          onCancel={() => setShowModal(false)}
+          onCreate={handleCreateDpto}
+        />
+      )}
 
-    </div >
+    </div>
   );
 };

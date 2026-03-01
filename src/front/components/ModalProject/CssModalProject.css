@@ -15,29 +15,43 @@
 
 /* CONTENEDOR */
 .modal-cyber-container {
-    background: #0f172a;
-    border: 2px solid var(--c-cyber);
-    border-radius: 15px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 2px solid #4da3ff;
+    border-radius: 12px;
     padding: 25px;
     width: 500px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 0 25px rgba(39, 230, 214, 0.3);
+    box-shadow: 0 0 25px rgba(77, 163, 255, 0.35);
+    animation: cyber-pop 0.25s ease-out;
+}
+
+/* ANIMACIÓN */
+@keyframes cyber-pop {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 /* TITULOS */
 .modal-cyber-title {
-    color: var(--c-cyber);
+    color: #4da3ff;
     text-align: center;
     font-size: 1.6rem;
     margin-bottom: 20px;
-    text-shadow: 0 0 10px rgba(39, 230, 214, 0.4);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
 }
 
 .cyber-subtitle {
-    color: var(--c-cyber);
+    color: #4da3ff;
     margin-top: 20px;
     margin-bottom: 10px;
+    text-shadow: 0 0 6px rgba(77, 163, 255, 0.4);
 }
 
 /* LABELS */
@@ -52,8 +66,8 @@
 .cyber-input {
     width: 100%;
     padding: 10px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(39, 230, 214, 0.3);
+    background: rgba(186, 239, 234, 0.05);
+    border: 2px solid #4da3ff;
     border-radius: 8px;
     color: white;
     margin-bottom: 15px;
@@ -62,8 +76,8 @@
 
 .cyber-input:focus {
     outline: none;
-    border-color: var(--c-cyber);
-    box-shadow: 0 0 10px rgba(39, 230, 214, 0.4);
+    border-color: #4da3ff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.97);
 }
 
 /* LISTA DE USUARIOS */
@@ -90,7 +104,7 @@
 
 /* BOTONES */
 .cyber-btn {
-    background: var(--c-cyber);
+    background: #4da3ff;
     color: black;
     padding: 10px 20px;
     border-radius: 10px;
@@ -101,13 +115,13 @@
 }
 
 .cyber-btn:hover {
-    box-shadow: 0 0 15px rgba(39, 230, 214, 0.6);
+    box-shadow: 0 0 15px #3bb7ff;
 }
 
 .cyber-btn-outline {
     background: transparent;
-    border: 1px solid var(--c-cyber);
-    color: var(--c-cyber);
+    border: 1px solid #4da3ff;
+    color: #4da3ff;
     padding: 10px 20px;
     border-radius: 10px;
     cursor: pointer;
@@ -115,8 +129,8 @@
 }
 
 .cyber-btn-outline:hover {
-    background: rgba(39, 230, 214, 0.1);
-    box-shadow: 0 0 10px rgba(39, 230, 214, 0.4);
+    background: rgba(77, 163, 255, 0.1);
+    box-shadow: 0 0 10px #3bb7ff;
 }
 
 .cyber-btn-danger {

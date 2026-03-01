@@ -5,6 +5,10 @@ export const MenuProjects = () => {
 
   const [showModal, setShowModal] = useState(false);
 
+  // Lista dinámica de proyectos
+  const [projects, setProjects] = useState([]);
+
+  // Datos del modal
   const [projectData, setProjectData] = useState({
     nombre: "",
     wpDeadline: "",
@@ -43,6 +47,42 @@ export const MenuProjects = () => {
     });
   };
 
+  // Guardar proyecto
+  const handleSaveProject = () => {
+    setProjects(prev => [
+      ...prev,
+      {
+        nombre: projectData.nombre,
+        wpDeadline: projectData.wpDeadline,
+        taskDeadline: projectData.taskDeadline,
+        users: projectData.users,
+        notificaciones: projectData.notificaciones,
+        finalizado: projectData.finalizado
+      }
+    ]);
+
+    // Reset modal
+    setProjectData({
+      nombre: "",
+      wpDeadline: "",
+      taskDeadline: "",
+      users: [{ value: "" }],
+      notificaciones: false,
+      finalizado: false
+    });
+
+    setShowModal(false);
+  };
+
+  // Borrar proyecto
+  const deleteProject = (index) => {
+    setProjects(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleProjectClick = (projectName) => {
+    console.log("Entrar a:", projectName);
+  };
+
   return (
     <div className="home-wrapper">
 
@@ -58,50 +98,53 @@ export const MenuProjects = () => {
         </div>
       </div>
 
-      {/* PROYECTOS EN RECTÁNGULOS VERTICALES */}
-        <div className="features-grid">
+      {/* LISTA DINÁMICA DE PROYECTOS */}
+      <div className="features-grid">
 
+        {projects.map((project, index) => (
           <div
+            key={index}
             className="project-rect"
-            onClick={() => {
-              handleProjectClick("Proyecto uno");
-              setShowModal(true);
-            }}
+            onClick={() => handleProjectClick(project.nombre)}
+            style={{ cursor: 'pointer' }}
           >
-            <svg width="60" height="60">
-              <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-            </svg>
-            <p>Proyecto uno</p>
+
+            <p className="dept-title">{project.nombre}</p>
+
+            <p className="section-label">Deadline WP</p>
+            <p className="staff-item">{project.wpDeadline || "Sin fecha"}</p>
+
+            <p className="section-label">Deadline Tareas</p>
+            <p className="staff-item">{project.taskDeadline || "Sin fecha"}</p>
+
+            <p className="section-label">Usuarios</p>
+            {project.users.map((u, i) => (
+              <p key={i} className="staff-item">• {u.value}</p>
+            ))}
+
+            <p className="section-label">Notificaciones</p>
+            <p className="staff-item">{project.notificaciones ? "Activadas" : "Desactivadas"}</p>
+
+            <p className="section-label">Estado</p>
+            <p className="staff-item">{project.finalizado ? "Finalizado" : "En progreso"}</p>
+
+            {/* BOTÓN BORRAR */}
+            <button
+              className="delete-btn"
+              onClick={(e) => {
+                e.stopPropagation(); // evita abrir el proyecto al borrar
+                deleteProject(index);
+              }}
+            >
+              Borrar
+            </button>
+
           </div>
+        ))}
 
-          <div
-            className="project-rect"
-            onClick={() => {
-              handleProjectClick("Proyecto dos");
-              setShowModal(true);
-            }}
-          >
-            <svg width="60" height="60">
-              <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-            </svg>
-            <p>Proyecto dos</p>
-          </div>
+      </div>
 
-          <div
-            className="project-rect"
-            onClick={() => {
-              handleProjectClick("Proyecto tres");
-              setShowModal(true);
-            }}
-          >
-            <svg width="60" height="60">
-              <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-            </svg>
-            <p>Proyecto tres</p>
-          </div>
-
-        </div>
-
+      {/* MODAL */}
       <ModalProject
         isOpen={showModal}
         onClose={() => setShowModal(false)}
@@ -110,7 +153,7 @@ export const MenuProjects = () => {
         onAddUser={onAddUser}
         onDeleteUser={onDeleteUser}
         onChangeUser={onChangeUser}
-        onSubmit={() => console.log(projectData)}
+        onSubmit={handleSaveProject}
       />
 
     </div>

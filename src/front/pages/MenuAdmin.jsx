@@ -7,13 +7,31 @@ export const MenuAdmin = () => {
     const [showNewUserForm, setShowNewUserForm] = useState(false);
     const [showNewDpto, setShowNewDpto] = useState(false);
 
+    // Lista dinámica de departamentos
+    const [departments, setDepartments] = useState([]);
+
     const handleCreateUser = () => setShowNewUserForm(true);
     const handleCreateDepartment = () => setShowNewDpto(true);
 
     const handleCancelNewDpto = () => setShowNewDpto(false);
+
+    // Guardar nuevo departamento
     const handleSaveNewDpto = (data) => {
-        console.log("Nuevo departamento creado:", data);
+        setDepartments(prev => [
+            ...prev,
+            {
+                name: data.department_name,
+                lider: data.lider,
+                staf: data.staf
+            }
+        ]);
+
         setShowNewDpto(false);
+    };
+
+    // Borrar departamento
+    const deleteDepartment = (index) => {
+        setDepartments(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleDptoClick = (dptoName) => {
@@ -23,45 +41,61 @@ export const MenuAdmin = () => {
     return (
         <div className="home-wrapper">
 
-            {/* TÍTULO PRINCIPAL */}
             <h2 className="welcome-text p-3">Panel Administrativo</h2>
 
-            {/* BOTONES SUPERIORES */}
             <div className="action-grid d-flex">
-                <div className="feature-item m-1" onClick={handleCreateDepartment} style={{ cursor: 'pointer' }}>
+                <div className="sub-feature m-1" onClick={handleCreateDepartment} style={{ cursor: 'pointer' }}>
                     <p className="feature-title">
-                        <p className="feature-description"> 
-                            Crear nuevo Departamento
-                        </p>
+                        <p className="feature-description">Crear nuevo Departamento</p>
                     </p>
                 </div>
 
-                <div className="feature-item m-1" onClick={handleCreateUser} style={{ cursor: 'pointer' }}>
+                <div className="sub-feature m-1" onClick={handleCreateUser} style={{ cursor: 'pointer' }}>
                     <p className="feature-title">
-                        <p className="feature-description">
-                            Crear nuevo Usuario
-                        </p>
+                        <p className="feature-description">Crear nuevo Usuario</p>
                     </p>
                 </div>
             </div>
 
-            {/* PANELES POR DEPARTAMENTO*/}
+            {/* LISTA DE DEPARTAMENTOS DINÁMICA */}
             <div className="projects-panel">
-
-                {/* RECTÁNGULOS VERTICALES */}
                 <div className="features-grid">
-                    
-                    <div className="project-rect" onClick={() => handleDptoClick("Departamento uno")} style={{ cursor: 'pointer' }}>
-                        <p>Departamento uno</p>
-                    </div>
 
-                    <div className="project-rect" onClick={() => handleDptoClick("Departamento dos")}  style={{ cursor: 'pointer' }}>
-                        <p>Departamento dos</p>
-                    </div>
+                    {departments.map((dpto, index) => (
+                        <div
+                            key={index}
+                            className="project-rect"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => handleDptoClick(dpto.name)}
+                        >
+                            {/* Nombre */}
+                            <p className="dept-title">{dpto.name}</p>
 
-                    <div className="project-rect" onClick={() => handleDptoClick("Departamento tres")}  style={{ cursor: 'pointer' }}>
-                        <p>Departamento tres</p>
-                    </div>
+                            {/* Líder */}
+                            <p className="section-label">Líder</p>
+                            {dpto.lider?.map((person, i) => (
+                                <p key={i} className="lider-item">• {person}</p>
+                            ))}
+
+                            {/* Equipo */}
+                            <p className="section-label">Equipo</p>
+                            {dpto.staf?.map((person, i) => (
+                                <p key={i} className="staff-item">• {person}</p>
+                            ))}
+
+                            {/* Botón borrar */}
+                            <button
+                                className="delete-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation(); // evita abrir el departamento al borrar
+                                    deleteDepartment(index);
+                                }}
+                            >
+                                Borrar
+                            </button>
+
+                        </div>
+                    ))}
 
                 </div>
             </div>
