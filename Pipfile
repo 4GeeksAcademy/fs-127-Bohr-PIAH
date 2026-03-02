@@ -19,10 +19,7 @@ typing-extensions = "*"
 flask-jwt-extended = "==4.6.0"
 wtforms = "==3.1.2"
 sqlalchemy = "*"
-<<<<<<< HEAD
 flask-migrate = "*"
-=======
->>>>>>> 10ba5f9b14aabe5a477b530084a9ef305d56d90e
 bcrypt = "*"
 
 [requires]
