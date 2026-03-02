@@ -4,6 +4,7 @@ from sqlalchemy import ForeignKey, String, Boolean, DateTime, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from api.models import db
+from sqlalchemy.ext.associationproxy import association_proxy
 
 
 class Project(db.Model):
@@ -32,10 +33,6 @@ class Project(db.Model):
         back_populates="owned_projects",
         foreign_keys=[user_id],
     )
-    # creator: Mapped["User"] = relationship(
-    #   back_populates="created_projects",
-    #   foreign_keys=[created_by],
-    # )
 
     work_packages: Mapped[List["WorkPackage"]] = relationship(
         back_populates="project",
@@ -43,14 +40,12 @@ class Project(db.Model):
     )
 
     user_projects: Mapped[List["UserProject"]] = relationship(
+        "UserProject",
         back_populates="project",
         cascade="all, delete-orphan",
     )
-    users: Mapped[List["User"]] = relationship(
-        secondary="user_projects",
-        back_populates="projects",
-        viewonly=True,
-    )
+
+    users = association_proxy("user_projects", "user")
 
     def serialize(self):
         return {

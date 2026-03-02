@@ -15,6 +15,7 @@ from sqlalchemy import ForeignKey, String, Boolean, DateTime, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from api.models import db
+from sqlalchemy.ext.associationproxy import association_proxy
 
 
 class RoleName(enum.Enum):
@@ -35,28 +36,29 @@ class User(db.Model):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)  # añadida
     role: Mapped[RoleName] = mapped_column(
         Enum(RoleName), nullable=False, default=RoleName.guest)  # cambiado
+    department_id: Mapped[int | None] = mapped_column(
+        ForeignKey("departments.id"),
+        nullable=True,
+    )
 
     # Relaciones
     department: Mapped["Department"] = relationship(
         "Department",
+        back_populates="users",
+    )
+
+    user_projects: Mapped[List["UserProject"]] = relationship(
+        "UserProject",
         back_populates="user",
         cascade="all, delete-orphan",
     )
-    projects: Mapped[List["Project"]] = relationship(
-        secondary="user_projects",
-        back_populates="users",
-        viewonly=True,
-    )
+
+    projects = association_proxy("user_projects", "project")
 
     owned_projects: Mapped[List["Project"]] = relationship(
         back_populates="owner",
         foreign_keys="Project.user_id",
     )
-
-    # created_projects: Mapped[List["Project"]] = relationship(
-    #   back_populates="creator",
-    #   foreign_keys="Project.created_by",
-    # )
 
     assigned_tasks: Mapped[List["Task"]] = relationship(
         back_populates="assignee",

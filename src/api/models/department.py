@@ -11,6 +11,5 @@ class Department(db.Model):
     name: Mapped[str] = mapped_column(String(255), unique=True)
 
     users: Mapped[List["User"]] = relationship(
-        back_populates="department",
-        cascade="all, delete-orphan",
+        back_populates="department"
     )
