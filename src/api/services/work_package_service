@@ -1,10 +1,8 @@
 from flask import abort
 from api.models import db, WorkPackage
-# from api.models.user import RoleName
-# VALID_ROLES = {role.value for role in RoleName}
 
 
-class UserService:
+class WorkPackageService:
 
     @staticmethod
     def get_all():
