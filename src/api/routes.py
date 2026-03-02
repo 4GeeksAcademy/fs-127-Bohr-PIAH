@@ -18,6 +18,7 @@ api.register_blueprint(auth_bp)
 api.register_blueprint(user_bp)
 
 
+
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
 

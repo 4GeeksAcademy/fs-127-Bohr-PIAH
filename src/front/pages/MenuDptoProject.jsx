@@ -1,106 +1,108 @@
 import { useState } from "react";
-
+import New_Dpto from "../components/NewDpto/New_Dpto";
 
 export const MenuDptoProject = () => {
 
-  const handleMenuDptoProject = () => {
-    console.log("Crear nuevo Departamento");
-  };
+  const [showModal, setShowModal] = useState(false);
+
+  const [departments, setDepartments] = useState([]);
 
   const handleDptoProjectClick = (projectName) => {
     console.log("Entrar a:", projectName);
   };
 
-  // Estado del modal
-  const [showModal, setShowModal] = useState(false);
-
-  // Estado del formulario del modal
-  const [dptoData, setDptoData] = useState({
-    departmentName: "",
-  });
-
-  // Función para actualizar campos del modal
-  const handleChange = (field, value) => {
-    setDptoData(prev => ({
+  const handleCreateDpto = (data) => {
+    setDepartments(prev => [
       ...prev,
-      [field]: value
-    }));
+      {
+        name: data.department_name,
+        lider: data.lider,
+        staf: data.staf
+      }
+    ]);
+
+    setShowModal(false);
+  };
+
+  const deleteDepartment = (index) => {
+    setDepartments(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
-    <div className="container py-5">
+    <div className="home-wrapper">
 
-      {/* ENCABEZADO SUPERIOR */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold m-0">Menu de mis proyectos</h2>
-        <div className="d-flex">
+      <h2 className="welcome-text p-3">Menú de mis departamentos</h2>
 
-          <button className="btn btn-success m-1" onClick={handleMenuDptoProject}>
-            Crear nuevo departamento
-          </button>
-          <button className="btn btn-warning m-1" onClick={handleMenuDptoProject}>
-            Crear nuevo Reporte
-          </button>
+      <div className="action-grid d-flex">
+        <div
+          className="sub-feature m-1"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setShowModal(true)}
+        >
+          <div className="feature-title">Nuevo Departamento</div>
+        </div>
+
+        <div
+          className="sub-feature m-1"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setShowModal(true)}
+        >
+          <div className="feature-title">Crear Reporte</div>
         </div>
       </div>
 
-      <div className="p-5"></div>
+      <div className="projects-panel">
+        <div className="section-sub-title">
 
-      {/* BOTONES DE PROYECTOS */}
-      <div className="d-flex flex-column p-4 gap-2 bg-light rounded-4">
+          {departments.map((dpto, index) => (
+            <div key={index} className="project-rect">
 
-        <button
-          className="btn btn-outline-primary py-3 fs-5 rounded-4"
-          onClick={() => {
-            handleDptoProjectClick("Proyecto uno");
-            setShowModal(true);
-          }}
-        >
-          Proyecto uno
-        </button>
+              {/* Nombre del departamento */}
+              <p
+                className="dept-title"
+                onClick={() => handleDptoProjectClick(dpto.name)}
+                style={{ cursor: "pointer" }}
+              >
+                {dpto.name}
+              </p>
 
-        <button
-          className="btn btn-outline-primary py-3 fs-5 rounded-4"
-          onClick={() => {
-            handleDptoProjectClick("Proyecto uno");
-            setShowModal(true);
-          }}
-        >
-          Proyecto uno
-        </button>
+              {/* Líder */}
+              <p className="section-label">Líder</p>
+              <div>
+                {dpto.lider?.map((person, i) => (
+                  <p key={i} className="lider-item">• {person}</p>
+                ))}
+              </div>
 
-        <button
-          className="btn btn-outline-primary py-3 fs-5 rounded-4"
-          onClick={() => {
-            handleDptoProjectClick("Proyecto uno");
-            setShowModal(true);
-          }}
-        >
-          Proyecto uno
-        </button>
+              {/* Equipo */}
+              <p className="section-label">Equipo</p>
+              <div>
+                {dpto.staf?.map((person, i) => (
+                  <p key={i} className="staff-item">• {person}</p>
+                ))}
+              </div>
 
-      </div>
+              {/* Botón borrar */}
+              <button
+                className="delete-btn"
+                onClick={() => deleteDepartment(index)}
+              >
+                Borrar
+              </button>
 
-      {/* Render del modal */}
-      <div className="container mt-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6 col-lg-4">
+            </div>
+          ))}
 
-            {showModal && (
-              <ModalProject
-                isOpen={showModal}
-                onClose={() => setShowModal(false)}
-                data={dptoData}
-                onChange={handleChange}
-                onAddUser={() => { }}
-                onDeleteUser={() => { }}
-                onSubmit={() => { }}
-              />
-            )}
-            
-          </div>
         </div>
       </div>
+
+      {showModal && (
+        <New_Dpto
+          onCancel={() => setShowModal(false)}
+          onCreate={handleCreateDpto}
+        />
+      )}
+
     </div>
   );
 };
