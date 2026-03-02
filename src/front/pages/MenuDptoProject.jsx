@@ -3,104 +3,105 @@ import New_Dpto from "../components/NewDpto/New_Dpto";
 
 export const MenuDptoProject = () => {
 
-  const handleMenuDptoProject = () => {
-    console.log("Crear nuevo Departamento");
-  };
+  const [showModal, setShowModal] = useState(false);
+
+  const [departments, setDepartments] = useState([]);
 
   const handleDptoProjectClick = (projectName) => {
     console.log("Entrar a:", projectName);
   };
 
-  const [showModal, setShowModal] = useState(false);
-
-  const [dptoData, setDptoData] = useState({
-    departmentName: "",
-  });
-
-  const handleChange = (field, value) => {
-    setDptoData(prev => ({
+  const handleCreateDpto = (data) => {
+    setDepartments(prev => [
       ...prev,
-      [field]: value
-    }));
+      {
+        name: data.department_name,
+        lider: data.lider,
+        staf: data.staf
+      }
+    ]);
+
+    setShowModal(false);
+  };
+
+  const deleteDepartment = (index) => {
+    setDepartments(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
     <div className="home-wrapper">
 
-      {/* TÍTULO PRINCIPAL */}
-      <h2 className="view-title">Menú de mis departamentos</h2>
+      <h2 className="welcome-text p-3">Menú de mis departamentos</h2>
 
-      {/* BOTONES SUPERIORES */}
-      <div className="action-grid">
-        <div className="action-item" onClick={handleMenuDptoProject}>
-          <p>Nuevo Departamento</p>
+      <div className="action-grid d-flex">
+        <div
+          className="sub-feature m-1"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setShowModal(true)}
+        >
+          <div className="feature-title">Nuevo Departamento</div>
         </div>
 
-        <div className="action-item" onClick={handleMenuDptoProject}>
-          <p>Nuevo Reporte</p>
+        <div
+          className="sub-feature m-1"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setShowModal(true)}
+        >
+          <div className="feature-title">Crear Reporte</div>
         </div>
       </div>
 
-      {/* PANEL CLARO */}
       <div className="projects-panel">
+        <div className="section-sub-title">
 
-        {/* RECTÁNGULOS VERTICALES */}
-        <div className="features-grid">
+          {departments.map((dpto, index) => (
+            <div key={index} className="project-rect">
 
-          <div
-            className="project-rect"
-            onClick={() => {
-              handleDptoProjectClick("Departamento uno");
-              setShowModal(true);
-            }}
-          >
-            <svg width="60" height="60">
-              <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-            </svg>
-            <p>Departamento uno</p>
-          </div>
+              {/* Nombre del departamento */}
+              <p
+                className="dept-title"
+                onClick={() => handleDptoProjectClick(dpto.name)}
+                style={{ cursor: "pointer" }}
+              >
+                {dpto.name}
+              </p>
 
-          <div
-            className="project-rect"
-            onClick={() => {
-              handleDptoProjectClick("Departamento dos");
-              setShowModal(true);
-            }}
-          >
-            <svg width="60" height="60">
-              <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-            </svg>
-            <p>Departamento dos</p>
-          </div>
+              {/* Líder */}
+              <p className="section-label">Líder</p>
+              <div>
+                {dpto.lider?.map((person, i) => (
+                  <p key={i} className="lider-item">• {person}</p>
+                ))}
+              </div>
 
-          <div
-            className="project-rect"
-            onClick={() => {
-              handleDptoProjectClick("Departamento tres");
-              setShowModal(true);
-            }}
-          >
-            <svg width="60" height="60">
-              <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-            </svg>
-            <p>Departamento tres</p>
-          </div>
+              {/* Equipo */}
+              <p className="section-label">Equipo</p>
+              <div>
+                {dpto.staf?.map((person, i) => (
+                  <p key={i} className="staff-item">• {person}</p>
+                ))}
+              </div>
+
+              {/* Botón borrar */}
+              <button
+                className="delete-btn"
+                onClick={() => deleteDepartment(index)}
+              >
+                Borrar
+              </button>
+
+            </div>
+          ))}
 
         </div>
-
       </div>
 
-      {/* MODAL CYBER */}
       {showModal && (
         <New_Dpto
           onCancel={() => setShowModal(false)}
-          onCreate={(data) => {
-            console.log("Departamento creado:", data);
-            setShowModal(false);
-          }}
+          onCreate={handleCreateDpto}
         />
       )}
-
 
     </div>
   );
