@@ -32,13 +32,13 @@ class User(db.Model):
     last_name: Mapped[str] = mapped_column(String(100))
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     password: Mapped[str] = mapped_column(String(255))
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)#añadida
-    role: Mapped[RoleName] = mapped_column(Enum(RoleName), nullable=False, default=RoleName.guest)#cambiado
-    
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)  # añadida
+    role: Mapped[RoleName] = mapped_column(
+        Enum(RoleName), nullable=False, default=RoleName.guest)  # cambiado
 
-    #Relaciones
+    # Relaciones
     department: Mapped["Department"] = relationship(
-        "department",
+        "Department",
         back_populates="user",
         cascade="all, delete-orphan",
     )
