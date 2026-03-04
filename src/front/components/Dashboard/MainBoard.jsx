@@ -1,7 +1,7 @@
 import React from "react";
 import { Zap, ShieldAlert, Users, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
-import { KanbanBoard } from "../Kanban/kanbanBoard";
+import { KanbanBoard } from "../Kanban/KanbanBoard";
 
 export const MainBoard = ({ workModes }) => {
     return (
