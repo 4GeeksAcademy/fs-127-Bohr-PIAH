@@ -18,7 +18,7 @@ export const MainBoard = ({ workModes }) => {
                         </Link>
 
                         <Link to="/team" className="text-decoration-none">
-                            <button className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>Get Work Package
+                            <button className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>Add Work Package
                             </button>
                         </Link>
 
