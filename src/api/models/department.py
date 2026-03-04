@@ -13,3 +13,16 @@ class Department(db.Model):
     users: Mapped[List["User"]] = relationship(
         back_populates="department"
     )
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name
+        }
+
+    def serialize_with_users(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "users": [u.serialize() for u in self.users],
+        }

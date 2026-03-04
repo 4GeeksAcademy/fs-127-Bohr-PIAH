@@ -1,5 +1,6 @@
 from flask import abort
 from api.models import db, Department
+from sqlalchemy.orm import selectinload
 
 
 class DepartmentService:
@@ -80,3 +81,19 @@ class DepartmentService:
         except Exception as error:
             db.session.rollback()
             abort(500, description=f"Error deleting department: {str(error)}")
+
+    @staticmethod
+    def get_by_id_with_users(department_id):
+        department = (
+            Department.query.options(
+                selectinload(Department.users)
+            )
+            .filter(Department.id == department_id)
+            .first()
+        )
+
+        if department is None:
+            abort(
+                404, description=f"Department with id {department_id} not found")
+
+        return department.serialize_with_users()

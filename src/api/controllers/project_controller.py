@@ -43,3 +43,10 @@ def update_project(project_id):
 def delete_project(project_id):
     result = ProjectService.delete(project_id)
     return jsonify(result), 200
+
+
+# GET /api/projects/<id> - Get project with all wp and tasks
+@project_bp.route('/<int:project_id>', methods=['GET'])
+def get_project_tree(project_id):
+    project = ProjectService.get_by_id_tree(project_id)
+    return jsonify(project), 200

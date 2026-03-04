@@ -97,3 +97,14 @@ class User(db.Model):
             "last_name": self.last_name,
             "role": self.role.value
         }
+
+    def serialize_with_projects(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "role": self.role.value,
+            "owned_projects": [p.serialize() for p in self.owned_projects],
+            "projects": [p.serialize() for p in self.projects],
+        }

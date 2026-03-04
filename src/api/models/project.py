@@ -56,3 +56,14 @@ class Project(db.Model):
             "deadline": self.deadline,
             "finalized": self.finalized
         }
+
+    def serialize_with_wps(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "created_by": self.created_by,
+            "created_at": self.created_at,
+            "deadline": self.deadline,
+            "finalized": self.finalized,
+            "work_packages": [wp.serialize_with_tasks() for wp in self.work_packages],
+        }

@@ -1,5 +1,8 @@
 from flask import abort
 from api.models import db, Project, User
+from sqlalchemy.orm import selectinload
+
+from api.models.work_package import WorkPackage
 
 
 class ProjectService:
@@ -101,3 +104,20 @@ class ProjectService:
         except Exception as error:
             db.session.rollback()
             abort(500, description=f"Error deleting project: {str(error)}")
+
+    @staticmethod
+    def get_by_id_tree(project_id):
+        project = (
+            Project.query.options(
+                selectinload(Project.work_packages)
+                .selectinload(WorkPackage.tasks)
+            )
+            .filter(Project.id == project_id)
+            .first()
+        )
+
+        if project is None:
+            abort(
+                404, description=f"Project with id {project_id} not found")
+
+        return project.serialize_with_wps()

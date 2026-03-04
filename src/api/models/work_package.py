@@ -28,5 +28,12 @@ class WorkPackage(db.Model):
             "id": self.id,
             "project_id": self.project_id,
             "name": self.name,
-            "tasks": self.tasks,
+        }
+
+    def serialize_with_tasks(self):
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "name": self.name,
+            "tasks": [t.serialize() for t in self.tasks],
         }

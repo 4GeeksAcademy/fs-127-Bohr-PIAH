@@ -6,6 +6,7 @@ Servicio de usuarios - Logica de negocio para CRUD de User
 from flask import abort
 from api.models import db, User
 from api.models.user import RoleName
+from sqlalchemy.orm import selectinload
 VALID_ROLES = {role.value for role in RoleName}
 
 
@@ -98,9 +99,18 @@ class UserService:
             db.session.rollback()
             abort(500, description=f"Error al eliminar usuario: {str(error)}")
 
-    # @staticmethod
-    # def get_with_orders(user_id):
-    #     user = User.query.get(user_id)
-    #     if user is None:
-    #         abort(404, description=f"Usuario con id {user_id} no encontrado")
-    #     return user.serialize_with_orders()
+    @staticmethod
+    def get_by_id_with_projects(user_id):
+        user = (
+            User.query.options(
+                selectinload(User.owned_projects),
+                selectinload(User.user_projects)
+            )
+            .filter(User.id == user_id)
+            .first()
+        )
+
+        if user is None:
+            abort(404, description=f"User with id {user_id} not found")
+
+        return user.serialize_with_projects()
