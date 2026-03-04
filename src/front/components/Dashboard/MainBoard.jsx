@@ -1,7 +1,7 @@
 import React from "react";
 import { Zap, ShieldAlert, Users, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
-import { KanbanBoard } from "../Kanban/kanbanBoard";
+import { KanbanBoard } from "../Kanban/KanbanBoard";
 
 export const MainBoard = ({ workModes }) => {
     return (
@@ -18,7 +18,7 @@ export const MainBoard = ({ workModes }) => {
                         </Link>
 
                         <Link to="/team" className="text-decoration-none">
-                            <button className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>Get Work Package
+                            <button className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>Add Work Package
                             </button>
                         </Link>
 
