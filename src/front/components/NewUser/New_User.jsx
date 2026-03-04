@@ -4,7 +4,6 @@ import "./CssAddUser.css";
 export default function NewUser({ onCancel, onCreate }) {
     const [formData, setFormData] = useState({
         name: "",
-        lastname: "",
         role: ""
     });
 
@@ -41,18 +40,6 @@ export default function NewUser({ onCancel, onCreate }) {
                             required
                         />
                     </div>
-
-                    <div className="cyber-field">
-                        <label>Lastname</label>
-                        <input
-                            type="text"
-                            name="lastname"
-                            value={formData.lastname}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
 
                     <div className="cyber-field">
                         <label>Role</label>

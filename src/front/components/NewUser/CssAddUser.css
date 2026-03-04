@@ -1,103 +1,114 @@
 /* OVERLAY DEL MODAL */
 .modal-cyber-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.65);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    backdrop-filter: blur(4px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
 }
 
 /* VENTANA DEL MODAL */
 .modal-cyber-window {
-    background: rgba(15, 23, 42, 0.95);
-    border: 2px solid var(--c-cyber);
-    border-radius: 15px;
-    padding: 30px;
-    width: 420px;
-    max-width: 90%;
-    box-shadow: 0 0 25px rgba(39, 230, 214, 0.4);
-    animation: fadeIn 0.3s ease-out;
+  background: rgba(15, 23, 42, 0.9);
+  border: 2px solid #4da3ff;
+  border-radius: 12px;
+  padding: 25px;
+  width: 420px;
+  max-width: 90%;
+  box-shadow: 0 0 25px rgba(77, 163, 255, 0.35);
+  animation: cyber-pop 0.25s ease-out;
+  position: relative;
+}
+
+/* ANIMACIÓN */
+@keyframes cyber-pop {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* CAMPOS DEL FORMULARIO */
 .cyber-form {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .cyber-field label {
-    font-size: 0.9rem;
-    color: var(--c-cyber);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  font-size: 0.9rem;
+  color: #4da3ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
 }
 
+/* INPUTS */
 .cyber-field input {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(39, 230, 214, 0.3);
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-    outline: none;
-    transition: all 0.3s ease;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 2px solid #4da3ff;
+  background: rgba(186, 239, 234, 0.05);
+  color: white;
+  outline: none;
+  transition: 0.3s;
 }
 
 .cyber-field input:focus {
-    border-color: var(--c-cyber);
-    box-shadow: 0 0 10px rgba(39, 230, 214, 0.4);
+  border-color: #4da3ff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.97);
 }
 
 /* BOTONES */
 .cyber-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
 }
 
 .btn-cyber-primary,
 .btn-cyber-secondary {
-    padding: 10px 25px;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+  font-size: 0.85rem;
 }
 
 /* BOTÓN PRINCIPAL */
 .btn-cyber-primary {
-    background: var(--c-cyber);
-    color: #000;
-    border: 2px solid var(--c-cyber);
+  background: #4da3ff;
+  border: none;
+  color: #000;
 }
 
 .btn-cyber-primary:hover {
-    box-shadow: 0 0 20px rgba(39, 230, 214, 0.6);
+  box-shadow: 0 0 10px #3bb7ff;
 }
 
 /* BOTÓN SECUNDARIO */
 .btn-cyber-secondary {
-    background: transparent;
-    color: var(--c-cyber);
-    border: 2px solid var(--c-cyber);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
 }
 
 .btn-cyber-secondary:hover {
-    background: rgba(39, 230, 214, 0.1);
-    box-shadow: 0 0 15px rgba(39, 230, 214, 0.4);
-}
-
-/* ANIMACIÓN */
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+  background: rgba(255, 255, 255, 0.2);
 }

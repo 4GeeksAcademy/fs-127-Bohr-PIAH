@@ -7,13 +7,31 @@ export const MenuAdmin = () => {
     const [showNewUserForm, setShowNewUserForm] = useState(false);
     const [showNewDpto, setShowNewDpto] = useState(false);
 
+    // Lista dinámica de departamentos
+    const [departments, setDepartments] = useState([]);
+
     const handleCreateUser = () => setShowNewUserForm(true);
     const handleCreateDepartment = () => setShowNewDpto(true);
 
     const handleCancelNewDpto = () => setShowNewDpto(false);
+
+    // Guardar nuevo departamento
     const handleSaveNewDpto = (data) => {
-        console.log("Nuevo departamento creado:", data);
+        setDepartments(prev => [
+            ...prev,
+            {
+                name: data.department_name,
+                lider: data.lider,
+                staf: data.staf
+            }
+        ]);
+
         setShowNewDpto(false);
+    };
+
+    // Borrar departamento
+    const deleteDepartment = (index) => {
+        setDepartments(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleDptoClick = (dptoName) => {
@@ -23,55 +41,61 @@ export const MenuAdmin = () => {
     return (
         <div className="home-wrapper">
 
-            {/* TÍTULO PRINCIPAL */}
-            <h2 className="view-title">Panel Administrativo</h2>
+            <h2 className="welcome-text p-3">Panel Administrativo</h2>
 
-            {/* BOTONES SUPERIORES */}
-            <div className="action-grid">
-                <div className="action-item" onClick={handleCreateDepartment}>
-                    <p>Crear nuevo Departamento</p>
+            <div className="action-grid d-flex">
+                <div className="sub-feature m-1" onClick={handleCreateDepartment} style={{ cursor: 'pointer' }}>
+                    <p className="feature-title">
+                        <p className="feature-description">Crear nuevo Departamento</p>
+                    </p>
                 </div>
 
-                <div className="action-item" onClick={handleCreateUser}>
-                    <p>Crear nuevo Usuario</p>
+                <div className="sub-feature m-1" onClick={handleCreateUser} style={{ cursor: 'pointer' }}>
+                    <p className="feature-title">
+                        <p className="feature-description">Crear nuevo Usuario</p>
+                    </p>
                 </div>
             </div>
 
-            {/* PANEL CLARO */}
+            {/* LISTA DE DEPARTAMENTOS DINÁMICA */}
             <div className="projects-panel">
-
-                {/* RECTÁNGULOS VERTICALES */}
                 <div className="features-grid">
 
-                    <div
-                        className="project-rect"
-                        onClick={() => handleDptoClick("Departamento uno")}
-                    >
-                        <svg width="60" height="60">
-                            <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-                        </svg>
-                        <p>Departamento uno</p>
-                    </div>
+                    {departments.map((dpto, index) => (
+                        <div
+                            key={index}
+                            className="project-rect"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => handleDptoClick(dpto.name)}
+                        >
+                            {/* Nombre */}
+                            <p className="dept-title">{dpto.name}</p>
 
-                    <div
-                        className="project-rect"
-                        onClick={() => handleDptoClick("Departamento dos")}
-                    >
-                        <svg width="60" height="60">
-                            <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-                        </svg>
-                        <p>Departamento dos</p>
-                    </div>
+                            {/* Líder */}
+                            <p className="section-label">Líder</p>
+                            {dpto.lider?.map((person, i) => (
+                                <p key={i} className="lider-item">• {person}</p>
+                            ))}
 
-                    <div
-                        className="project-rect"
-                        onClick={() => handleDptoClick("Departamento tres")}
-                    >
-                        <svg width="60" height="60">
-                            <circle cx="30" cy="30" r="25" stroke="var(--c-cyber)" strokeWidth="3" fill="none" />
-                        </svg>
-                        <p>Departamento tres</p>
-                    </div>
+                            {/* Equipo */}
+                            <p className="section-label">Equipo</p>
+                            {dpto.staf?.map((person, i) => (
+                                <p key={i} className="staff-item">• {person}</p>
+                            ))}
+
+                            {/* Botón borrar */}
+                            <button
+                                className="delete-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation(); // evita abrir el departamento al borrar
+                                    deleteDepartment(index);
+                                }}
+                            >
+                                Borrar
+                            </button>
+
+                        </div>
+                    ))}
 
                 </div>
             </div>
