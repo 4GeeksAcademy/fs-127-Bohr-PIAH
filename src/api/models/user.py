@@ -11,6 +11,7 @@ Tabla principal de usuarios.
 import enum
 from typing import List, Optional
 import bcrypt
+from flask import abort
 from sqlalchemy import ForeignKey, String, Boolean, DateTime, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
@@ -35,7 +36,8 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String(255))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)  # añadida
     role: Mapped[RoleName] = mapped_column(
-        Enum(RoleName), nullable=False, default=RoleName.guest)  # cambiado
+        Enum(RoleName, name="role_name", native_enum=True),
+        nullable=False, default=RoleName.guest)  # cambiado
     department_id: Mapped[int | None] = mapped_column(
         ForeignKey("departments.id"),
         nullable=True,
@@ -71,8 +73,17 @@ class User(db.Model):
     def set_last_name(self, last_name):
         self.last_name = last_name
 
+    def parse_role(self, role_str):
+        try:
+            return RoleName(role_str)
+        except ValueError:
+            abort(400, description=f"Invalid role '{role_str}'")
+
     def set_role(self, role):
-        self.role = role
+        if isinstance(role, RoleName):
+            self.role = role
+        else:
+            self.role = RoleName(role)
 
     def set_password(self, password):
         """Hashea un password en texto plano y lo almacena."""

@@ -36,14 +36,15 @@ class UserService:
             abort(409, description="User with that email already existing")
 
         if data["role"] not in VALID_ROLES:
-            abort(404, description=f"Invalid role {data["role"]}")
+            abort(400, description=f"Invalid role {data["role"]}")
 
         try:
+            role_enum = RoleName(data["role"])
             new_user = User(
                 email=data["email"],
                 first_name=data["first_name"],
                 last_name=data["last_name"],
-                role=data["role"],
+                role=role_enum,
                 is_active=data.get("is_active", True)
             )
             new_user.set_password(data["password"])
@@ -72,6 +73,8 @@ class UserService:
         if "last_name" in data:
             user.set_last_name(data["last_name"])
         if "role" in data:
+            if data["role"] not in VALID_ROLES:
+                abort(400, description=f"Invalid role {data['role']}")
             user.set_role(data["role"])
         if "is_active" in data:
             user.is_active = data["is_active"]
