@@ -1,34 +1,31 @@
 import { useState } from "react";
 import ModalProject from "../components/ModalProject/ModalProject";
 
+// Estado inicial del proyecto
+const initialProject = {
+  nombre: "",
+  wpDeadline: "",
+  taskDeadline: "",
+  users: [""],
+  notificaciones: false,
+  finalizado: false
+};
+
 export const MenuProjects = () => {
-
   const [showModal, setShowModal] = useState(false);
-
-  // Lista dinámica de proyectos
   const [projects, setProjects] = useState([]);
+  const [projectData, setProjectData] = useState(initialProject);
 
-  // Datos del modal
-  const [projectData, setProjectData] = useState({
-    nombre: "",
-    wpDeadline: "",
-    taskDeadline: "",
-    users: [{ value: "" }],
-    notificaciones: false,
-    finalizado: false
-  });
-
+  // Cambios generales del formulario
   const handleChange = (field, value) => {
-    setProjectData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setProjectData(prev => ({ ...prev, [field]: value }));
   };
 
+  // Usuarios dinámicos
   const onAddUser = () => {
     setProjectData(prev => ({
       ...prev,
-      users: [...prev.users, { value: "" }]
+      users: [...prev.users, ""]
     }));
   };
 
@@ -42,7 +39,7 @@ export const MenuProjects = () => {
   const onChangeUser = (index, newValue) => {
     setProjectData(prev => {
       const updated = [...prev.users];
-      updated[index].value = newValue;
+      updated[index] = newValue;
       return { ...prev, users: updated };
     });
   };
@@ -52,35 +49,25 @@ export const MenuProjects = () => {
     setProjects(prev => [
       ...prev,
       {
-        nombre: projectData.nombre,
-        wpDeadline: projectData.wpDeadline,
-        taskDeadline: projectData.taskDeadline,
-        users: projectData.users,
-        notificaciones: projectData.notificaciones,
-        finalizado: projectData.finalizado
+        id: crypto.randomUUID(),
+        ...projectData
       }
     ]);
 
-    // Reset modal
-    setProjectData({
-      nombre: "",
-      wpDeadline: "",
-      taskDeadline: "",
-      users: [{ value: "" }],
-      notificaciones: false,
-      finalizado: false
-    });
-
+    setProjectData(initialProject);
     setShowModal(false);
   };
 
   // Borrar proyecto
-  const deleteProject = (index) => {
-    setProjects(prev => prev.filter((_, i) => i !== index));
+  const deleteProject = (id) => {
+    setProjects(prev => prev.filter(p => p.id !== id));
   };
 
+  // Click en proyecto
   const handleProjectClick = (projectName) => {
     console.log("Entrar a:", projectName);
+    // Aquí puedes navegar con React Router si quieres
+    // navigate(`/project/${projectName}`);
   };
 
   return (
@@ -93,55 +80,64 @@ export const MenuProjects = () => {
           <div className="feature-title">Crear nuevo proyecto</div>
         </div>
 
-        <div className="sub-feature m-1" style={{ cursor: 'pointer' }} onClick={() => setShowModal(true)}>
+        <div className="sub-feature m-1" style={{ cursor: 'pointer' }}>
           <p>Crear nuevo reporte</p>
         </div>
       </div>
 
-      {/* LISTA DINÁMICA DE PROYECTOS */}
+      {/* LISTA DE PROYECTOS */}
       <div className="features-grid">
+        {projects.map((project) => (
+          <div className="project-rect" onClick={() => handleProjectClick(project)}>
 
-        {projects.map((project, index) => (
-          <div
-            key={index}
-            className="project-rect"
-            onClick={() => handleProjectClick(project.nombre)}
-            style={{ cursor: 'pointer' }}
-          >
+            <h3 className="project-title">{project.nombre}</h3>
 
-            <p className="dept-title">{project.nombre}</p>
+            <div className="project-section">
+              <span className="project-label">Deadline WP</span>
+              <span className="project-value">{project.wpDeadline || "Sin fecha"}</span>
+            </div>
 
-            <p className="section-label">Deadline WP</p>
-            <p className="staff-item">{project.wpDeadline || "Sin fecha"}</p>
+            <div className="project-section">
+              <span className="project-label">Deadline Tareas</span>
+              <span className="project-value">{project.taskDeadline || "Sin fecha"}</span>
+            </div>
 
-            <p className="section-label">Deadline Tareas</p>
-            <p className="staff-item">{project.taskDeadline || "Sin fecha"}</p>
+            <div className="project-section">
+              <span className="project-label">Usuarios</span>
+              <div className="project-users">
+                {project.users.map((u, i) => (
+                  <span key={i} className="project-value">• {u}</span>
+                ))}
+              </div>
+            </div>
 
-            <p className="section-label">Usuarios</p>
-            {project.users.map((u, i) => (
-              <p key={i} className="staff-item">• {u.value}</p>
-            ))}
+            <div className="project-section">
+              <span className="project-label">Notificaciones</span>
+              <span className="project-value">
+                {project.notificaciones ? "Activadas" : "Desactivadas"}
+              </span>
+            </div>
 
-            <p className="section-label">Notificaciones</p>
-            <p className="staff-item">{project.notificaciones ? "Activadas" : "Desactivadas"}</p>
+            <div className="project-section">
+              <span className="project-label">Estado</span>
+              <span className="project-value">
+                {project.finalizado ? "Finalizado" : "En progreso"}
+              </span>
+            </div>
 
-            <p className="section-label">Estado</p>
-            <p className="staff-item">{project.finalizado ? "Finalizado" : "En progreso"}</p>
-
-            {/* BOTÓN BORRAR */}
             <button
               className="delete-btn"
               onClick={(e) => {
-                e.stopPropagation(); // evita abrir el proyecto al borrar
-                deleteProject(index);
+                e.stopPropagation();
+                deleteProject(project.id);
               }}
             >
               Borrar
             </button>
 
           </div>
-        ))}
 
+        ))}
       </div>
 
       {/* MODAL */}

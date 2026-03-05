@@ -1,10 +1,11 @@
 import React from "react";
 import "./CssModalProject.css";
+import "./CssCard.css";
 
 export default function ModalProject({
   isOpen,
   onClose,
-  title = "Add New Project",
+  title = "Añadir nuevo proyecto",
   data,
   onChange,
   onAddUser,
@@ -68,7 +69,7 @@ export default function ModalProject({
                 className="cyber-input"
                 type="text"
                 placeholder="Nombre del usuario"
-                value={u.value}
+                value={u}
                 onChange={(e) => onChangeUser(i, e.target.value)}
               />
 
@@ -100,7 +101,16 @@ export default function ModalProject({
           <label>Notificaciones</label>
         </div>
 
-        {/*Footer */}
+        <div className="cyber-checkbox">
+          <input
+            type="checkbox"
+            checked={finalizado}
+            onChange={(e) => onChange("finalizado", e.target.checked)}
+          />
+          <label>Finalizado</label>
+        </div>
+
+        {/* Footer */}
         <div className="modal-cyber-footer">
           <button className="cyber-btn-outline" onClick={onClose}>
             Cancelar

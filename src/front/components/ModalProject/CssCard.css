@@ -1,0 +1,67 @@
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 100px;
+    width: 100%;
+    margin-top: 60px;
+}
+
+.project-rect {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  padding: 16px;
+  border-radius: 10px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.project-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #00eaff;
+  text-align: left;
+}
+
+.project-section {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.project-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #8be0ff;
+  margin-bottom: 2px;
+}
+
+.project-value {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #ffffff;
+}
+
+.project-users {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.delete-btn {
+  margin-top: 10px;
+  align-self: flex-start;
+  background: #ff4d4d;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-weight: 600;
+}
+
+.delete-btn:hover {
+  background: #ff1f1f;
+}
