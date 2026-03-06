@@ -44,39 +44,59 @@ class ProjectService:
 
     @staticmethod
     def create(data):
-        if "project_id" not in data:
-            abort(400, description="Field 'project_id' is mandatory")
-
-        required_fields = ["name", "created_by"]
+        required_fields = ["user_id", "name", "created_by"]
         for field in required_fields:
-            if field not in data or not data[field]:
+            if field not in data or data[field] is None or data[field] == "":
                 abort(400, description=f"Field '{field}' is mandatory")
 
-        # Verify that project exists
-        project = Project.query.get(data["project_id"])
-        if project is None:
-            abort(
-                404, description=f"Project with id {data['user_id']} not found")
+        owner = User.query.get(data["user_id"])
+        if owner is None:
+            abort(404, description=f"User with id {data['user_id']} not found")
 
-        # Validate fields before order execution
-        # y comprobar que es jefe o admin
-        if not User.query.filter_by(id=data["created_by"]).first():
+        creator = User.query.get(data["created_by"])
+        if creator is None:
             abort(404, description="Creator user not found")
 
-        # Validar que deadline sea mayor que start date
+        if creator.role not in (RoleName.admin, RoleName.head):
+            abort(403, description="created_by must be admin or head")
+
+        now_utc = datetime.now(timezone.utc)
+
+        if "created_at" in data and data["created_at"] is not None:
+            try:
+                created_at = parse_dt_utc(data["created_at"], "created_at")
+            except ValueError as e:
+                abort(400, description=str(e))
+
+            if created_at > now_utc:
+                abort(400, description="created_at cannot be in the future (UTC)")
+        else:
+            created_at = now_utc
+
+        deadline = None
+        if "deadline" in data and data["deadline"] is not None:
+            try:
+                deadline = parse_dt_utc(data["deadline"], "deadline")
+            except ValueError as e:
+                abort(400, description=str(e))
+
+            if deadline < created_at:
+                abort(400, description="deadline must be >= created_at (UTC)")
 
         try:
             new_project = Project(
+                user_id=data["user_id"],
                 name=data["name"],
                 created_by=data["created_by"],
-                created_at=data["created_at"],
-                deadline=data["deadline"],
+                created_at=created_at,
+                deadline=deadline,
                 finalized=data.get("finalized", False)
             )
 
             db.session.add(new_project)
             db.session.commit()
             return new_project.serialize()
+
         except Exception as error:
             db.session.rollback()
             abort(500, description=f"Error creating project: {str(error)}")

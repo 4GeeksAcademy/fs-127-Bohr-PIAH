@@ -50,10 +50,11 @@ class Project(db.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "user_id": self.user_id,
             "name": self.name,
             "created_by": self.created_by,
-            "created_at": self.created_at,
-            "deadline": self.deadline,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "deadline": self.deadline.isoformat() if self.deadline else None,
             "finalized": self.finalized
         }
 
