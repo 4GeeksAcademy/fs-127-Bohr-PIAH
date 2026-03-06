@@ -29,8 +29,13 @@ class Task(db.Model):
 
     # status: Mapped[str] = mapped_column(
     #     String(50), default="to_do", nullable=False)
+    # status: Mapped[Status] = mapped_column(
+    #     Enum(Status), default="to_do", nullable=False)
     status: Mapped[Status] = mapped_column(
-        Enum(Status), default="to_do", nullable=False)
+        Enum(Status, name="status", native_enum=True),
+        default=Status.to_do,
+        nullable=False
+    )
     alert: Mapped[bool] = mapped_column(Boolean, default=False)
 
     todo_by: Mapped[Optional[int]] = mapped_column(
