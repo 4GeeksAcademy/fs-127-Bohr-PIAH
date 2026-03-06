@@ -12,7 +12,7 @@ def get_projects():
 
 
 # GET /api/projects/<id> - Get project by id
-@project_bp.route('/<int:projects_id>', methods=['GET'])
+@project_bp.route('/<int:project_id>', methods=['GET'])
 def get_project(project_id):
     project = ProjectService.get_by_id(project_id)
     return jsonify(project), 200
@@ -46,7 +46,7 @@ def delete_project(project_id):
 
 
 # GET /api/projects/<id> - Get project with all wp and tasks
-@project_bp.route('/<int:project_id>', methods=['GET'])
+@project_bp.route('/<int:project_id>/tree', methods=['GET'])
 def get_project_tree(project_id):
     project = ProjectService.get_by_id_tree(project_id)
     return jsonify(project), 200
