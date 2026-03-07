@@ -6,9 +6,8 @@ const initialProject = {
   nombre: "",
   wpDeadline: "",
   taskDeadline: "",
-  users: [""],
-  notificaciones: false,
-  finalizado: false
+  teamLeader: "",
+  users: []
 };
 
 export const MenuProjects = () => {
@@ -16,12 +15,23 @@ export const MenuProjects = () => {
   const [projects, setProjects] = useState([]);
   const [projectData, setProjectData] = useState(initialProject);
 
+  // Saber si estamos editando
+  const [editingId, setEditingId] = useState(null);
+
   // Cambios generales del formulario
   const handleChange = (field, value) => {
     setProjectData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Usuarios dinámicos
+  // Lider
+  const onChangeLeader = (value) => {
+    setProjectData(prev => ({
+      ...prev,
+      teamLeader: value
+    }));
+  };
+
+  // Usuarios 
   const onAddUser = () => {
     setProjectData(prev => ({
       ...prev,
@@ -44,17 +54,29 @@ export const MenuProjects = () => {
     });
   };
 
-  // Guardar proyecto
+  // Guardar proyecto (crear o editar)
   const handleSaveProject = () => {
-    setProjects(prev => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        ...projectData
-      }
-    ]);
+    if (editingId) {
+      // MODO EDICIÓN
+      setProjects(prev =>
+        prev.map(p =>
+          p.id === editingId ? { ...p, ...projectData } : p
+        )
+      );
+    } else {
+      // MODO CREACIÓN
+      setProjects(prev => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          ...projectData
+        }
+      ]);
+    }
 
+    // Reset
     setProjectData(initialProject);
+    setEditingId(null);
     setShowModal(false);
   };
 
@@ -63,66 +85,69 @@ export const MenuProjects = () => {
     setProjects(prev => prev.filter(p => p.id !== id));
   };
 
-  // Click en proyecto
-  const handleProjectClick = (projectName) => {
-    console.log("Entrar a:", projectName);
-    // Aquí puedes navegar con React Router si quieres
-    // navigate(`/project/${projectName}`);
+  // Click en proyecto → editar
+  const handleProjectClick = (project) => {
+    setProjectData(project);   // cargar datos en el modal
+    setEditingId(project.id);  // activar modo edición
+    setShowModal(true);
   };
 
   return (
     <div className="home-wrapper">
 
-      <h2 className="welcome-text p-3">Menú de mis proyectos</h2>
+      <h2 className="welcome-text p-3">My Projects</h2>
 
       <div className="action-grid d-flex">
-        <div className="sub-feature m-1" style={{ cursor: 'pointer' }} onClick={() => setShowModal(true)}>
-          <div className="feature-title">Crear nuevo proyecto</div>
+        <div
+          className="sub-feature m-1"
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            setProjectData(initialProject);
+            setEditingId(null);
+            setShowModal(true);
+          }}
+        >
+          <div className="feature-title">New Project</div>
         </div>
 
         <div className="sub-feature m-1" style={{ cursor: 'pointer' }}>
-          <p>Crear nuevo reporte</p>
+          <p>New Report</p>
         </div>
       </div>
 
       {/* LISTA DE PROYECTOS */}
-      <div className="features-grid">
+      <div className="projects-grid">
         {projects.map((project) => (
-          <div className="project-rect" onClick={() => handleProjectClick(project)}>
+          <div
+            key={project.id}
+            className="project-rect"
+            onClick={() => handleProjectClick(project)}
+          >
 
             <h3 className="project-title">{project.nombre}</h3>
 
             <div className="project-section">
-              <span className="project-label">Deadline WP</span>
+              <span className="project-label">Start Project</span>
               <span className="project-value">{project.wpDeadline || "Sin fecha"}</span>
             </div>
 
             <div className="project-section">
-              <span className="project-label">Deadline Tareas</span>
+              <span className="project-label">End Project</span>
               <span className="project-value">{project.taskDeadline || "Sin fecha"}</span>
             </div>
 
             <div className="project-section">
-              <span className="project-label">Usuarios</span>
+              <span className="project-label">Leader</span>
+              <span className="project-value">• {project.teamLeader || "Sin líder"}</span>
+            </div>
+
+            <div className="project-section">
+              <span className="project-label">Users</span>
               <div className="project-users">
                 {project.users.map((u, i) => (
                   <span key={i} className="project-value">• {u}</span>
                 ))}
               </div>
-            </div>
-
-            <div className="project-section">
-              <span className="project-label">Notificaciones</span>
-              <span className="project-value">
-                {project.notificaciones ? "Activadas" : "Desactivadas"}
-              </span>
-            </div>
-
-            <div className="project-section">
-              <span className="project-label">Estado</span>
-              <span className="project-value">
-                {project.finalizado ? "Finalizado" : "En progreso"}
-              </span>
             </div>
 
             <button
@@ -132,23 +157,28 @@ export const MenuProjects = () => {
                 deleteProject(project.id);
               }}
             >
-              Borrar
+              Delete
             </button>
 
           </div>
-
         ))}
       </div>
 
       {/* MODAL */}
       <ModalProject
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => {
+          setShowModal(false);
+          setEditingId(null);
+          setProjectData(initialProject);
+        }}
+        title={editingId ? "Edit Project" : "Add New Project"}
         data={projectData}
         onChange={handleChange}
         onAddUser={onAddUser}
         onDeleteUser={onDeleteUser}
         onChangeUser={onChangeUser}
+        onChangeLeader={onChangeLeader}
         onSubmit={handleSaveProject}
       />
 

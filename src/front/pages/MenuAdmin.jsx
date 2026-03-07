@@ -59,7 +59,7 @@ export const MenuAdmin = () => {
 
             {/* LISTA DE DEPARTAMENTOS DINÁMICA */}
             <div className="projects-panel">
-                <div className="features-grid">
+                <div className="z">
 
                     {departments.map((dpto, index) => (
                         <div
