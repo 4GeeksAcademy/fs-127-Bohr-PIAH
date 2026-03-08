@@ -1,31 +1,10 @@
 from datetime import datetime, timezone
 from flask import abort
-from api.models import db, Project, User
 from sqlalchemy.orm import selectinload
+from api.models import db, Project, User, Department
 from api.models.user import RoleName
 from api.models.work_package import WorkPackage
-
-
-def parse_dt_utc(value, field_name) -> datetime:
-    if isinstance(value, datetime):
-        dt = value
-    elif isinstance(value, str):
-        s = value.strip()
-        if s.endswith("Z"):
-            s = s[:-1] + "+00:00"
-        try:
-            dt = datetime.fromisoformat(s)
-        except ValueError:
-            raise ValueError(f"{field_name} must be ISO 8601 datetime")
-    else:
-        raise ValueError(f"{field_name} must be datetime or ISO string")
-
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    else:
-        dt = dt.astimezone(timezone.utc)
-
-    return dt
+from api.services.common import parse_dt_utc
 
 
 class ProjectService:
@@ -43,15 +22,33 @@ class ProjectService:
         return project.serialize()
 
     @staticmethod
+    def get_projects_by_department(department_id):
+        department = Department.query.get(department_id)
+        if department is None:
+            abort(
+                404, description=f"Department with id {department_id} not found")
+
+        projects = Project.query.filter_by(department_id=department_id).all()
+        return [project.serialize() for project in projects]
+
+    @staticmethod
     def create(data):
-        required_fields = ["user_id", "name", "created_by"]
+        required_fields = ["department_id", "name", "created_by"]
         for field in required_fields:
             if field not in data or data[field] is None or data[field] == "":
                 abort(400, description=f"Field '{field}' is mandatory")
 
-        owner = User.query.get(data["user_id"])
+        department = Department.query.get(data["department_id"])
+        if department is None:
+            abort(
+                404, description=f"Department with id {data['department_id']} not found")
+
+        if department.head_id is None:
+            abort(400, description="Department must have a head before creating projects")
+
+        owner = User.query.get(department.head_id)
         if owner is None:
-            abort(404, description=f"User with id {data['user_id']} not found")
+            abort(404, description="Department head user not found")
 
         creator = User.query.get(data["created_by"])
         if creator is None:
@@ -85,7 +82,8 @@ class ProjectService:
 
         try:
             new_project = Project(
-                user_id=data["user_id"],
+                department_id=department.id,
+                user_id=department.head_id,
                 name=data["name"],
                 created_by=data["created_by"],
                 created_at=created_at,
@@ -122,6 +120,19 @@ class ProjectService:
 
             project.created_by = creator.id
 
+        if "department_id" in data and data["department_id"] is not None:
+            department = Department.query.get(data["department_id"])
+            if department is None:
+                abort(
+                    404, description=f"Department with id {data['department_id']} not found")
+
+            if department.head_id is None:
+                abort(
+                    400, description="Department must have a head before assigning projects")
+
+            project.department_id = department.id
+            project.user_id = department.head_id
+
         if "created_at" in data and data["created_at"] is not None:
             try:
                 created_at = parse_dt_utc(data["created_at"], "created_at")
@@ -130,6 +141,19 @@ class ProjectService:
 
             if created_at > now_utc:
                 abort(400, description="created_at cannot be in the future (UTC)")
+
+            current_deadline = project.deadline
+            if current_deadline is not None:
+                if current_deadline.tzinfo is None:
+                    current_deadline = current_deadline.replace(
+                        tzinfo=timezone.utc)
+                else:
+                    current_deadline = current_deadline.astimezone(
+                        timezone.utc)
+
+                if current_deadline < created_at:
+                    abort(
+                        400, description="created_at cannot be greater than current deadline (UTC)")
 
             project.created_at = created_at
 
@@ -150,6 +174,8 @@ class ProjectService:
                 if isinstance(created_at_ref, datetime) and created_at_ref.tzinfo is None:
                     created_at_ref = created_at_ref.replace(
                         tzinfo=timezone.utc)
+                else:
+                    created_at_ref = created_at_ref.astimezone(timezone.utc)
 
                 if deadline < created_at_ref:
                     abort(400, description="deadline must be >= created_at (UTC)")
@@ -192,7 +218,6 @@ class ProjectService:
         )
 
         if project is None:
-            abort(
-                404, description=f"Project with id {project_id} not found")
+            abort(404, description=f"Project with id {project_id} not found")
 
         return project.serialize_with_wps()

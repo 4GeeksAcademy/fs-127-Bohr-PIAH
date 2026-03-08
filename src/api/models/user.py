@@ -35,23 +35,20 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     password: Mapped[str] = mapped_column(String(255))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)  # añadida
-    # role: Mapped[RoleName] = mapped_column(
-    #     Enum(RoleName, name="role_name", native_enum=True),
-    #     nullable=False, default=RoleName.guest)  # cambiado
     role: Mapped[RoleName] = mapped_column(
         Enum(RoleName, name="rolename", native_enum=True),
         nullable=False,
         default=RoleName.guest
     )
     department_id: Mapped[int | None] = mapped_column(
-        ForeignKey("departments.id"),
+        ForeignKey("departments.id", ondelete="SET NULL"),
         nullable=True,
     )
 
-    # Relaciones
     department: Mapped["Department"] = relationship(
         "Department",
         back_populates="users",
+        foreign_keys=[department_id]
     )
 
     user_projects: Mapped[List["UserProject"]] = relationship(

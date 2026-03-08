@@ -50,3 +50,10 @@ def delete_project(project_id):
 def get_project_tree(project_id):
     project = ProjectService.get_by_id_tree(project_id)
     return jsonify(project), 200
+
+
+# GET api/departments/<int:department_id>/projects - get department with projects
+@project_bp.route("<int:department_id>/projects", methods=["GET"])
+def get_projects_by_department(department_id):
+    result = ProjectService.get_projects_by_department(department_id)
+    return jsonify(result), 200

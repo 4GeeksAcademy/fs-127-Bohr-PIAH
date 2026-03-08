@@ -21,7 +21,7 @@ class UserService:
     def get_by_id(user_id):
         user = User.query.get(user_id)
         if user is None:
-            abort(404, description=f"Usuario con id {user_id} no encontrado")
+            abort(404, description=f"User with id {user_id} not found")
         return user.serialize()
 
     @staticmethod
@@ -53,30 +53,30 @@ class UserService:
             return new_user.serialize()
         except Exception as error:
             db.session.rollback()
-            abort(500, description=f"Error al crear usuario: {str(error)}")
+            abort(500, description=f"Error creating user: {str(error)}")
 
     @staticmethod
     def update(user_id, data):
         user = User.query.get(user_id)
         if user is None:
-            abort(404, description=f"Usuario con id {user_id} no encontrado")
+            abort(404, description=f"User with id {user_id} not found")
 
-        if "email" in data and data["email"] != user.email:
+        if "email" in data and data["email"] != user.email and data["email"] is not None:
             if User.query.filter_by(email=data["email"]).first():
-                abort(409, description="Ya existe un usuario con ese email")
+                abort(409, description="User with that email already existing")
             user.email = data["email"]
 
-        if "password" in data:
+        if "password" in data and data["password"] is not None:
             user.set_password(data["password"])
-        if "first_name" in data:
+        if "first_name" in data and data["first_name"] is not None:
             user.set_first_name(data["first_name"])
-        if "last_name" in data:
+        if "last_name" in data and data["last_name"] is not None:
             user.set_last_name(data["last_name"])
-        if "role" in data:
+        if "role" in data and data["role"] is not None:
             if data["role"] not in VALID_ROLES:
                 abort(400, description=f"Invalid role {data['role']}")
             user.set_role(data["role"])
-        if "is_active" in data:
+        if "is_active" in data and data["is_active"] is not None:
             user.is_active = data["is_active"]
 
         try:
@@ -85,22 +85,22 @@ class UserService:
         except Exception as error:
             db.session.rollback()
             abort(
-                500, description=f"Error al actualizar usuario: {str(error)}")
+                500, description=f"Error updating user: {str(error)}")
 
     @staticmethod
     def delete(user_id):
         user = User.query.get(user_id)
         if user is None:
-            abort(404, description=f"Usuario con id {user_id} no encontrado")
+            abort(404, description=f"User with id {user_id} no t found")
 
         email = user.email
         try:
             db.session.delete(user)
             db.session.commit()
-            return {"message": f"Usuario '{email}' eliminado correctamente"}
+            return {"message": f"user '{email}' deleted correctly"}
         except Exception as error:
             db.session.rollback()
-            abort(500, description=f"Error al eliminar usuario: {str(error)}")
+            abort(500, description=f"Error deleting user: {str(error)}")
 
     @staticmethod
     def get_by_id_with_projects(user_id):
