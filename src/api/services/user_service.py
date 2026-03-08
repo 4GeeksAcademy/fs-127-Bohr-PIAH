@@ -36,7 +36,7 @@ class UserService:
             abort(409, description="User with that email already existing")
 
         if data["role"] not in VALID_ROLES:
-            abort(400, description=f"Invalid role {data["role"]}")
+            abort(400, description=f"Invalid role {data['role']}")
 
         try:
             role_enum = RoleName(data["role"])

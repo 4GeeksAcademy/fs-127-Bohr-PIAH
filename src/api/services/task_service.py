@@ -84,9 +84,13 @@ class TaskService:
             abort(404, description=f"task with id {task_id} not found")
 
         if "todo_by" in data:
-            if User.query.filter_by(id=data["todo_by"]).first():
-                abort(404, description="User not found")
-            task.todo_by = data["todo_by"]
+            if data["todo_by"] is None:
+                task.todo_by = None
+            else:
+                assignee = User.query.get(data["todo_by"])
+                if assignee is None:
+                    abort(404, description="User not found")
+                task.todo_by = data["todo_by"]
 
         if "name" in data and data["name"] is not None:
             task.name(data["name"])
@@ -95,8 +99,8 @@ class TaskService:
             task.task_description(data["task_description"])
 
         if "status" in data and data["status"] is not None:
-            if data["satus"] not in VALID_STATUSES:
-                abort(404, description=f"Invalid status: {data["status"]}")
+            if data["status"] not in VALID_STATUSES:
+                abort(404, description=f"Invalid status: {data['status']}")
             task.status(data["status"])
 
         if "alert" in data and data["alert"] is not None:
