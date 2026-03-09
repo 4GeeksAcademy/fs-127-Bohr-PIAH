@@ -11,7 +11,7 @@ class Department(db.Model):
     name: Mapped[str] = mapped_column(String(255), unique=True)
 
     head_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("users.id", ondelete="SET NULL"),
+        ForeignKey("users.id",use_alter= True, ondelete="SET NULL"),
         nullable=True,
         unique=True
     )
