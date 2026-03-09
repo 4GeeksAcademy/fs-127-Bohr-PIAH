@@ -12,8 +12,7 @@
 *::before,
 *::after { box-sizing: border-box; }
 
-
-.projects-grid {
+.dpto-panel {
   display: flex;
   flex-wrap: wrap;
   gap: var(--gap);
@@ -24,8 +23,7 @@
   padding: 0 12px;
 }
 
-/* ancho de la tarjeta */
-.project-rect {
+.dpto-rect {
   width: 300px;
   max-width: 100%;
   background: var(--card-bg);
@@ -44,57 +42,52 @@
 }
 
 /* Hover y foco */
-.project-rect:hover,
-.project-rect:focus-within {
+.dpto-rect:hover,
+.dpto-rect:focus-within {
   transform: translateY(-6px) scale(1.01);
   box-shadow: 0 18px 40px rgba(116,185,255,0.12);
   border-color: rgba(116,185,255,0.35);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .project-rect,
+  .dpto-rect,
   .delete-btn {
     transition: none;
   }
 }
 
 /* Títulos y textos */
-.project-title {
+.dpto-title {
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 0.4rem;
   color: var(--accent-strong);
 }
 
-.project-section {
+.personal-section {
   display: flex;
   flex-direction: column;
   text-align: left;
 }
 
-.project-label {
+.section-leader,
+.section-team {
   font-size: 0.85rem;
   font-weight: 600;
   color: #8be0ff;
-  margin-bottom: 2px;
+  margin-bottom: 0.25rem;
 }
 
-.project-value {
-  font-size: 1rem;
-  font-weight: 400;
+.item-section {
+  font-size: 0.95rem;
   color: #ffffff;
-}
-
-.project-users {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  margin: 0.15rem 0;
+  padding-left: 0.35rem;
 }
 
 /* Botón borrar accesible */
 .delete-btn {
-  margin-top: auto;
-  align-self: flex-end; 
+  margin-top: 18px;
   background: transparent;
   border: 1px solid var(--danger);
   color: var(--danger);
@@ -117,11 +110,11 @@
 
 /* Responsivo corregido */
 @media (max-width: 480px) {
-  .project-rect {
+  .dpto-rect {
     width: 100%;
     padding: 1.1rem;
   }
-  .project-panel {
+  .dpto-panel {
     justify-content: center;
     gap: 12px;
   }

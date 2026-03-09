@@ -4,8 +4,8 @@ import ModalProject from "../components/ModalProject/ModalProject";
 // Estado inicial del proyecto
 const initialProject = {
   nombre: "",
-  wpDeadline: "",
-  taskDeadline: "",
+  startproject: "",
+  endproject: "",
   teamLeader: "",
   users: []
 };
