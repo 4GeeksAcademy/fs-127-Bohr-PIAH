@@ -34,14 +34,7 @@ export const KanbanColumn = ({ columnRef, tasks, title, borderColor, ledColor, o
             <div className="d-flex justify-content-between align-items-center gap-3 mb-3">
                 <div className="d-flex align-items-center gap-3">
                     <div
-                        style={{
-                            width: "10px",
-                            height: "10px",
-                            borderRadius: "50%",
-                            backgroundColor: ledColor,
-                            boxShadow: `0 0 10px ${ledColor}`
-                        }}
-                    />
+                        style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: ledColor, boxShadow: `0 0 10px ${ledColor}` }}/>
                     <p className="feature-title mb-0" style={{ fontSize: "0.85rem", color: "#FFFFFF" }}>{title}</p>
                 </div>
 
@@ -65,7 +58,7 @@ export const KanbanColumn = ({ columnRef, tasks, title, borderColor, ledColor, o
                         value={newTaskText}
                         onChange={(e) => setNewTaskText(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && confirmAddTask()}
-                        placeholder="Nueva tarea..."
+                        placeholder="New task..."
                         autoFocus
                     />
                     <button className="btn btn-sm btn-success" onClick={confirmAddTask}>Add</button>
