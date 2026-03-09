@@ -1,34 +1,41 @@
 import { useState } from "react";
 import ModalProject from "../components/ModalProject/ModalProject";
 
+// Estado inicial del proyecto
+const initialProject = {
+  nombre: "",
+  startproject: "",
+  endproject: "",
+  teamLeader: "",
+  users: []
+};
+
 export const MenuProjects = () => {
-
   const [showModal, setShowModal] = useState(false);
-
-  // Lista dinámica de proyectos
   const [projects, setProjects] = useState([]);
+  const [projectData, setProjectData] = useState(initialProject);
 
-  // Datos del modal
-  const [projectData, setProjectData] = useState({
-    nombre: "",
-    wpDeadline: "",
-    taskDeadline: "",
-    users: [{ value: "" }],
-    notificaciones: false,
-    finalizado: false
-  });
+  // Saber si estamos editando
+  const [editingId, setEditingId] = useState(null);
 
+  // Cambios generales del formulario
   const handleChange = (field, value) => {
+    setProjectData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Lider
+  const onChangeLeader = (value) => {
     setProjectData(prev => ({
       ...prev,
-      [field]: value
+      teamLeader: value
     }));
   };
 
+  // Usuarios 
   const onAddUser = () => {
     setProjectData(prev => ({
       ...prev,
-      users: [...prev.users, { value: "" }]
+      users: [...prev.users, ""]
     }));
   };
 
@@ -42,117 +49,136 @@ export const MenuProjects = () => {
   const onChangeUser = (index, newValue) => {
     setProjectData(prev => {
       const updated = [...prev.users];
-      updated[index].value = newValue;
+      updated[index] = newValue;
       return { ...prev, users: updated };
     });
   };
 
-  // Guardar proyecto
+  // Guardar proyecto (crear o editar)
   const handleSaveProject = () => {
-    setProjects(prev => [
-      ...prev,
-      {
-        nombre: projectData.nombre,
-        wpDeadline: projectData.wpDeadline,
-        taskDeadline: projectData.taskDeadline,
-        users: projectData.users,
-        notificaciones: projectData.notificaciones,
-        finalizado: projectData.finalizado
-      }
-    ]);
+    if (editingId) {
+      // MODO EDICIÓN
+      setProjects(prev =>
+        prev.map(p =>
+          p.id === editingId ? { ...p, ...projectData } : p
+        )
+      );
+    } else {
+      // MODO CREACIÓN
+      setProjects(prev => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          ...projectData
+        }
+      ]);
+    }
 
-    // Reset modal
-    setProjectData({
-      nombre: "",
-      wpDeadline: "",
-      taskDeadline: "",
-      users: [{ value: "" }],
-      notificaciones: false,
-      finalizado: false
-    });
-
+    // Reset
+    setProjectData(initialProject);
+    setEditingId(null);
     setShowModal(false);
   };
 
   // Borrar proyecto
-  const deleteProject = (index) => {
-    setProjects(prev => prev.filter((_, i) => i !== index));
+  const deleteProject = (id) => {
+    setProjects(prev => prev.filter(p => p.id !== id));
   };
 
-  const handleProjectClick = (projectName) => {
-    console.log("Entrar a:", projectName);
+  // Click en proyecto → editar
+  const handleProjectClick = (project) => {
+    setProjectData(project);   // cargar datos en el modal
+    setEditingId(project.id);  // activar modo edición
+    setShowModal(true);
   };
 
   return (
     <div className="home-wrapper">
 
-      <h2 className="welcome-text p-3">Menú de mis proyectos</h2>
+      <h2 className="welcome-text p-3">My Projects</h2>
 
       <div className="action-grid d-flex">
-        <div className="sub-feature m-1" style={{ cursor: 'pointer' }} onClick={() => setShowModal(true)}>
-          <div className="feature-title">Crear nuevo proyecto</div>
+        <div
+          className="sub-feature m-1"
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            setProjectData(initialProject);
+            setEditingId(null);
+            setShowModal(true);
+          }}
+        >
+          <div className="feature-title">New Project</div>
         </div>
 
-        <div className="sub-feature m-1" style={{ cursor: 'pointer' }} onClick={() => setShowModal(true)}>
-          <p>Crear nuevo reporte</p>
+        <div className="sub-feature m-1" style={{ cursor: 'pointer' }}>
+          <p>New Report</p>
         </div>
       </div>
 
-      {/* LISTA DINÁMICA DE PROYECTOS */}
-      <div className="features-grid">
-
-        {projects.map((project, index) => (
+      {/* LISTA DE PROYECTOS */}
+      <div className="projects-grid">
+        {projects.map((project) => (
           <div
-            key={index}
+            key={project.id}
             className="project-rect"
-            onClick={() => handleProjectClick(project.nombre)}
-            style={{ cursor: 'pointer' }}
+            onClick={() => handleProjectClick(project)}
           >
 
-            <p className="dept-title">{project.nombre}</p>
+            <h3 className="project-title">{project.nombre}</h3>
 
-            <p className="section-label">Deadline WP</p>
-            <p className="staff-item">{project.wpDeadline || "Sin fecha"}</p>
+            <div className="project-section">
+              <span className="project-label">Start Project</span>
+              <span className="project-value">{project.wpDeadline || "Sin fecha"}</span>
+            </div>
 
-            <p className="section-label">Deadline Tareas</p>
-            <p className="staff-item">{project.taskDeadline || "Sin fecha"}</p>
+            <div className="project-section">
+              <span className="project-label">End Project</span>
+              <span className="project-value">{project.taskDeadline || "Sin fecha"}</span>
+            </div>
 
-            <p className="section-label">Usuarios</p>
-            {project.users.map((u, i) => (
-              <p key={i} className="staff-item">• {u.value}</p>
-            ))}
+            <div className="project-section">
+              <span className="project-label">Leader</span>
+              <span className="project-value">• {project.teamLeader || "Sin líder"}</span>
+            </div>
 
-            <p className="section-label">Notificaciones</p>
-            <p className="staff-item">{project.notificaciones ? "Activadas" : "Desactivadas"}</p>
+            <div className="project-section">
+              <span className="project-label">Users</span>
+              <div className="project-users">
+                {project.users.map((u, i) => (
+                  <span key={i} className="project-value">• {u}</span>
+                ))}
+              </div>
+            </div>
 
-            <p className="section-label">Estado</p>
-            <p className="staff-item">{project.finalizado ? "Finalizado" : "En progreso"}</p>
-
-            {/* BOTÓN BORRAR */}
             <button
               className="delete-btn"
               onClick={(e) => {
-                e.stopPropagation(); // evita abrir el proyecto al borrar
-                deleteProject(index);
+                e.stopPropagation();
+                deleteProject(project.id);
               }}
             >
-              Borrar
+              Delete
             </button>
 
           </div>
         ))}
-
       </div>
 
       {/* MODAL */}
       <ModalProject
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => {
+          setShowModal(false);
+          setEditingId(null);
+          setProjectData(initialProject);
+        }}
+        title={editingId ? "Edit Project" : "Add New Project"}
         data={projectData}
         onChange={handleChange}
         onAddUser={onAddUser}
         onDeleteUser={onDeleteUser}
         onChangeUser={onChangeUser}
+        onChangeLeader={onChangeLeader}
         onSubmit={handleSaveProject}
       />
 

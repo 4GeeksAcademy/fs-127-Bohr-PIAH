@@ -1,5 +1,6 @@
 import React from "react";
 import "./CssModalProject.css";
+import "./CssCard.css";
 
 export default function ModalProject({
   isOpen,
@@ -10,6 +11,7 @@ export default function ModalProject({
   onAddUser,
   onDeleteUser,
   onChangeUser,
+  onChangeLeader,
   onSubmit
 }) {
   if (!isOpen) return null;
@@ -19,20 +21,15 @@ export default function ModalProject({
     wpDeadline,
     taskDeadline,
     users = [],
-    notificaciones,
-    finalizado
+    teamLeader = ""
   } = data;
 
   return (
     <div className="modal-cyber-overlay" onClick={onClose}>
-      <div
-        className="modal-cyber-container"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="modal-cyber-container" onClick={(e) => e.stopPropagation()}>
         <h3 className="modal-cyber-title">{title}</h3>
 
-        {/* Nombre */}
-        <label className="cyber-label">Nombre</label>
+        <label className="cyber-label">Project</label>
         <input
           className="cyber-input"
           type="text"
@@ -40,8 +37,7 @@ export default function ModalProject({
           onChange={(e) => onChange("nombre", e.target.value)}
         />
 
-        {/* WP Deadline */}
-        <label className="cyber-label">Default WP deadline</label>
+        <label className="cyber-label">Start Project</label>
         <input
           className="cyber-input"
           type="date"
@@ -49,8 +45,7 @@ export default function ModalProject({
           onChange={(e) => onChange("wpDeadline", e.target.value)}
         />
 
-        {/* Task Deadline */}
-        <label className="cyber-label">Default task deadline</label>
+        <label className="cyber-label">End Project</label>
         <input
           className="cyber-input"
           type="date"
@@ -58,9 +53,18 @@ export default function ModalProject({
           onChange={(e) => onChange("taskDeadline", e.target.value)}
         />
 
-        {/* Usuarios */}
-        <h4 className="cyber-subtitle">Usuarios</h4>
+        <h4 className="cyber-subtitle">Team Leader</h4>
+        <div className="cyber-user-item">
+          <input
+            className="cyber-input"
+            type="text"
+            placeholder="Nombre del líder"
+            value={teamLeader}
+            onChange={(e) => onChangeLeader(e.target.value)}
+          />
+        </div>
 
+        <h4 className="cyber-subtitle">Users</h4>
         <div className="cyber-user-list">
           {users.map((u, i) => (
             <div key={i} className="cyber-user-item">
@@ -68,46 +72,23 @@ export default function ModalProject({
                 className="cyber-input"
                 type="text"
                 placeholder="Nombre del usuario"
-                value={u.value}
+                value={u}
                 onChange={(e) => onChangeUser(i, e.target.value)}
               />
-
-              <button
-                className="cyber-btn-danger"
-                onClick={() => onDeleteUser(i)}
-              >
+              <button className="cyber-btn-danger" onClick={() => onDeleteUser(i)}>
                 ✖
               </button>
             </div>
           ))}
         </div>
 
-        <button
-          className="cyber-btn-outline"
-          style={{ width: "100%", marginTop: "10px" }}
-          onClick={onAddUser}
-        >
-          Añadir usuario
+        <button className="cyber-btn-outline" style={{ width: "100%", marginTop: "10px" }} onClick={onAddUser}>
+          Add User
         </button>
 
-        {/* Checkboxes */}
-        <div className="cyber-checkbox">
-          <input
-            type="checkbox"
-            checked={notificaciones}
-            onChange={(e) => onChange("notificaciones", e.target.checked)}
-          />
-          <label>Notificaciones</label>
-        </div>
-
-        {/*Footer */}
         <div className="modal-cyber-footer">
-          <button className="cyber-btn-outline" onClick={onClose}>
-            Cancelar
-          </button>
-          <button className="cyber-btn" onClick={onSubmit}>
-            Guardar
-          </button>
+          <button className="cyber-btn-outline" onClick={onClose}>Cancel</button>
+          <button className="cyber-btn" onClick={onSubmit}>Save</button>
         </div>
       </div>
     </div>

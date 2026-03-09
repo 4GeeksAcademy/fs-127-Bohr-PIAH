@@ -78,6 +78,8 @@ class UserService:
             user.set_role(data["role"])
         if "is_active" in data and data["is_active"] is not None:
             user.is_active = data["is_active"]
+        if "department_id" in data:
+            user.department_id = data["department_id"]
 
         try:
             db.session.commit()

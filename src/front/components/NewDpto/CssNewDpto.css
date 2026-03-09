@@ -6,11 +6,11 @@
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
+  backdrop-filter: blur(4px);
 }
 
 /* CAJA PRINCIPAL */
@@ -24,7 +24,6 @@
   padding: 25px;
   box-shadow: 0 0 25px rgba(178, 108, 108, 0.4);
   animation: cyber-pop 0.25s ease-out;
-  position: relative;
 }
 
 /* ANIMACIÓN */
@@ -57,7 +56,7 @@
   right: 8px;
   background: transparent;
   border: none;
-  color:#4da3ff;
+  color: #4da3ff;
   font-size: 16px;
   cursor: pointer;
   transition: 0.3s;
@@ -70,7 +69,7 @@
 
 /* LABELS */
 .cyber-label {
-  color: #4da3ff;
+  color: white;
   font-size: 0.9rem;
   margin-top: 10px;
   margin-bottom: 5px;
@@ -150,70 +149,3 @@
   margin-top: 20px;
 }
 
-.project-rect {
-  text-align: center;
-  width:350px;
-  transition: all 0.3s ease;
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(116, 185, 255, 0.2);
-  border-radius: 20px;
-  padding: 25px 15px;
-  box-shadow:0 0 10px rgba(116, 185, 255, 0.05);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.project-rect p {
-  font-size: 15px;
-  color: white;
-}
-
-
-.project-rect:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0 25px rgba(77, 106, 187, 0.512);
-  border-color: var(--c-elec);
-}
-
-/* Nombre del departamento */
-.project-rect {
-  font-family: "Inter", sans-serif;
-  font-size: 0.82rem;
-  opacity: 1;
-  margin-top: 10px;
-  font-weight: 400;
-  text-shadow: 0 0 6px rgba(55, 43, 43, 0.6);
-}
-
-
-/* Staff */
-.staff-list {
-  margin-top: 5px;
-  font-size: 0.9rem;
-}
-
-.staff-item {
-  margin: 0;
-  color: rgb(255, 255, 255);
-}
-
-/* Botón borrar */
-.delete-btn {
-  margin-top: 30px;
-  background: transparent;
-  border: 1px solid #ff4d4d;
-  color: #ff4d4d;
-  padding: 3px 6px;
-  font-size: 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.25s;
-  gap:8px;
-}
-
-.projects-panel .section-sub-title {
-  display: flex;
-  flex-wrap: wrap;
-  color: rgb(255, 255, 255);
-  gap: 8px;
-}

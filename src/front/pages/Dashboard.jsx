@@ -1,10 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { DashboardNavbar } from "../components/Dashboard/DashboardNavbar"; 
+import { DashboardNavbar } from "../components/Dashboard/DashboardNavbar";
 import { Sidebar } from "../components/Dashboard/Sidebar";
-import {MainBoard} from "../components/Dashboard/MainBoard"
+import { MainBoard } from "../components/Dashboard/MainBoard"
 import { Orbit, UserCheck, Zap, ShieldAlert, BarChart3, Settings } from "lucide-react";
 import { BohrLogo } from "../components/BohrLogo";
+import { useState } from "react";
 
 
 export const Dashboard = () => {
@@ -16,11 +17,17 @@ export const Dashboard = () => {
         { id: 3, title: "WORK PACKAGE 3", status: "Review" }
     ];
 
-    const activeProjects = [
-        { id: 101, name: "Proyecto 1" },
-        { id: 102, name: "Proyecto 2" },
-        { id: 103, name: "Proyecto 3" }
+    const [activeProjects, setActiveProjects] = useState([]);
+
+    const exampleProjects = [
+        { id: 101, name: "Project 1" },
+        { id: 102, name: "Project 2" },
+        { id: 103, name: "Project 3" }
     ];
+
+     const projectsToShow = activeProjects.length ? activeProjects : exampleProjects;
+
+    
 
     return (
         <div className="home-wrapper v1 dashboard-container">
@@ -30,7 +37,7 @@ export const Dashboard = () => {
                 <div className="row g-4 px-md-4">
 
                     {/* LADO IZQUIERDO */}
-                    <Sidebar activeProjects={activeProjects} />
+                    <Sidebar activeProjects={projectsToShow} />
 
                     {/* LADO DERECHO */}
                     <MainBoard workModes={workModes} />

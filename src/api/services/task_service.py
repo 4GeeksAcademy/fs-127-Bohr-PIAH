@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from flask import abort
-from api.models import db, Task, User
+from api.models import db, Task, User, WorkPackage
 from api.models.task import Status
 from api.services.common import parse_dt_utc
 VALID_STATUSES = {status.value for status in Status}
@@ -29,7 +29,7 @@ class TaskService:
             if field not in data or not data[field]:
                 abort(400, description=f"Field '{field}' is mandatory")
 
-        if not Task.query.filter_by(wp_id=data["wp_id"]).first():
+        if not WorkPackage.query.filter_by(id=data["wp_id"]).first():
             abort(409, description="Work package non existant")
 
         if not User.query.filter_by(id=data["todo_by"]).first():
@@ -93,18 +93,18 @@ class TaskService:
                 task.todo_by = data["todo_by"]
 
         if "name" in data and data["name"] is not None:
-            task.name(data["name"])
+            task.name = data["name"]
 
         if "task_description" in data and data["task_description"] is not None:
-            task.task_description(data["task_description"])
+            task.task_description = data["task_description"]
 
         if "status" in data and data["status"] is not None:
             if data["status"] not in VALID_STATUSES:
                 abort(404, description=f"Invalid status: {data['status']}")
-            task.status(data["status"])
+            task.status = data["status"]
 
         if "alert" in data and data["alert"] is not None:
-            task.alert(data["alert"])
+            task.alert = data["alert"]
 
         now_utc = datetime.now(timezone.utc)
         if "created_at" in data and data["created_at"] is not None:

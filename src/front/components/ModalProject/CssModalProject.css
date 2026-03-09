@@ -93,14 +93,6 @@
     align-items: center;
 }
 
-/* CHECKBOXES */
-.cyber-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: white;
-    margin-bottom: 10px;
-}
 
 /* BOTONES */
 .cyber-btn {

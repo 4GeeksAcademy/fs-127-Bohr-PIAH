@@ -39,7 +39,7 @@ export const Sidebar = ({ activeProjects }) => {
                 {/* 4. BOTÓN FINALIZADOS */}
                 <div className="feature-item w-100 d-flex align-items-center gap-3 py-3 px-4" style={{ cursor: 'pointer', minHeight: '80px' }}>
                     <Zap size={32} strokeWidth={1.5} color="#27E6D6" />
-                    <p className="feature-title mb-0" style={{ fontSize: "0.9rem" }}>FINALIZADOS</p>
+                    <p className="feature-title mb-0" style={{ fontSize: "0.9rem" }}>FINISHED</p>
                 </div>
 
             </div>

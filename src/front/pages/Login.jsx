@@ -12,14 +12,14 @@ export const Login = () => {
 
         <form className="cyber-form">
 
-          <label className="cyber-label">Correo</label>
+          <label className="cyber-label">Email</label>
           <input
             type="email"
             className="cyber-input"
             placeholder="correo@ejemplo.com"
           />
 
-          <label className="cyber-label">Contraseña</label>
+          <label className="cyber-label">Password</label>
           <input
             type="password"
             className="cyber-input"
