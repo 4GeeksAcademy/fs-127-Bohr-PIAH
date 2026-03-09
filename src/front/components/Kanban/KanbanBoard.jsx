@@ -6,10 +6,10 @@ import { KanbanColumn } from "./KanbanColumn";
 
 export const KanbanBoard = () => {
 
-    const [todoRef, todoTasks] = useDragAndDrop(["Tarea 1", "Tarea 2"], { group: "bohrTasks" });
-    const [progressRef, progressTasks] = useDragAndDrop(["Tarea 3"], { group: "bohrTasks" });
-    const [reviewRef, reviewTasks] = useDragAndDrop(["Tarea 4"], { group: "bohrTasks" });
-    const [doneRef, doneTasks] = useDragAndDrop(["Tarea 5"], { group: "bohrTasks" });
+    const [todoRef, todoTasks] = useDragAndDrop(["Task 1", "Task 2"], { group: "bohrTasks" });
+    const [progressRef, progressTasks] = useDragAndDrop(["Task 3"], { group: "bohrTasks" });
+    const [reviewRef, reviewTasks] = useDragAndDrop(["Task 4"], { group: "bohrTasks" });
+    const [doneRef, doneTasks] = useDragAndDrop(["Task 5"], { group: "bohrTasks" });
     const [, setUpdate] = useState(0);
 
 
