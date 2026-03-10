@@ -6,10 +6,12 @@ import { MainBoard } from "../components/Dashboard/MainBoard"
 import { Orbit, UserCheck, Zap, ShieldAlert, BarChart3, Settings } from "lucide-react";
 import { BohrLogo } from "../components/BohrLogo";
 import { useState } from "react";
+import useGlobalReducer from "../hooks/useGlobalReducer"; 
 
 
 export const Dashboard = () => {
 
+    const { store } = useGlobalReducer();
 
     const workModes = [
         { id: 1, title: "WORK PACKAGE 1", status: "Active" },
@@ -17,17 +19,18 @@ export const Dashboard = () => {
         { id: 3, title: "WORK PACKAGE 3", status: "Review" }
     ];
 
-    const [activeProjects, setActiveProjects] = useState([]);
+ 
 
     const exampleProjects = [
-        { id: 101, name: "Project 1" },
-        { id: 102, name: "Project 2" },
-        { id: 103, name: "Project 3" }
+        { id: 101, nombre: "Project 1" },
+        { id: 102, nombre: "Project 2" },
+        { id: 103, nombre: "Project 3" }
     ];
 
-     const projectsToShow = activeProjects.length ? activeProjects : exampleProjects;
+   const projectsToShow = store.projects.length ? store.projects : exampleProjects;
 
-    
+
+
 
     return (
         <div className="home-wrapper v1 dashboard-container">

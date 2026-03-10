@@ -1,6 +1,7 @@
 export const initialStore=()=>{
   return{
     message: null,
+    projects: [],
     todos: [
       {
         id: 1,
@@ -18,6 +19,19 @@ export const initialStore=()=>{
 
 export default function storeReducer(store, action = {}) {
   switch(action.type){
+
+    case 'add_project': 
+      return {
+        ...store,
+        projects: [...store.projects, action.payload]
+      };
+      
+      case 'delete_project':
+    return {
+        ...store,
+        projects: store.projects.filter(project => project.id !== action.payload)
+    };
+
     case 'set_hello':
       return {
         ...store,
