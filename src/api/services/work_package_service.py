@@ -11,13 +11,6 @@ class WorkPackageService:
         return [work_package.serialize() for work_package in work_packages]
 
     @staticmethod
-    # def get_by_id(work_package_id):
-    #     work_package = WorkPackage.query.get(work_package_id)
-    #     if work_package is None:
-    #         abort(
-    #             404, description=f"Work package with id {work_package_id} not found")
-    #     return work_package.serialize()
-    @staticmethod
     def get_by_id(work_package_id):
         work_package = WorkPackage.query.get(work_package_id)
         if work_package is None:
@@ -26,13 +19,8 @@ class WorkPackageService:
 
         data = work_package.serialize()
 
-        total_tasks = len(work_package.tasks)
-        done_tasks = sum(
-            1 for task in work_package.tasks if task.status == Status.done
-        ) if total_tasks > 0 else 0
-
-        completion_ratio = done_tasks / total_tasks if total_tasks > 0 else 0
-        data["completion_status"] = completion_ratio
+        completion = WorkPackageService.get_completion_status(work_package_id)
+        data["completion_status"] = completion["completion_status"]
 
         return data
 
@@ -114,7 +102,5 @@ class WorkPackageService:
 
         return {
             "work_package_id": work_package.id,
-            "total_tasks": total_tasks,
-            "done_tasks": 0 if total_tasks == 0 else done_tasks,
             "completion_status": completion_ratio,
         }
