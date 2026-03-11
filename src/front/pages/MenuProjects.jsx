@@ -1,6 +1,5 @@
 import { useState } from "react";
 import ModalProject from "../components/ModalProject/ModalProject";
-import { useContext } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer"; 
 
 
@@ -16,8 +15,9 @@ const initialProject = {
 
 export const MenuProjects = () => {
   const [showModal, setShowModal] = useState(false);
-  const { store, dispatch } = useContext(Context);
+  const { store, dispatch } = useGlobalReducer(); 
   const [projectData, setProjectData] = useState(initialProject);
+   const projects = store.projects || []; 
 
   // Saber si estamos editando
   const [editingId, setEditingId] = useState(null);

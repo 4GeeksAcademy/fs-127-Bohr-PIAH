@@ -1,9 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import { Zap, ShieldAlert, Users, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { KanbanBoard } from "../Kanban/KanbanBoard";
+import useGlobalReducer from "../../hooks/useGlobalReducer"; 
+import ModalWorkPackage from "./ModalWorkPackage"; 
 
 export const MainBoard = ({ workModes }) => {
+
+    const { dispatch } = useGlobalReducer();
+
+
+    // ESTADOS PARA EL MODAL
+
+    const [isWpModalOpen, setIsWpModalOpen] = useState(false);
+    const [wpTitleInput, setWpTitleInput] = useState("");
+
+    // FUNCIÓN Guardar
+    const handleAddWP = () => {
+         if (!wpTitleInput.trim()) return;
+
+        dispatch({
+            type: "add_work_package",
+            payload: {
+                id: crypto.randomUUID(),
+                title: wpTitleInput.toUpperCase(),
+                status: "Active"
+            }
+        });
+
+        setWpTitleInput("");     // Limpiar input correcto
+        setIsWpModalOpen(false); // Cerrar modal correcto
+    };
+
     return (
 
         <main className="col-lg-9 col-md-8">
@@ -17,10 +45,16 @@ export const MainBoard = ({ workModes }) => {
                             </button>
                         </Link>
 
-                        <Link to="/team" className="text-decoration-none">
-                            <button className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>Add Work Package
+                        
+                            <button
+                                onClick={() => setIsWpModalOpen(true)}
+                                className="nav-login-cyber d-flex align-items-center gap-2"
+                                style={{ padding: "8px 15px", fontSize: "0.8rem" }}
+                            >
+                                Add Work Package
                             </button>
-                        </Link>
+
+                       
 
 
                     </div>
@@ -53,6 +87,16 @@ export const MainBoard = ({ workModes }) => {
                     ))}
                 </div>
             </div>
+
+             {/* 2. EL MODAL AQUÍ (Fuera de la caja, pero dentro del <main>) */}
+            {/* Al estar aquí, se superpone a todo el MainBoard cuando se abre */}
+            <ModalWorkPackage 
+                isOpen={isWpModalOpen}
+                onClose={() => setIsWpModalOpen(false)}
+                title={wpTitleInput}
+                setTitle={setWpTitleInput}
+                onSubmit={handleAddWP}
+            />
         </main >
     );
 };

@@ -32,6 +32,18 @@ export default function storeReducer(store, action = {}) {
         projects: store.projects.filter(project => project.id !== action.payload)
     };
 
+    case 'add_work_package':
+    return {
+        ...store,
+        projects: store.projects.map(project => 
+            
+            project.id === action.payload.projectId 
+            ? { ...project, workPackages: [...(project.workPackages || []), action.payload] }
+            : project
+        )
+    };
+
+
     case 'set_hello':
       return {
         ...store,
