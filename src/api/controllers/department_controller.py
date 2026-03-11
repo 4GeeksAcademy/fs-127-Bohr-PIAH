@@ -47,7 +47,7 @@ def delete_department(department_id):
 
 
 # GET /api/departments/<id> - get department with users
-@department_bp.route('/<int:department_id>', methods=['GET'])
+@department_bp.route('/<int:department_id>/users', methods=['GET'])
 def get_department_with_users(department_id):
     department = DepartmentService.get_by_id_with_users(department_id)
     return jsonify(department), 200
