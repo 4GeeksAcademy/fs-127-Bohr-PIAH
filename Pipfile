@@ -21,6 +21,7 @@ sqlalchemy = "*"
 flask-migrate = "*"
 bcrypt = "*"
 flask = "*"
+resend = "*"
 
 [requires]
 python_version = "3.13"
