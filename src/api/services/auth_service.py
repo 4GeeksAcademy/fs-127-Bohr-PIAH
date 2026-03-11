@@ -1,10 +1,13 @@
 """
 Servicio de autenticacion - Login, Signup y validacion de tokens
 """
-
+import os
+import resend
+from datetime import timedelta
 from flask import abort
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, decode_token
 from api.models import db, User
+from api.models.user import RoleName
 
 
 class AuthService:
