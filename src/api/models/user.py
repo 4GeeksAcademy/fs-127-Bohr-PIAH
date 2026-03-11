@@ -11,10 +11,12 @@ Tabla principal de usuarios.
 import enum
 from typing import List, Optional
 import bcrypt
+from flask import abort
 from sqlalchemy import ForeignKey, String, Boolean, DateTime, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from api.models import db
+from sqlalchemy.ext.associationproxy import association_proxy
 
 
 class RoleName(enum.Enum):
@@ -32,31 +34,35 @@ class User(db.Model):
     last_name: Mapped[str] = mapped_column(String(100))
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     password: Mapped[str] = mapped_column(String(255))
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)#añadida
-    role: Mapped[RoleName] = mapped_column(Enum(RoleName), nullable=False, default=RoleName.guest)#cambiado
-    
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)  # añadida
+    role: Mapped[RoleName] = mapped_column(
+        Enum(RoleName, name="rolename", native_enum=True),
+        nullable=False,
+        default=RoleName.guest
+    )
+    department_id: Mapped[int | None] = mapped_column(
+        ForeignKey("departments.id", ondelete="SET NULL"),
+        nullable=True,
+    )
 
-    #Relaciones
     department: Mapped["Department"] = relationship(
-        "department",
+        "Department",
+        back_populates="users",
+        foreign_keys=[department_id]
+    )
+
+    user_projects: Mapped[List["UserProject"]] = relationship(
+        "UserProject",
         back_populates="user",
         cascade="all, delete-orphan",
     )
-    projects: Mapped[List["Project"]] = relationship(
-        secondary="user_projects",
-        back_populates="users",
-        viewonly=True,
-    )
+
+    projects = association_proxy("user_projects", "project")
 
     owned_projects: Mapped[List["Project"]] = relationship(
         back_populates="owner",
         foreign_keys="Project.user_id",
     )
-
-    # created_projects: Mapped[List["Project"]] = relationship(
-    #   back_populates="creator",
-    #   foreign_keys="Project.created_by",
-    # )
 
     assigned_tasks: Mapped[List["Task"]] = relationship(
         back_populates="assignee",
@@ -69,8 +75,17 @@ class User(db.Model):
     def set_last_name(self, last_name):
         self.last_name = last_name
 
+    def parse_role(self, role_str):
+        try:
+            return RoleName(role_str)
+        except ValueError:
+            abort(400, description=f"Invalid role '{role_str}'")
+
     def set_role(self, role):
-        self.role = role
+        if isinstance(role, RoleName):
+            self.role = role
+        else:
+            self.role = RoleName(role)
 
     def set_password(self, password):
         """Hashea un password en texto plano y lo almacena."""
@@ -93,5 +108,16 @@ class User(db.Model):
             "email": self.email,
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "role": self.role
+            "role": self.role.value
+        }
+
+    def serialize_with_projects(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "role": self.role.value,
+            "owned_projects": [p.serialize() for p in self.owned_projects],
+            "projects": [p.serialize() for p in self.projects],
         }

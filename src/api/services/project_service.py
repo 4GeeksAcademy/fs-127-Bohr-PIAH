@@ -1,111 +1,223 @@
-"""
-Servicio de ordenes - Logica de negocio para CRUD de Order
-"""
-
+from datetime import datetime, timezone
 from flask import abort
-from api.models import db, User, Article, Order, OrderItem
+from sqlalchemy.orm import selectinload
+from api.models import db, Project, User, Department
+from api.models.user import RoleName
+from api.models.work_package import WorkPackage
+from api.services.common import parse_dt_utc
 
 
-class OrderService:
+class ProjectService:
 
     @staticmethod
     def get_all():
-        orders = Order.query.all()
-        return [order.serialize() for order in orders]
+        projects = Project.query.all()
+        return [project.serialize() for project in projects]
 
     @staticmethod
-    def get_by_id(order_id):
-        order = Order.query.get(order_id)
-        if order is None:
-            abort(404, description=f"Orden con id {order_id} no encontrada")
-        return order.serialize_with_items()
+    def get_by_id(project_id):
+        project = Project.query.get(project_id)
+        if project is None:
+            abort(404, description=f"Project with ID {project_id} not found")
+        return project.serialize()
+
+    @staticmethod
+    def get_projects_by_department(department_id):
+        department = Department.query.get(department_id)
+        if department is None:
+            abort(
+                404, description=f"Department with id {department_id} not found")
+
+        projects = Project.query.filter_by(department_id=department_id).all()
+        return [project.serialize() for project in projects]
 
     @staticmethod
     def create(data):
-        if "user_id" not in data:
-            abort(400, description="El campo 'user_id' es obligatorio")
+        required_fields = ["department_id", "name", "created_by"]
+        for field in required_fields:
+            if field not in data or data[field] is None or data[field] == "":
+                abort(400, description=f"Field '{field}' is mandatory")
 
-        # Verificar que el usuario existe
-        user = User.query.get(data["user_id"])
-        if user is None:
-            abort(404, description=f"Usuario con id {data['user_id']} no encontrado")
+        department = Department.query.get(data["department_id"])
+        if department is None:
+            abort(
+                404, description=f"Department with id {data['department_id']} not found")
 
-        # Validar items antes de crear la orden
-        validated_items = []
-        if "items" in data and isinstance(data["items"], list):
-            for item_data in data["items"]:
-                if "article_id" not in item_data or "quantity" not in item_data:
-                    abort(400, description="Cada item necesita 'article_id' y 'quantity'")
+        if department.head_id is None:
+            abort(400, description="Department must have a head before creating projects")
 
-                article = Article.query.get(item_data["article_id"])
-                if article is None:
-                    abort(404, description=f"Articulo con id {item_data['article_id']} no encontrado")
+        owner = User.query.get(department.head_id)
+        if owner is None:
+            abort(404, description="Department head user not found")
 
-                if not article.is_available:
-                    abort(400, description=f"El articulo '{article.name}' no esta disponible")
+        creator = User.query.get(data["created_by"])
+        if creator is None:
+            abort(404, description="Creator user not found")
 
-                if article.stock < item_data["quantity"]:
-                    abort(400, description=f"Stock insuficiente para '{article.name}'. Disponible: {article.stock}")
+        if creator.role not in (RoleName.admin, RoleName.head):
+            abort(403, description="created_by must be admin or head")
 
-                validated_items.append((item_data, article))
+        now_utc = datetime.now(timezone.utc)
+
+        if "created_at" in data and data["created_at"] is not None:
+            try:
+                created_at = parse_dt_utc(data["created_at"], "created_at")
+            except ValueError as e:
+                abort(400, description=str(e))
+
+            if created_at > now_utc:
+                abort(400, description="created_at cannot be in the future (UTC)")
+        else:
+            created_at = now_utc
+
+        deadline = None
+        if "deadline" in data and data["deadline"] is not None:
+            try:
+                deadline = parse_dt_utc(data["deadline"], "deadline")
+            except ValueError as e:
+                abort(400, description=str(e))
+
+            if deadline < created_at:
+                abort(400, description="deadline must be >= created_at (UTC)")
 
         try:
-            new_order = Order(
-                user_id=data["user_id"],
-                shipping_address=data.get("shipping_address")
+            new_project = Project(
+                department_id=department.id,
+                user_id=department.head_id,
+                name=data["name"],
+                created_by=data["created_by"],
+                created_at=created_at,
+                deadline=deadline,
+                finalized=data.get("finalized", False)
             )
 
-            for item_data, article in validated_items:
-                order_item = OrderItem(
-                    article_id=article.id,
-                    quantity=item_data["quantity"],
-                    unit_price=article.price
-                )
-                order_item.calculate_subtotal()
-                new_order.items.append(order_item)
-
-            db.session.add(new_order)
-            db.session.flush()
-            new_order.calculate_total()
+            db.session.add(new_project)
             db.session.commit()
-            return new_order.serialize_with_items()
+            return new_project.serialize()
+
         except Exception as error:
             db.session.rollback()
-            abort(500, description=f"Error al crear orden: {str(error)}")
+            abort(500, description=f"Error creating project: {str(error)}")
 
     @staticmethod
-    def update(order_id, data):
-        order = Order.query.get(order_id)
-        if order is None:
-            abort(404, description=f"Orden con id {order_id} no encontrada")
+    def update(project_id, data):
+        project = Project.query.get(project_id)
+        if project is None:
+            abort(404, description=f"Project with id {project_id} not found")
 
-        valid_statuses = ["pending", "paid", "shipped", "delivered", "cancelled"]
+        now_utc = datetime.now(timezone.utc)
 
-        if "status" in data:
-            if data["status"] not in valid_statuses:
-                abort(400, description=f"Estado invalido. Los estados validos son: {', '.join(valid_statuses)}")
-            order.status = data["status"]
+        if "name" in data and data["name"] is not None:
+            project.name = data["name"]
 
-        if "shipping_address" in data:
-            order.shipping_address = data["shipping_address"]
+        if "created_by" in data and data["created_by"] is not None:
+            creator = User.query.get(data["created_by"])
+            if creator is None:
+                abort(404, description="Creator user not found")
+
+            if creator.role not in (RoleName.admin, RoleName.head):
+                abort(403, description="created_by must be admin or head")
+
+            project.created_by = creator.id
+
+        if "department_id" in data and data["department_id"] is not None:
+            department = Department.query.get(data["department_id"])
+            if department is None:
+                abort(
+                    404, description=f"Department with id {data['department_id']} not found")
+
+            if department.head_id is None:
+                abort(
+                    400, description="Department must have a head before assigning projects")
+
+            project.department_id = department.id
+            project.user_id = department.head_id
+
+        if "created_at" in data and data["created_at"] is not None:
+            try:
+                created_at = parse_dt_utc(data["created_at"], "created_at")
+            except ValueError as e:
+                abort(400, description=str(e))
+
+            if created_at > now_utc:
+                abort(400, description="created_at cannot be in the future (UTC)")
+
+            current_deadline = project.deadline
+            if current_deadline is not None:
+                if current_deadline.tzinfo is None:
+                    current_deadline = current_deadline.replace(
+                        tzinfo=timezone.utc)
+                else:
+                    current_deadline = current_deadline.astimezone(
+                        timezone.utc)
+
+                if current_deadline < created_at:
+                    abort(
+                        400, description="created_at cannot be greater than current deadline (UTC)")
+
+            project.created_at = created_at
+
+        if "deadline" in data:
+            if data["deadline"] is None:
+                project.deadline = None
+            else:
+                try:
+                    deadline = parse_dt_utc(data["deadline"], "deadline")
+                except ValueError as e:
+                    abort(400, description=str(e))
+
+                created_at_ref = project.created_at
+                if created_at_ref is None:
+                    abort(
+                        400, description="created_at is required before setting deadline")
+
+                if isinstance(created_at_ref, datetime) and created_at_ref.tzinfo is None:
+                    created_at_ref = created_at_ref.replace(
+                        tzinfo=timezone.utc)
+                else:
+                    created_at_ref = created_at_ref.astimezone(timezone.utc)
+
+                if deadline < created_at_ref:
+                    abort(400, description="deadline must be >= created_at (UTC)")
+
+                project.deadline = deadline
+
+        if "finalized" in data and data["finalized"] is not None:
+            project.finalized = bool(data["finalized"])
 
         try:
             db.session.commit()
-            return order.serialize()
+            return project.serialize()
         except Exception as error:
             db.session.rollback()
-            abort(500, description=f"Error al actualizar orden: {str(error)}")
+            abort(500, description=f"Error updating project: {str(error)}")
 
     @staticmethod
-    def delete(order_id):
-        order = Order.query.get(order_id)
-        if order is None:
-            abort(404, description=f"Orden con id {order_id} no encontrada")
+    def delete(project_id):
+        project = Project.query.get(project_id)
+        if project is None:
+            abort(404, description=f"Project with ID {project_id} not found")
 
         try:
-            db.session.delete(order)
+            db.session.delete(project)
             db.session.commit()
-            return {"message": f"Orden #{order_id} eliminada correctamente"}
+            return {"message": f"Project #{project_id} deleted successfully"}
         except Exception as error:
             db.session.rollback()
-            abort(500, description=f"Error al eliminar orden: {str(error)}")
+            abort(500, description=f"Error deleting project: {str(error)}")
+
+    @staticmethod
+    def get_by_id_tree(project_id):
+        project = (
+            Project.query.options(
+                selectinload(Project.work_packages)
+                .selectinload(WorkPackage.tasks)
+            )
+            .filter(Project.id == project_id)
+            .first()
+        )
+
+        if project is None:
+            abort(404, description=f"Project with id {project_id} not found")
+
+        return project.serialize_with_wps()
