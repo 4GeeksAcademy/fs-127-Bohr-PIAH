@@ -19,6 +19,7 @@ def get_users():
 
 # GET /api/users/<id> - Obtener un usuario por ID
 @user_bp.route('/<int:user_id>', methods=['GET'])
+@jwt_required()
 def get_user(user_id):
     user = UserService.get_by_id(user_id)
     return jsonify(user), 200
@@ -54,3 +55,9 @@ def delete_user(user_id):
     return jsonify(result), 200
 
 
+# GET /api/users/<id>/projects - Usuario con proyectos
+@user_bp.route('/<int:user_id>/projects', methods=['GET'])
+@jwt_required()
+def get_user_with_projects(user_id):
+    user = UserService.get_by_id_with_projects(user_id)
+    return jsonify(user), 200

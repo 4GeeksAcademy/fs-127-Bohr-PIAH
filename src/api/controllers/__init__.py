@@ -15,9 +15,10 @@ principal 'api', por lo que todas las rutas quedan bajo /api/...
 """
 
 from api.controllers.user_controller import user_bp
-# from api.controllers.department_controller import article_bp
-# from api.controllers.project_controller import order_bp
-# from api.controllers.task_controller import tag_bp
+from api.controllers.department_controller import department_bp
+from api.controllers.project_controller import project_bp
+from api.controllers.task_controller import task_bp
+from api.controllers.work_package_controller import work_package_bp
 from api.controllers.auth_controller import auth_bp
 
 
@@ -27,7 +28,8 @@ def register_controllers(api):
     Se llama desde routes.py al inicializar la API.
     """
     api.register_blueprint(user_bp)
-    # api.register_blueprint(article_bp)
-    # api.register_blueprint(order_bp)
-    # api.register_blueprint(tag_bp)
+    api.register_blueprint(department_bp)
+    api.register_blueprint(project_bp)
+    api.register_blueprint(work_package_bp)
+    api.register_blueprint(task_bp)
     api.register_blueprint(auth_bp)

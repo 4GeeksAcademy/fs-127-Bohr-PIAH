@@ -3,107 +3,149 @@ import NewUser from "../components/NewUser/New_User.jsx";
 import NewDpto from "../components/NewDpto/New_Dpto.jsx";
 
 export const MenuAdmin = () => {
+  const [showNewUserForm, setShowNewUserForm] = useState(false);
+  const [showNewDpto, setShowNewDpto] = useState(false);
 
-    const [showNewUserForm, setShowNewUserForm] = useState(false);
-    const [showNewDpto, setShowNewDpto] = useState(false);
+  const [departments, setDepartments] = useState([]);
 
-    // Botón: Crear nuevo usuario
-    const handleCreateUser = () => {
-        setShowNewUserForm(true);
-    };
+  // Para edición
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingData, setEditingData] = useState(null);
 
-    // Botón: Crear nuevo departamento
-    const handleCreateDepartment = () => {
-        setShowNewDpto(true);
-    };
+  const handleCreateUser = () => setShowNewUserForm(true);
 
-    const handleCancelNewDpto = () => {
-        setShowNewDpto(false);
-    };
+  // Crear nuevo (abrir modal vacío)
+  const handleCreateDepartment = () => {
+    setEditingIndex(null);
+    setEditingData(null);
+    setShowNewDpto(true);
+  };
 
-    const handleSaveNewDpto = (data) => {
-        console.log("Nuevo departamento creado:", data);
-        setShowNewDpto(false);
-    };
+  const handleCancelNewDpto = () => {
+    setShowNewDpto(false);
+    setEditingIndex(null);
+    setEditingData(null);
+  };
 
-    const handleDptoClick = (dptoName) => {
-        console.log("Entrar a:", dptoName);
-    };
+  // Guardar nuevo departamento
+  const handleSaveNewDpto = (data) => {
+    setDepartments(prev => [
+      ...prev,
+      {
+        name: data.department_name,
+        leader: data.leader,
+        staf: data.staf
+      }
+    ]);
+    setShowNewDpto(false);
+  };
 
-    return (
-        <div className="container py-5">
-            {/* ENCABEZADO SUPERIOR */}
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="fw-bold m-0">Panel Administrativo</h2>
+  // Guardar departamento editado
+  const handleSaveEditedDpto = (data) => {
+    setDepartments(prev => prev.map((d, i) => {
+      if (i === editingIndex) {
+        return {
+          name: data.department_name,
+          leader: data.leader,
+          staf: data.staf
+        };
+      }
+      return d;
+    }));
+    setEditingIndex(null);
+    setEditingData(null);
+    setShowNewDpto(false);
+  };
 
-                <div className="d-flex">
-                    <button className="btn btn-success m-1" onClick={handleCreateDepartment}>
-                        Crear nuevo Departamento
-                    </button>
+  // Borrar departamento
+  const deleteDepartment = (index) => {
+    setDepartments(prev => prev.filter((_, i) => i !== index));
+  };
 
-                    
+  // Al hacer click en la tarjeta: abrir modal en modo edición
+  const handleDptoClick = (index) => {
+    const d = departments[index];
+    setEditingIndex(index);
+    setEditingData({
+      department_name: d.name,
+      leader: Array.isArray(d.leader) && d.leader.length ? d.leader : [""],
+      staf: Array.isArray(d.staf) && d.staf.length ? d.staf : [""],
+    });
+    setShowNewDpto(true);
+  };
 
-                    <button className="btn btn-success m-1" onClick={handleCreateUser}>
-                        Crear nuevo usuario
-                    </button>
-                </div>
-            </div>
+  return (
+    <div className="home-wrapper">
+      <h2 className="welcome-text p-3">Menu Admin</h2>
 
-            <div className="p-5"></div>
-
-            {/* BOTONES DE PROYECTOS */}
-            <div className="d-flex flex-row p-4 gap-3 bg-light rounded-4">
-                <button
-                    className="btn btn-outline-primary py-4 px-5 fs-5 rounded-4 flex-fill"
-                    onClick={() => handleDptoClick("Departamento uno")}
-                >
-                    Departamento uno
-                </button>
-
-                <button
-                    className="btn btn-outline-primary py-4 px-5 fs-5 rounded-4 flex-fill"
-                    onClick={() => handleDptoClick("Departamento uno")}
-                >
-                    Departamento uno
-                </button>
-
-                <button
-                    className="btn btn-outline-primary py-4 px-5 fs-5 rounded-4 flex-fill"
-                    onClick={() => handleDptoClick("Departamento uno")}
-                >
-                    Departamento uno
-                </button>
-            </div>
-
-            {/* FORMULARIO DE CREACIÓN DE USUARIO */}
-            <div className="container mt-5">
-                <div className="row justify-content-center">
-                    <div className="col-md-6 col-lg-4">
-
-                        {showNewDpto && (
-                        <NewDpto
-                            onCancel={handleCancelNewDpto}
-                            onCreate={handleSaveNewDpto}
-                        />
-                        )}
-
-
-
-
-                        {showNewUserForm && (
-                            <NewUser
-                                onCancel={() => setShowNewUserForm(false)}
-                                onCreate={(data) => {
-                                    console.log("Usuario creado:", data);
-                                    setShowNewUserForm(false);
-                                }}
-                            />
-                        )}
-
-
-                    </div>
-                </div>
-            </div>
+      <div className="action-grid d-flex">
+        <div className="sub-feature m-1" onClick={handleCreateDepartment} style={{ cursor: 'pointer' }}>
+          <p className="feature-title">Add New Department</p>
         </div>
-    );
+
+        <div className="sub-feature m-1" onClick={handleCreateUser} style={{ cursor: 'pointer' }}>
+          <p className="feature-title">Add New User</p>
+        </div>
+      </div>
+
+      {/* LISTA DE Dpto */}
+      <div className="dpto-panel">
+        <div className="dpto-section">
+          {departments.map((dpto, index) => (
+            <div
+              key={index}
+              className="dpto-rect"
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleDptoClick(index)}
+            >
+              <h3 className="dpto-title">{dpto.name}</h3>
+              
+              <div className="personal-section">
+                <p className="section-label">Leader</p>
+                {dpto.leader?.map((person, i) => (
+                  <p key={i} className="item-section">• {person}</p>))}
+              </div>
+
+              <div className="personal-section">
+              <p className="section-label">Team</p>
+              {dpto.staf?.map((person, i) => (
+                <p key={i} className="item-section">• {person}</p>
+              ))}
+              </div>
+
+                <button
+                  className="delete-btn"
+                  onClick={(e) => {
+                    e.stopPropagation(); // evita abrir el modal al borrar
+                    deleteDepartment(index);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Modal para crear o editar */}
+      {showNewDpto && (
+        <NewDpto
+          onCancel={handleCancelNewDpto}
+          onCreate={editingIndex === null ? handleSaveNewDpto : handleSaveEditedDpto}
+          initialData={editingData}
+          isEdit={editingIndex !== null}
+        />
+      )}
+
+      {showNewUserForm && (
+        <NewUser
+          onCancel={() => setShowNewUserForm(false)}
+          onCreate={(data) => {
+            console.log("Usuario creado:", data);
+            setShowNewUserForm(false);
+          }}
+        />
+      )}
+    </div>
+  );
 };

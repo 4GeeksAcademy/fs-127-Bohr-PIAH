@@ -13,6 +13,9 @@ import { MenuProjects } from "./pages/MenuProjects";
 import { MenuAdmin } from "./pages/MenuAdmin";
 import { Login } from "./pages/Login";
 import { MenuDptoProject } from "./pages/MenuDptoProject";
+import { Dashboard} from "./pages/Dashboard";
+import { Signup } from "./pages/Signup";
+
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -27,12 +30,14 @@ export const router = createBrowserRouter(
 
         {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
         <Route path= "/" element={<Home />} />
+        <Route path= "/dashboard" element={<Dashboard />} />
         <Route path="/single/:theId" element={ <Single />} />  {/* Dynamic route for single items */}
         <Route path="/demo" element={<Demo />} />
         <Route path="/menuprojects" element={<MenuProjects />} />
         <Route path="/menuadmin" element={<MenuAdmin />} />
         <Route path="/login" element={<Login />} />
         <Route path="/menudptoproject" element={<MenuDptoProject />} />
+        <Route path="/signup" element={<Signup />} />
       </Route>
     )
 );

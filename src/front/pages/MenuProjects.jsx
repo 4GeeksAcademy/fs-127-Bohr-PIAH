@@ -1,109 +1,187 @@
 import { useState } from "react";
 import ModalProject from "../components/ModalProject/ModalProject";
 
+// Estado inicial del proyecto
+const initialProject = {
+  nombre: "",
+  startproject: "",
+  endproject: "",
+  teamLeader: "",
+  users: []
+};
+
 export const MenuProjects = () => {
-
-  const handleMenuProject = () => {
-    console.log("Crear nuevo proyecto");
-  };
-
-  const handleProjectClick = (projectName) => {
-    console.log("Entrar a:", projectName);
-  };
-
-  // Estado del modal
   const [showModal, setShowModal] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [projectData, setProjectData] = useState(initialProject);
 
-  // Estado del formulario del modal
-  const [projectData, setProjectData] = useState({
-    nombre: "",
-    wpDeadline: "",
-    taskDeadline: "",
-    users: [],
-    notificaciones: false,
-    finalizado: false
-  });
+  // Saber si estamos editando
+  const [editingId, setEditingId] = useState(null);
 
-  // Función para actualizar campos del modal
+  // Cambios generales del formulario
   const handleChange = (field, value) => {
+    setProjectData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Lider
+  const onChangeLeader = (value) => {
     setProjectData(prev => ({
       ...prev,
-      [field]: value
+      teamLeader: value
     }));
   };
 
+  // Usuarios 
+  const onAddUser = () => {
+    setProjectData(prev => ({
+      ...prev,
+      users: [...prev.users, ""]
+    }));
+  };
+
+  const onDeleteUser = (index) => {
+    setProjectData(prev => ({
+      ...prev,
+      users: prev.users.filter((_, i) => i !== index)
+    }));
+  };
+
+  const onChangeUser = (index, newValue) => {
+    setProjectData(prev => {
+      const updated = [...prev.users];
+      updated[index] = newValue;
+      return { ...prev, users: updated };
+    });
+  };
+
+  // Guardar proyecto (crear o editar)
+  const handleSaveProject = () => {
+    if (editingId) {
+      // MODO EDICIÓN
+      setProjects(prev =>
+        prev.map(p =>
+          p.id === editingId ? { ...p, ...projectData } : p
+        )
+      );
+    } else {
+      // MODO CREACIÓN
+      setProjects(prev => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          ...projectData
+        }
+      ]);
+    }
+
+    // Reset
+    setProjectData(initialProject);
+    setEditingId(null);
+    setShowModal(false);
+  };
+
+  // Borrar proyecto
+  const deleteProject = (id) => {
+    setProjects(prev => prev.filter(p => p.id !== id));
+  };
+
+  // Click en proyecto → editar
+  const handleProjectClick = (project) => {
+    setProjectData(project);   // cargar datos en el modal
+    setEditingId(project.id);  // activar modo edición
+    setShowModal(true);
+  };
+
   return (
-    <div className="container py-5">
+    <div className="home-wrapper">
 
-      {/* ENCABEZADO SUPERIOR */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold m-0">Menu de mis proyectos</h2>
-        <div className="d-flex">
+      <h2 className="welcome-text p-3">My Projects</h2>
 
-          <button className="btn btn-success m-1" onClick={handleMenuProject}>
-            Crear nuevo proyecto
-          </button>
-          <button className="btn btn-warning m-1" onClick={handleMenuProject}>
-            Crear nuevo Reporte
-          </button>
+      <div className="action-grid d-flex">
+        <div
+          className="sub-feature m-1"
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            setProjectData(initialProject);
+            setEditingId(null);
+            setShowModal(true);
+          }}
+        >
+          <div className="feature-title">New Project</div>
+        </div>
+
+        <div className="sub-feature m-1" style={{ cursor: 'pointer' }}>
+          <p>New Report</p>
         </div>
       </div>
 
-      <div className="p-5"></div>
+      {/* LISTA DE PROYECTOS */}
+      <div className="projects-grid">
+        {projects.map((project) => (
+          <div
+            key={project.id}
+            className="project-rect"
+            onClick={() => handleProjectClick(project)}
+          >
 
-      {/* BOTONES DE PROYECTOS */}
-      <div className="d-flex flex-column p-4 gap-2 bg-light rounded-4">
+            <h3 className="project-title">{project.nombre}</h3>
 
-        <button
-          className="btn btn-outline-primary py-3 fs-5 rounded-4"
-          onClick={() => {
-            handleProjectClick("Proyecto uno");
-            setShowModal(true);
-          }}
-        >
-          Proyecto uno
-        </button>
+            <div className="project-section">
+              <span className="project-label">Start Project</span>
+              <span className="project-value">{project.wpDeadline || "Sin fecha"}</span>
+            </div>
 
-        <button
-          className="btn btn-outline-primary py-3 fs-5 rounded-4"
-          onClick={() => {
-            handleProjectClick("Proyecto dos");
-            setShowModal(true);
-          }}
-        >
-          Proyecto dos
-        </button>
+            <div className="project-section">
+              <span className="project-label">End Project</span>
+              <span className="project-value">{project.taskDeadline || "Sin fecha"}</span>
+            </div>
 
-        <button
-          className="btn btn-outline-primary py-3 fs-5 rounded-4"
-          onClick={() => {
-            handleProjectClick("Proyecto tres");
-            setShowModal(true);
-          }}
-        >
-          Proyecto tres
-        </button>
+            <div className="project-section">
+              <span className="project-label">Leader</span>
+              <span className="project-value">• {project.teamLeader || "Sin líder"}</span>
+            </div>
 
-      </div>
+            <div className="project-section">
+              <span className="project-label">Users</span>
+              <div className="project-users">
+                {project.users.map((u, i) => (
+                  <span key={i} className="project-value">• {u}</span>
+                ))}
+              </div>
+            </div>
 
-      {/* Render del modal */}
-      <div className="container mt-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6 col-lg-4">
-            {showModal && (
-              <ModalProject
-                isOpen={showModal}
-                onClose={() => setShowModal(false)}
-                data={projectData}
-                onChange={handleChange}
-                onAddUser={() => { }}
-                onDeleteUser={() => { }}
-                onSubmit={() => { }}
-              />
-            )}
+            <button
+              className="delete-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteProject(project.id);
+              }}
+            >
+              Delete
+            </button>
+
           </div>
-        </div>
+        ))}
       </div>
+
+      {/* MODAL */}
+      <ModalProject
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setEditingId(null);
+          setProjectData(initialProject);
+        }}
+        title={editingId ? "Edit Project" : "Add New Project"}
+        data={projectData}
+        onChange={handleChange}
+        onAddUser={onAddUser}
+        onDeleteUser={onDeleteUser}
+        onChangeUser={onChangeUser}
+        onChangeLeader={onChangeLeader}
+        onSubmit={handleSaveProject}
+      />
+
     </div>
   );
 };
