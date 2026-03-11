@@ -98,7 +98,7 @@ class WorkPackageService:
             done_tasks = sum(
                 1 for task in work_package.tasks if task.status == Status.done
             )
-            completion_ratio = done_tasks / total_tasks
+            completion_ratio = done_tasks / total_tasks * 100
 
         return {
             "work_package_id": work_package.id,
