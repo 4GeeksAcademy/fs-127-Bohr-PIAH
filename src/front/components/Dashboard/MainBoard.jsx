@@ -7,7 +7,7 @@ import ModalWorkPackage from "./ModalWorkPackage";
 
 export const MainBoard = ({ workModes }) => {
 
-    const { dispatch } = useGlobalReducer();
+    const { store, dispatch } = useGlobalReducer();
 
 
     // ESTADOS PARA EL MODAL
@@ -19,10 +19,13 @@ export const MainBoard = ({ workModes }) => {
     const handleAddWP = () => {
          if (!wpTitleInput.trim()) return;
 
+         const currentProjectId = store.projects[0]?.id;
+
         dispatch({
             type: "add_work_package",
             payload: {
                 id: crypto.randomUUID(),
+                projectId: currentProjectId,
                 title: wpTitleInput.toUpperCase(),
                 status: "Active"
             }
@@ -37,7 +40,7 @@ export const MainBoard = ({ workModes }) => {
         <main className="col-lg-9 col-md-8">
             <div className="glass-card-yellow p-4 h-100 d-flex flex-column">
 
-                {/* --- BOTONES ARRIBA --- */}
+                {/* --- BOTONES DE ARRIBA --- */}
                 <div className="d-flex gap-3 mb-5 flex-wrap">
                     <div className="ms-auto d-flex gap-3">
                         <Link to="/admin" className="text-decoration-none">
@@ -75,7 +78,7 @@ export const MainBoard = ({ workModes }) => {
                             <div id={`collapse${wp.id}`} className="accordion-collapse collapse" data-bs-parent="#projectAccordion">
 
 
-                                {/* COMPONENTE AQUI */}
+                                {/* COMPONENTE DEL KANBAN */}
 
                                 <KanbanBoard packageId={wp.id} />
 
@@ -88,14 +91,10 @@ export const MainBoard = ({ workModes }) => {
                 </div>
             </div>
 
-             {/* 2. EL MODAL AQUÍ (Fuera de la caja, pero dentro del <main>) */}
-            {/* Al estar aquí, se superpone a todo el MainBoard cuando se abre */}
+             {/* MODAL NEW PROJECT) */}
+           
             <ModalWorkPackage 
-                isOpen={isWpModalOpen}
-                onClose={() => setIsWpModalOpen(false)}
-                title={wpTitleInput}
-                setTitle={setWpTitleInput}
-                onSubmit={handleAddWP}
+                isOpen={isWpModalOpen} onClose={() => setIsWpModalOpen(false)} title={wpTitleInput} setTitle={setWpTitleInput} onSubmit={handleAddWP}
             />
         </main >
     );

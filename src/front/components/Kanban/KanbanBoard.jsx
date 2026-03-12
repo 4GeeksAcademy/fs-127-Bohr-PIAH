@@ -6,6 +6,8 @@ import { KanbanColumn } from "./KanbanColumn";
 
 export const KanbanBoard = () => {
 
+    
+
     const [todoRef, todoTasks] = useDragAndDrop(["Task 1", "Task 2"], { group: "bohrTasks" });
     const [progressRef, progressTasks] = useDragAndDrop(["Task 3"], { group: "bohrTasks" });
     const [reviewRef, reviewTasks] = useDragAndDrop(["Task 4"], { group: "bohrTasks" });
