@@ -132,10 +132,19 @@ class AuthService:
         frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
         reset_link = f"{frontend_url}/reset-password?token={reset_token}"
 
+        # Configuramos la API key de Resend leyéndola del archivo .env
         resend.api_key = os.getenv("RESEND_API_KEY")
+
+        # En desarrollo sin dominio verificado, Resend solo permite enviar
+        # al email de la cuenta de Resend. RESEND_TEST_EMAIL permite redirigir
+        # todos los emails a ese email de prueba.
+        # En producción con dominio verificado, se elimina RESEND_TEST_EMAIL
+        # del .env y los emails llegarán al email real de cada usuario.
+        to_email = os.getenv("RESEND_TEST_EMAIL", user.email)
+
         resend.Emails.send({
             "from": "onboarding@resend.dev",
-            "to": user.email,
+            "to": to_email,
             "subject": "Password Recovery - Bohr PIAH",
             "html": f"""
                 <h2>Password Recovery</h2>
@@ -173,4 +182,6 @@ class AuthService:
         except Exception as error:
             db.session.rollback()
             abort(500, description=f"Error updating password: {error}")
+
+
 
