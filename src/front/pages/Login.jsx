@@ -30,10 +30,10 @@ export const Login = () => {
             Iniciar sesión
           </button>
 
-          {/* LINK PARA CREAR USUARIO
+          {/* LINK PARA CREAR USUARIO */}
           <p className="signup-link">
-            ¿No tienes cuenta? <a href="/signup">Crear usuario</a>
-          </p>*/}
+            <a href="/signup">Forgot your password?</a>
+          </p>
 
         </form>
 

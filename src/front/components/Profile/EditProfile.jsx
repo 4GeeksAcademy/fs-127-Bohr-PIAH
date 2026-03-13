@@ -50,32 +50,32 @@ export const EditProfile = ({ label, value, onSave }) => {
       {editing ? (
         <div style={{ display: "flex", gap: "10px" }}>
           <button
-            className="nav-login-cyber"
+            className="cyber-btn-secondary"
             style={{ marginTop: "10px", opacity: tempValue === value ? 0.5 : 1 }}
             disabled={tempValue === value}
             onClick={handleSave}
           >
-            Guardar
+            Save
           </button>
 
           <button
-            className="nav-login-cyber"
+            className="cyber-btn-secondary"
             style={{ marginTop: "10px", background: "gray" }}
             onClick={() => {
               setTempValue(value);
               setEditing(false);
             }}
           >
-            Cancelar
+            Cancel
           </button>
         </div>
       ) : (
         <button
           className="nav-login-cyber"
-          style={{ marginTop: "10px" }}
+          style={{ marginTop: "5px" }}
           onClick={() => setEditing(true)}
         >
-          Editar
+          Edit
         </button>
       )}
     </div>

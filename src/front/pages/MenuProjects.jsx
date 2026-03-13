@@ -1,5 +1,8 @@
 import { useState } from "react";
 import ModalProject from "../components/ModalProject/ModalProject";
+import useGlobalReducer from "../hooks/useGlobalReducer"; 
+
+
 
 // Estado inicial del proyecto
 const initialProject = {
@@ -12,8 +15,9 @@ const initialProject = {
 
 export const MenuProjects = () => {
   const [showModal, setShowModal] = useState(false);
-  const [projects, setProjects] = useState([]);
+  const { store, dispatch } = useGlobalReducer(); 
   const [projectData, setProjectData] = useState(initialProject);
+   const projects = store.projects || []; 
 
   // Saber si estamos editando
   const [editingId, setEditingId] = useState(null);
@@ -57,21 +61,18 @@ export const MenuProjects = () => {
   // Guardar proyecto (crear o editar)
   const handleSaveProject = () => {
     if (editingId) {
-      // MODO EDICIÓN
-      setProjects(prev =>
-        prev.map(p =>
-          p.id === editingId ? { ...p, ...projectData } : p
-        )
-      );
+
+      // MODO EDICIÓN: Enviamos una acción de editar 
+      dispatch({
+        type: 'edit_project',
+        payload: { id: editingId, ...projectData }
+      });
     } else {
-      // MODO CREACIÓN
-      setProjects(prev => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          ...projectData
-        }
-      ]);
+      // MODO CREACIÓN: Usamos la que ya creamos tú y yo
+      dispatch({
+        type: 'add_project',
+        payload: { id: crypto.randomUUID(), ...projectData }
+      });
     }
 
     // Reset
@@ -82,7 +83,10 @@ export const MenuProjects = () => {
 
   // Borrar proyecto
   const deleteProject = (id) => {
-    setProjects(prev => prev.filter(p => p.id !== id));
+    dispatch({
+      type: 'delete_project',
+      payload: id
+    });
   };
 
   // Click en proyecto → editar

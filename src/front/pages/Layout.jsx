@@ -5,14 +5,20 @@ import { Footer } from "../components/Footer"
 
 
 export const Layout = () => {
-    const location = useLocation ();
-     const isHome = location.pathname === "/"; 
+    const location = useLocation();
+    const isHome = location.pathname === "/";
+  
+
+
     return (
-         <ScrollToTop>
+
+
+        <ScrollToTop>
+           
             {/* Si es la Home (Landing), sale el Navbar */}
             {isHome && <Navbar />}
             {/* Aquí se carga Home.jsx (en "/") o Dashboard.jsx (en "/dashboard") */}
-            <Outlet />
+             <Outlet />
             <Footer />
         </ScrollToTop>
     );
