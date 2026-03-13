@@ -6,28 +6,58 @@ import { MainBoard } from "../components/Dashboard/MainBoard"
 import { Orbit, UserCheck, Zap, ShieldAlert, BarChart3, Settings } from "lucide-react";
 import { BohrLogo } from "../components/BohrLogo";
 import { useState } from "react";
+import useGlobalReducer from "../hooks/useGlobalReducer";
+import ModalProject from "../components/ModalProject/ModalProject"
 
 
 export const Dashboard = () => {
 
+    const { store, dispatch } = useGlobalReducer();
+    const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
-    const workModes = [
-        { id: 1, title: "WORK PACKAGE 1", status: "Active" },
-        { id: 2, title: "WORK PACKAGE 2", status: "Pending" },
-        { id: 3, title: "WORK PACKAGE 3", status: "Review" }
-    ];
+    const [newProjectData, setNewProjectData] = useState({
+        nombre: "",
+        wpDeadline: "",
+        taskDeadline: "",
+        teamLeader: "",
+        users: []
+    });
 
-    const [activeProjects, setActiveProjects] = useState([]);
+  //  const workModes = [
+  //      { id: 1, title: "WORK PACKAGE 1", status: "Active" },
+  //      { id: 2, title: "WORK PACKAGE 2", status: "Pending" },
+ //       { id: 3, title: "WORK PACKAGE 3", status: "Review" }
+  //  ];
 
-    const exampleProjects = [
-        { id: 101, name: "Project 1" },
-        { id: 102, name: "Project 2" },
-        { id: 103, name: "Project 3" }
-    ];
+    const activeProject = store.projects.find(p => p.id === store.currentProjectId);
 
-     const projectsToShow = activeProjects.length ? activeProjects : exampleProjects;
+    const projectsToShow = store.projects || [];
 
-    
+    const handleAddProject = () => {
+        const newId = crypto.randomUUID();
+        dispatch({
+            type: "add_project",
+            payload:  { id: newId, ...newProjectData, workPackages: [] }
+        });
+        dispatch({ 
+            type: "set_current_project", 
+            payload: newId 
+        });
+
+        setIsProjectModalOpen(false);
+        setNewProjectData({ nombre: "", wpDeadline: "", taskDeadline: "", teamLeader: "", users: [] });
+    };
+
+
+
+    // Sacamos sus Work Packages reales. Si no hay, devolvemos un array vacío.
+    const realWPs = activeProject?.workPackages || [];
+
+    // DECISIÓN: Si hay reales, usamos esos. Si no, usamos tus ejemplos (workModes).
+    const workModesToShow = activeProject ? (activeProject.workPackages || []) : [];
+
+
+
 
     return (
         <div className="home-wrapper v1 dashboard-container">
@@ -37,13 +67,36 @@ export const Dashboard = () => {
                 <div className="row g-4 px-md-4">
 
                     {/* LADO IZQUIERDO */}
-                    <Sidebar activeProjects={projectsToShow} />
+                    <Sidebar activeProjects={projectsToShow}
+                        onNewProjectClick={() => setIsProjectModalOpen(true)}
+                        // manda el ID al store al hacer clic
+                        onProjectSelect={(id) => dispatch({ type: "set_current_project", payload: id })}
+                        // aqui se le pasa el ID al store asi sabe cual es el que tiene qu eiluminar
+                        selectedId={store.currentProjectId} />
 
                     {/* LADO DERECHO */}
-                    <MainBoard workModes={workModes} />
+                    <MainBoard workModes={workModesToShow} />
 
                 </div>
             </div>
+            <ModalProject
+                isOpen={isProjectModalOpen}
+                onClose={() => setIsProjectModalOpen(false)}
+                data={newProjectData}
+                onChange={(field, val) => setNewProjectData({ ...newProjectData, [field]: val })}
+                onAddUser={() => setNewProjectData({ ...newProjectData, users: [...newProjectData.users, ""] })}
+                onChangeUser={(index, val) => {
+                    const updated = [...newProjectData.users];
+                    updated[index] = val;
+                    setNewProjectData({ ...newProjectData, users: updated });
+                }}
+                onDeleteUser={(index) => {
+                    const filtered = newProjectData.users.filter((_, i) => i !== index);
+                    setNewProjectData({ ...newProjectData, users: filtered });
+                }}
+                onChangeLeader={(val) => setNewProjectData({ ...newProjectData, teamLeader: val })}
+                onSubmit={handleAddProject}
+            />
         </div>
     );
 };
