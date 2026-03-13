@@ -23,33 +23,38 @@ export const Dashboard = () => {
         users: []
     });
 
-    const workModes = [
-        { id: 1, title: "WORK PACKAGE 1", status: "Active" },
-        { id: 2, title: "WORK PACKAGE 2", status: "Pending" },
-        { id: 3, title: "WORK PACKAGE 3", status: "Review" }
-    ];
+  //  const workModes = [
+  //      { id: 1, title: "WORK PACKAGE 1", status: "Active" },
+  //      { id: 2, title: "WORK PACKAGE 2", status: "Pending" },
+ //       { id: 3, title: "WORK PACKAGE 3", status: "Review" }
+  //  ];
 
-
+    const activeProject = store.projects.find(p => p.id === store.currentProjectId);
 
     const projectsToShow = store.projects || [];
 
     const handleAddProject = () => {
+        const newId = crypto.randomUUID();
         dispatch({
             type: "add_project",
-            payload: { id: crypto.randomUUID(), ...newProjectData, workPackages: [] }
+            payload:  { id: newId, ...newProjectData, workPackages: [] }
         });
+        dispatch({ 
+            type: "set_current_project", 
+            payload: newId 
+        });
+
         setIsProjectModalOpen(false);
         setNewProjectData({ nombre: "", wpDeadline: "", taskDeadline: "", teamLeader: "", users: [] });
     };
 
-    // Buscamos el proyecto "activo" usando el ID guardado en el store
-    const activeProject = store.projects.find(p => p.id === store.currentProjectId);
+
 
     // Sacamos sus Work Packages reales. Si no hay, devolvemos un array vacío.
     const realWPs = activeProject?.workPackages || [];
 
     // DECISIÓN: Si hay reales, usamos esos. Si no, usamos tus ejemplos (workModes).
-    const workModesToShow = realWPs.length > 0 ? realWPs : workModes;
+    const workModesToShow = activeProject ? (activeProject.workPackages || []) : [];
 
 
 
@@ -70,7 +75,7 @@ export const Dashboard = () => {
                         selectedId={store.currentProjectId} />
 
                     {/* LADO DERECHO */}
-                   <MainBoard workModes={workModesToShow} />
+                    <MainBoard workModes={workModesToShow} />
 
                 </div>
             </div>

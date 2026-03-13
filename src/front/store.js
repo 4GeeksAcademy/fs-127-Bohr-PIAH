@@ -42,6 +42,8 @@ export default function storeReducer(store, action = {}) {
       };
 
     case "add_work_package":
+      if (!action.payload.projectId) return store;
+      
       return {
         ...store,
         projects: store.projects.map((project) =>
