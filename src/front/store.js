@@ -2,6 +2,7 @@ export const initialStore = () => {
   return {
     message: null,
     projects: [],
+    currentProjectId: null,
     tasks: [],
     todos: [
       {
@@ -32,6 +33,12 @@ export default function storeReducer(store, action = {}) {
         projects: store.projects.filter(
           (project) => project.id !== action.payload,
         ),
+      };
+
+    case "set_current_project":
+      return {
+        ...store,
+        currentProjectId: action.payload
       };
 
     case "add_work_package":

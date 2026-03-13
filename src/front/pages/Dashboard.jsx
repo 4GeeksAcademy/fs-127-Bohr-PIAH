@@ -42,6 +42,14 @@ export const Dashboard = () => {
         setNewProjectData({ nombre: "", wpDeadline: "", taskDeadline: "", teamLeader: "", users: [] });
     };
 
+    // Buscamos el proyecto "activo" usando el ID guardado en el store
+    const activeProject = store.projects.find(p => p.id === store.currentProjectId);
+
+    // Sacamos sus Work Packages reales. Si no hay, devolvemos un array vacío.
+    const realWPs = activeProject?.workPackages || [];
+
+    // DECISIÓN: Si hay reales, usamos esos. Si no, usamos tus ejemplos (workModes).
+    const workModesToShow = realWPs.length > 0 ? realWPs : workModes;
 
 
 
@@ -54,10 +62,15 @@ export const Dashboard = () => {
                 <div className="row g-4 px-md-4">
 
                     {/* LADO IZQUIERDO */}
-                    <Sidebar activeProjects={projectsToShow} onNewProjectClick={() => setIsProjectModalOpen(true)} />
+                    <Sidebar activeProjects={projectsToShow}
+                        onNewProjectClick={() => setIsProjectModalOpen(true)}
+                        // manda el ID al store al hacer clic
+                        onProjectSelect={(id) => dispatch({ type: "set_current_project", payload: id })}
+                        // aqui se le pasa el ID al store asi sabe cual es el que tiene qu eiluminar
+                        selectedId={store.currentProjectId} />
 
                     {/* LADO DERECHO */}
-                    <MainBoard workModes={workModes} />
+                   <MainBoard workModes={workModesToShow} />
 
                 </div>
             </div>

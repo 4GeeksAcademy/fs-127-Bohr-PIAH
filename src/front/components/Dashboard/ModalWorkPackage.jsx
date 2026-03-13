@@ -7,8 +7,8 @@ const ModalWorkPackage = ({ isOpen, onClose, title, setTitle, onSubmit }) => {
     return (
 
         <div style={{
-            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center',
-            alignItems: 'center', zIndex: 100, backdropFilter: 'blur(4px)', borderRadius: '15px'
+            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.4)',
+            display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, backdropFilter: 'blur(4px)'
         }}>
 
             <div className="glass-card-yellow p-4 shadow-lg" style={{ width: '350px', border: '1px solid #27E6D6' }}>
