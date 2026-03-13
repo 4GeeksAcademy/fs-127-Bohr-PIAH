@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
+from api.auth.decorators import require_permission
 from api.services.department_service import DepartmentService
 
 department_bp = Blueprint('departments', __name__, url_prefix='/departments')
@@ -6,6 +7,7 @@ department_bp = Blueprint('departments', __name__, url_prefix='/departments')
 
 # GET /api/departments - Get all departments
 @department_bp.route('', methods=['GET'])
+@require_permission("departments:read")
 def get_departments():
     departments = DepartmentService.get_all()
     return jsonify(departments), 200
@@ -14,6 +16,7 @@ def get_departments():
 
 
 @department_bp.route('/<int:department_id>', methods=['GET'])
+@require_permission("departments:read")
 def get_department_by_id(department_id):
     department = DepartmentService.get_by_id(department_id)
     return jsonify(department), 200
@@ -21,6 +24,7 @@ def get_department_by_id(department_id):
 
 # POST /api/departments - Create new department
 @department_bp.route('', methods=['POST'])
+@require_permission("departments:create")
 def create_departments():
     body = request.get_json()
     if not body:
@@ -31,6 +35,7 @@ def create_departments():
 
 # PUT /api/departments/<id> - Edit department
 @department_bp.route('/<int:department_id>', methods=['PUT'])
+@require_permission("departments:update")
 def update_department(department_id):
     body = request.get_json()
     if not body:
@@ -41,6 +46,7 @@ def update_department(department_id):
 
 # DELETE /api/departments/<id> - Delete department
 @department_bp.route('/<int:department_id>', methods=['DELETE'])
+@require_permission("departments:delete")
 def delete_department(department_id):
     result = DepartmentService.delete(department_id)
     return jsonify(result), 200
@@ -48,6 +54,7 @@ def delete_department(department_id):
 
 # GET /api/departments/<id> - get department with users
 @department_bp.route('/<int:department_id>/users', methods=['GET'])
+@require_permission("departments:read")
 def get_department_with_users(department_id):
     department = DepartmentService.get_by_id_with_users(department_id)
     return jsonify(department), 200
