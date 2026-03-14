@@ -40,8 +40,17 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
         <main className="col-lg-9 col-md-8">
             <div className="glass-card-yellow p-4 h-100 d-flex flex-column">
 
-                {/* --- BOTONES DE ARRIBA --- */}
-                <div className="d-flex gap-3 mb-5 flex-wrap">
+                {/* BOTONES DE ARRIBA*/}
+                <div className="d-flex align-items-center justify-content-between mb-5 flex-wrap gap-3">
+
+                    {/* TÍTULO DEL PROYECTO */}
+                    {store.currentProjectId && (
+                        <div className="d-flex align-items-center">
+                            <h2 className="section-sub-title mb-0" style={{ color: "#27E6D6", fontSize: "1 rem", letterSpacing: "1.5px", borderBottom: "2px solid rgba(39, 230, 214, 0.3)", }}>
+                                {store.projects.find(p => p.id === store.currentProjectId)?.nombre}
+                            </h2>
+                        </div>
+                    )}
                     <div className="ms-auto d-flex gap-3">
                         <Link to="/admin" className="text-decoration-none">
                             <button className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>Get Report
@@ -71,7 +80,7 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
                 </div>
 
                 {/* Mensaje de crear tu primer proyecto para empezar */}
-                
+
                 {!store.currentProjectId ? (
                     <div className="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-center animate__animated animate__fadeIn"
                         style={{ marginTop: "-50px" }}>

@@ -23,11 +23,11 @@ export const Dashboard = () => {
         users: []
     });
 
-  //  const workModes = [
-  //      { id: 1, title: "WORK PACKAGE 1", status: "Active" },
-  //      { id: 2, title: "WORK PACKAGE 2", status: "Pending" },
- //       { id: 3, title: "WORK PACKAGE 3", status: "Review" }
-  //  ];
+    //  const workModes = [
+    //      { id: 1, title: "WORK PACKAGE 1", status: "Active" },
+    //      { id: 2, title: "WORK PACKAGE 2", status: "Pending" },
+    //       { id: 3, title: "WORK PACKAGE 3", status: "Review" }
+    //  ];
 
     const activeProject = store.projects.find(p => p.id === store.currentProjectId);
 
@@ -37,11 +37,11 @@ export const Dashboard = () => {
         const newId = crypto.randomUUID();
         dispatch({
             type: "add_project",
-            payload:  { id: newId, ...newProjectData, workPackages: [] }
+            payload: { id: newId, ...newProjectData, workPackages: [] }
         });
-        dispatch({ 
-            type: "set_current_project", 
-            payload: newId 
+        dispatch({
+            type: "set_current_project",
+            payload: newId
         });
 
         setIsProjectModalOpen(false);
@@ -53,7 +53,7 @@ export const Dashboard = () => {
     // Sacamos sus Work Packages reales. Si no hay, devolvemos un array vacío.
     const realWPs = activeProject?.workPackages || [];
 
-    // DECISIÓN: Si hay reales, usamos esos. Si no, usamos tus ejemplos (workModes).
+    // Si hay reales, usamos esos. Si no, usamos tus ejemplos (workModes).
     const workModesToShow = activeProject ? (activeProject.workPackages || []) : [];
 
 
@@ -75,7 +75,8 @@ export const Dashboard = () => {
                         selectedId={store.currentProjectId} />
 
                     {/* LADO DERECHO */}
-                    <MainBoard workModes={workModesToShow} />
+                    <MainBoard workModes={workModesToShow} openProjectModal={() => setIsProjectModalOpen(true)}
+                        projectName={activeProject?.nombre} />
 
                 </div>
             </div>
