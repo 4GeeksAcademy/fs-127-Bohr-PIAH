@@ -38,6 +38,30 @@ class ReportScope:
 
 
 class ReportService:
+    '''
+    Servicio encargado de generar informes en formato PDF para proyectos,
+    departamentos y para la organización completa.
+
+    Este servicio obtiene la información necesaria desde la base de datos
+    (departamentos, proyectos, paquetes de trabajo y tareas), calcula métricas
+    y genera el text del report sobre el estado del trabajo.
+    Posteriormente renderiza la info en un documento PDF.
+
+    Los archivos se descargan automáticamente, no se almacenan en la app
+
+    Tipos de report:
+        - Proyecto: informe detallado con sus paquetes de trabajo y tareas.
+        - Departamento: informe agregado de todos los proyectos activos
+          dentro de un departamento.
+        - Organización: informe global que aúna información de todos los
+          departamentos, proyectos y tareas.
+
+    Partes del proceso:
+        - Cargar los datos de la BBDD.
+        - Calcular métricas y KPIs
+        - Generar el texto.
+        - Construir el doc.
+    '''
 
     # Helpers
     @staticmethod
