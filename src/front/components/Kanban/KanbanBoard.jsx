@@ -6,7 +6,7 @@ import { KanbanColumn } from "./KanbanColumn";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalTask from "./ModalTask"
 
-export const KanbanBoard = ({ packageId }) => { 
+export const KanbanBoard = ({ packageId }) => {
     const { store, dispatch } = useGlobalReducer();
     const wpTasks = store.tasks?.filter(t => t.wpId === packageId) || [];
 
@@ -32,36 +32,83 @@ export const KanbanBoard = ({ packageId }) => {
         deadline: "",
         alert: false,
         status: "to_do",
-        wpId: packageId 
+        wpId: packageId
     });
 
-const handleAddTask = () => {
-    if (!newTaskData.name.trim()) return;
-
-    const newTask = { 
-        ...newTaskData, 
-        id: crypto.randomUUID(),
-        wpId: packageId,
-        status: "to_do"
+    // PREPARAMOS EL MODAL VACÍO
+    const handlePrepareCreateModal = () => {
+        setNewTaskData({
+            name: "",
+            task_description: "",
+            todo_by: "",
+            deadline: "",
+            alert: false,
+            status: "to_do",
+            wpId: packageId,
+            id: null
+        });
+        setIsTaskModalOpen(true);
     };
-    
-    // Guardamos en el Store Global
-    dispatch({ type: "add_task", payload: newTask });
-    
-    todoTasks.push(newTask);
-    
-    // Reset y cierre del modal
-    setIsTaskModalOpen(false);
-    setNewTaskData({ 
-        name: "", 
-        task_description: "", 
-        todo_by: "", 
-        deadline: "", 
-        alert: false, 
-        status: "to_do", 
-        wpId: packageId 
-    });
-};
+
+    // SALTA EL MODAL RELLENADO
+    const handlePrepareEditModal = (task) => {
+        setNewTaskData(task);
+        setIsTaskModalOpen(true);
+    };
+
+    // GUARDA UNA TAREA TOTALMENTE NUEVA ---
+    const handleSaveNewTask = () => {
+        if (!newTaskData.name.trim()) return;
+
+        const newTask = {
+            ...newTaskData,
+            id: crypto.randomUUID(),
+            wpId: packageId,
+            status: "to_do"
+        };
+
+        dispatch({ type: "add_task", payload: newTask });
+        todoTasks.push(newTask);
+        setIsTaskModalOpen(false);
+    };
+
+    // GUARDAMOS LOS CAMBIOS SI SE EDITA
+    const handleSaveEditedTask = () => {
+        if (!newTaskData.name.trim()) return;
+
+        dispatch({
+            type: "edit_task",
+            payload: newTaskData
+        });
+
+        const index = todoTasks.findIndex(t => t.id === newTaskData.id);
+
+        if (index !== -1) {
+            // Usamos splice para reemplazar la vieja tarea por la nueva en esa posición
+            todoTasks.splice(index, 1, { ...newTaskData });
+        }
+
+        setIsTaskModalOpen(false);
+    };
+
+    // ELIMINAMOS TAREA
+    const handleDeleteTask = (taskId) => {
+        
+        dispatch({
+            type: "delete_task",
+            payload: taskId
+        });
+
+        const index = todoTasks.findIndex(t => t.id === taskId);
+        if (index !== -1) {
+            todoTasks.splice(index, 1); // Borramos 1 elemento en esa posición
+        }
+
+        setIsTaskModalOpen(false);
+    };
+
+
+
     return (
         <div className="accordion-body d-flex flex-row gap-3 align-items-start overflow-auto pb-3">
             <KanbanColumn
@@ -70,7 +117,8 @@ const handleAddTask = () => {
                 title="TO DO"
                 borderColor="border-info"
                 ledColor="#27E6D6"
-                onAddTask={() => setIsTaskModalOpen(true)} 
+                onAddTask={handlePrepareCreateModal}
+                onEditTask={handlePrepareEditModal}
             />
 
             <KanbanColumn
@@ -79,6 +127,7 @@ const handleAddTask = () => {
                 title="IN PROGRESS"
                 borderColor="border-warning"
                 ledColor="#ffc107"
+                onEditTask={handlePrepareEditModal}
             />
 
             <KanbanColumn
@@ -87,6 +136,7 @@ const handleAddTask = () => {
                 title="IN REVIEW"
                 borderColor="border-primary"
                 ledColor="#0d6efd"
+                onEditTask={handlePrepareEditModal}
             />
 
             <KanbanColumn
@@ -95,14 +145,17 @@ const handleAddTask = () => {
                 title="DONE"
                 borderColor="border-success"
                 ledColor="#198754"
+                onEditTask={handlePrepareEditModal}
             />
 
-            <ModalTask 
+            <ModalTask
                 isOpen={isTaskModalOpen}
                 onClose={() => setIsTaskModalOpen(false)}
                 data={newTaskData}
-                onChange={(field, val) => setNewTaskData({...newTaskData, [field]: val})}
-                onSubmit={handleAddTask}
+                onChange={(field, val) => setNewTaskData({ ...newTaskData, [field]: val })}
+                onSubmit={newTaskData?.id ? handleSaveEditedTask : handleSaveNewTask}
+                onDelete={handleDeleteTask}
+
             />
         </div>
     );
