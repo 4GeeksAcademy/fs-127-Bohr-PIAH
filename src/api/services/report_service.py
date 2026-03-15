@@ -302,3 +302,179 @@ class ReportService:
             )
             .all()
         )
+
+    # Things for rendering
+
+    @staticmethod
+    def styles():
+        base = getSampleStyleSheet()
+        return {
+            "title": ParagraphStyle(
+                "title",
+                parent=base["Title"],
+                fontName="Helvetica-Bold",
+                fontSize=20,
+                leading=24,
+                textColor=colors.HexColor("#17324D"),
+                spaceAfter=6,
+                alignment=TA_LEFT,
+            ),
+            "subtitle": ParagraphStyle(
+                "subtitle",
+                parent=base["Normal"],
+                fontName="Helvetica",
+                fontSize=10,
+                leading=13,
+                textColor=colors.HexColor("#4F6174"),
+                spaceAfter=3,
+            ),
+            "muted": ParagraphStyle(
+                "muted",
+                parent=base["Normal"],
+                fontName="Helvetica",
+                fontSize=8.5,
+                leading=11,
+                textColor=colors.HexColor("#6C7A89"),
+                spaceAfter=4,
+            ),
+            "h1": ParagraphStyle(
+                "h1",
+                parent=base["Heading1"],
+                fontName="Helvetica-Bold",
+                fontSize=13,
+                leading=16,
+                textColor=colors.HexColor("#17324D"),
+                spaceBefore=8,
+                spaceAfter=6,
+            ),
+            "h2": ParagraphStyle(
+                "h2",
+                parent=base["Heading2"],
+                fontName="Helvetica-Bold",
+                fontSize=11,
+                leading=14,
+                textColor=colors.HexColor("#274C77"),
+                spaceBefore=6,
+                spaceAfter=4,
+            ),
+            "body": ParagraphStyle(
+                "body",
+                parent=base["BodyText"],
+                fontName="Helvetica",
+                fontSize=9.5,
+                leading=13,
+                textColor=colors.black,
+                spaceAfter=4,
+            ),
+        }
+
+    @staticmethod
+    def metrics_sentence(metrics: dict[str, Any]) -> str:
+        return (
+            f"{metrics['total_tasks']} tasks, {metrics['done']} completed, "
+            f"{metrics['in_progress']} in progress, {metrics['in_review']} in review, "
+            f"{metrics['to_do']} to do, {metrics['overdue']} overdue, "
+            f"cmopletion rate {metrics['progress_pct']}%."
+        )
+
+    @staticmethod
+    def kv_table(rows: list[list[str]]):
+        table = Table(rows, colWidths=[35 * mm, 120 * mm])
+        table.setStyle(
+            TableStyle(
+                [
+                    ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D0D7E2")),
+                    ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#EEF3F8")),
+                    ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
+                    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                    ("PADDING", (0, 0), (-1, -1), 6),
+                ]
+            )
+        )
+        return table
+
+    @staticmethod
+    def metrics_table(metrics: dict[str, Any]):
+        data = [
+            ["KPIs", "Value"],
+            ["Total tasks", str(metrics["total_tasks"])],
+            ["Completed", str(metrics["done"])],
+            ["In progress", str(metrics["in_progress"])],
+            ["In review", str(metrics["in_review"])],
+            ["To do", str(metrics["to_do"])],
+            ["Overdue", str(metrics["overdue"])],
+            ["Stopper", str(metrics["alerts"])],
+            ["Completion rate", f"{metrics['progress_pct']}%"],
+        ]
+
+        table = Table(data, colWidths=[75 * mm, 35 * mm])
+        table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1F3A5F")),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                    ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#C7D2E0")),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                    ("PADDING", (0, 0), (-1, -1), 6),
+                    ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
+                ]
+            )
+        )
+        return table
+
+    @staticmethod
+    def tasks_table(tasks: list[dict[str, Any]]):
+        rows = [["ID", "Task", "Status", "In charge", "Deadline", "Stopper"]]
+        for task in tasks:
+            rows.append(
+                [
+                    str(task["id"]),
+                    task["name"],
+                    task["status"],
+                    str(task.get("todo_by") or "-"),
+                    task.get("deadline") or "-",
+                    "Sí" if task.get("alert") else "No",
+                ]
+            )
+
+        table = Table(
+            rows,
+            colWidths=[12 * mm, 55 * mm, 28 * mm, 24 * mm, 30 * mm, 16 * mm],
+            repeatRows=1,
+        )
+        table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#314E6E")),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D0D7E2")),
+                    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                    ("PADDING", (0, 0), (-1, -1), 5),
+                    ("FONTSIZE", (0, 0), (-1, -1), 8.5),
+                    ("ROWBACKGROUNDS", (0, 1), (-1, -1),
+                     [colors.white, colors.HexColor("#F6F8FB")]),
+                ]
+            )
+        )
+        return table
+
+    @staticmethod
+    def index_table(rows: list[list[str]]):
+        table = Table(rows, colWidths=[20 * mm, 135 * mm], repeatRows=1)
+        table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1F3A5F")),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D0D7E2")),
+                    ("PADDING", (0, 0), (-1, -1), 6),
+                    ("ROWBACKGROUNDS", (0, 1), (-1, -1),
+                     [colors.white, colors.HexColor("#F6F8FB")]),
+                    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ]
+            )
+        )
+        return table
