@@ -9,12 +9,13 @@ export default function ModalTask({
   title = "Add New",
   data,
   onChange,
-  onSubmit
+  onSubmit,
+  onDelete
 }) {
   if (!isOpen) return null;
 
   const {
-   name = "",
+    name = "",
     task_description = "",
     todo_by = "",
     deadline = "",
@@ -70,18 +71,37 @@ export default function ModalTask({
 
         {/* --- CHECKBOX DE ALERTA (Punto rojo) --- */}
         <div className="d-flex align-items-center gap-3 mt-3">
-            <input 
-                type="checkbox" 
-                checked={alert}
-                onChange={(e) => onChange("alert", e.target.checked)}
-                style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-            />
-            <label className="cyber-label mb-0">Urgent Alert</label>
+          <input
+            type="checkbox"
+            checked={alert}
+            onChange={(e) => onChange("alert", e.target.checked)}
+            style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+          />
+          <label className="cyber-label mb-0">Urgent Alert</label>
         </div>
 
-        <div className="modal-cyber-footer mt-4">
-          <button className="cyber-btn-outline" onClick={onClose}>Cancel</button>
-          <button className="cyber-btn" onClick={onSubmit}>Save Task</button>
+        <div className="modal-cyber-footer mt-4 d-flex justify-content-between">
+
+          <div>
+            {data.id ? (
+              <button
+                type="button"
+                className="cyber-btn-danger"
+                style={{ padding: "8px 15px", fontSize: "0.8rem" }}
+                onClick={() => {
+                  if (window.confirm("Delete task?")) {
+                    onDelete(data.id);
+                  }
+                }}
+              >
+                Delete
+              </button>
+            ) : null} 
+          </div>
+
+
+          <button type="button" className="cyber-btn-outline" onClick={onClose}>Cancel</button>
+          <button type="button" className="cyber-btn" onClick={onSubmit}>Save Task</button>
         </div>
       </div>
     </div>
