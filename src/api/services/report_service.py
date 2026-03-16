@@ -684,3 +684,274 @@ class ReportService:
         def decorate(canvas: Canvas, doc):
             ReportService._draw_header_footer(canvas, doc, scope, generated_at)
         return decorate
+
+    # Sections
+    @staticmethod
+    def _append_project_detail(story, payload, styles):
+        project = payload["project"]
+        story.append(Paragraph("Project report", styles["h1"]))
+        story.append(
+            ReportService._kv_table(
+                [
+                    ["ID", str(project["id"])],
+                    ["Name", project["name"]],
+                    ["Department", project.get("department_name") or "-"],
+                    ["Created at", project.get("created_at") or "-"],
+                    ["Deadline", project.get("deadline") or "-"],
+                    ["Finished", "Yes" if project.get("finalized") else "No"],
+                ]
+            )
+        )
+        story.append(Spacer(1, 6))
+        story.append(ReportService._metrics_table(payload["metrics"]))
+        story.append(Spacer(1, 6))
+        story.append(
+            ReportService._status_chart(
+                payload["metrics"],
+                f"Tasks per project · {project['name']}",
+            )
+        )
+        story.append(Spacer(1, 8))
+
+        for wp in payload["work_packages"]:
+            story.append(
+                Paragraph(f"Work package: {wp['name']}", styles["h2"]))
+            story.append(Paragraph(ReportService._metrics_sentence(
+                wp["metrics"]), styles["body"]))
+            story.append(Spacer(1, 4))
+            story.append(ReportService._tasks_table(wp["tasks"]))
+            story.append(Spacer(1, 8))
+
+    @staticmethod
+    def _append_department_index(story, payload, styles):
+        story.append(Paragraph("Índice", styles["h1"]))
+
+        rows = [["Section", "Content"]]
+        rows.append(["1", "Executive summary for the department"])
+        rows.append(["2", "Department datasheet"])
+        rows.append(["2.1", "Only active projects shown"])
+
+        section_number = 3
+        for project_payload in payload["projects"]:
+            project = project_payload["project"]
+            rows.append(
+                [str(section_number), f"Report for project: {project['name']}"])
+            section_number += 1
+
+        story.append(ReportService._index_table(rows))
+        story.append(Spacer(1, 10))
+        story.append(PageBreak())
+
+    @staticmethod
+    def _append_department_detail(story, payload, styles):
+        department = payload["department"]
+        story.append(Paragraph("Department datasheet", styles["h1"]))
+        story.append(
+            ReportService._kv_table(
+                [
+                    ["ID", str(department["id"])],
+                    ["Name", department["name"]],
+                    ["Head ID", str(department.get("head_id") or "-")],
+                    ["Active projects", str(payload.get(
+                        "active_projects_count", len(payload["projects"])))],
+                ]
+            )
+        )
+        story.append(Spacer(1, 10))
+
+        story.append(Paragraph("Project reports", styles["h1"]))
+        story.append(
+            Paragraph(
+                "Individual reports for the active projects in the department",
+                styles["body"],
+            )
+        )
+        story.append(Spacer(1, 6))
+
+        total_projects = len(payload["projects"])
+        for index, project_payload in enumerate(payload["projects"]):
+            ReportService._append_embedded_project_report(
+                story,
+                project_payload,
+                styles,
+                show_page_break=index < total_projects - 1,
+            )
+
+    @staticmethod
+    def _append_organization_index(story, payload, styles):
+        story.append(Paragraph("Índice", styles["h1"]))
+
+        rows = [["Section", "Content"]]
+        rows.append(["1", "Corporate-wide executive summary"])
+        rows.append(["1.1", "Only active projects shown"])
+
+        section_number = 2
+        for department_payload in payload["departments"]:
+            department = department_payload["department"]
+            rows.append(
+                [str(section_number), f"Department overview: {department['name']}"])
+            section_number += 1
+
+            for project_payload in department_payload["projects"]:
+                project = project_payload["project"]
+                rows.append(
+                    [str(section_number), f"Report for project: {project['name']}"])
+                section_number += 1
+
+        story.append(ReportService._index_table(rows))
+        story.append(Spacer(1, 10))
+        story.append(PageBreak())
+
+    @staticmethod
+    def _append_organization_detail(story, payload, styles):
+        departments_with_projects = [
+            department_payload
+            for department_payload in payload["departments"]
+            if department_payload["projects"]
+        ]
+        total_departments = len(departments_with_projects)
+
+        for dept_index, department_payload in enumerate(departments_with_projects):
+            department = department_payload["department"]
+            story.append(
+                Paragraph(f"Department: {department['name']}", styles["h1"]))
+            story.append(
+                Paragraph(department_payload["narrative"], styles["body"]))
+            story.append(Spacer(1, 4))
+            story.append(ReportService._metrics_table(
+                department_payload["metrics"]))
+            story.append(Spacer(1, 6))
+            story.append(
+                ReportService._comparison_chart_from_projects(
+                    department_payload["projects"],
+                    f"Tasks per project · {department['name']}",
+                    "Tasks",
+                )
+            )
+            story.append(Spacer(1, 8))
+            story.append(Paragraph("Department project reports", styles["h2"]))
+            story.append(
+                Paragraph(
+                    "Individual reports for the active projects in the department",
+                    styles["body"],
+                )
+            )
+            story.append(Spacer(1, 6))
+
+            total_projects = len(department_payload["projects"])
+            for project_index, project_payload in enumerate(department_payload["projects"]):
+                is_last_project_in_department = project_index == total_projects - 1
+                is_last_department = dept_index == total_departments - 1
+
+                ReportService._append_embedded_project_report(
+                    story,
+                    project_payload,
+                    styles,
+                    show_page_break=not (
+                        is_last_project_in_department and is_last_department),
+                )
+
+    @staticmethod
+    def _append_embedded_project_report(story, project_payload, styles, show_page_break: bool = True):
+        project = project_payload["project"]
+        story.append(
+            Paragraph(f"Project report: {project['name']}", styles["h2"]))
+        story.append(Paragraph(project_payload["narrative"], styles["body"]))
+        story.append(Spacer(1, 4))
+        story.append(
+            ReportService._kv_table(
+                [
+                    ["ID", str(project["id"])],
+                    ["Name", project["name"]],
+                    ["Department", project.get("department_name") or "-"],
+                    ["Created at", project.get("created_at") or "-"],
+                    ["Deadline", project.get("deadline") or "-"],
+                    ["Finished", "Yes" if project.get("finalized") else "No"],
+                ]
+            )
+        )
+        story.append(Spacer(1, 6))
+        story.append(ReportService._metrics_table(project_payload["metrics"]))
+        story.append(Spacer(1, 6))
+        story.append(
+            ReportService._status_chart(
+                project_payload["metrics"],
+                f"Tasks per project · {project['name']}",
+            )
+        )
+        story.append(Spacer(1, 8))
+
+        for wp in project_payload["work_packages"]:
+            story.append(
+                Paragraph(f"Work package: {wp['name']}", styles["h2"]))
+            story.append(Paragraph(ReportService._metrics_sentence(
+                wp["metrics"]), styles["body"]))
+            story.append(Spacer(1, 4))
+            story.append(ReportService._tasks_table(wp["tasks"]))
+            story.append(Spacer(1, 8))
+
+        if show_page_break:
+            story.append(PageBreak())
+
+
+    @staticmethod
+    def _render_pdf(scope: ReportScope, payload: dict[str, Any], generated_at: datetime) -> bytes:
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=A4,
+            rightMargin=18 * mm,
+            leftMargin=18 * mm,
+            topMargin=24 * mm,
+            bottomMargin=20 * mm,
+        )
+        styles = ReportService._styles()
+        story = []
+
+        story.append(Paragraph(scope.title, styles["title"]))
+        story.append(Paragraph(scope.subtitle, styles["subtitle"]))
+        story.append(
+            Paragraph(
+                f"Generated at: {ReportService._fmt_dt(generated_at)}",
+                styles["muted"],
+            )
+        )
+        story.append(Spacer(1, 8))
+
+        story.append(Paragraph("Executive summary", styles["h1"]))
+        story.append(Paragraph(payload["narrative"], styles["body"]))
+        story.append(Spacer(1, 8))
+
+        story.append(ReportService._metrics_table(payload["metrics"]))
+        story.append(Spacer(1, 8))
+
+        if scope.kind == "project":
+            story.append(ReportService._status_chart(payload["metrics"], "Tasks by status"))
+        elif scope.kind == "department":
+            story.append(ReportService._status_chart(payload["metrics"], "Tasks by department"))
+            story.append(Spacer(1, 8))
+            story.append(ReportService._comparison_chart_from_projects(payload["projects"], "Workload by project", "Tasks"))
+        elif scope.kind == "organization":
+            story.append(ReportService._status_chart(payload["metrics"], "Global distribution of tasks"))
+            story.append(Spacer(1, 8))
+            story.append(ReportService._comparison_chart_from_departments(payload["departments"], "Workload by department", "Tasks"))
+
+        story.append(Spacer(1, 10))
+
+        if scope.kind == "project":
+            ReportService._append_project_detail(story, payload, styles)
+        elif scope.kind == "department":
+            ReportService._append_department_index(story, payload, styles)
+            ReportService._append_department_detail(story, payload, styles)
+        elif scope.kind == "organization":
+            ReportService._append_organization_index(story, payload, styles)
+            ReportService._append_organization_detail(story, payload, styles)
+
+        doc.build(
+            story,
+            onFirstPage=ReportService._build_page_decorator(scope, generated_at),
+            onLaterPages=ReportService._build_page_decorator(scope, generated_at),
+        )
+        pdf_bytes = buffer.getvalue()
+        buffer.close()
+        return pdf_bytes
