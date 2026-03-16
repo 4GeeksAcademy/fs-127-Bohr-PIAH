@@ -1,6 +1,8 @@
 export const initialStore = () => {
   return {
     message: null,
+    token: null,
+    user: null,
     projects: [],
     currentProjectId: null,
     tasks: [],
@@ -79,6 +81,18 @@ export default function storeReducer(store, action = {}) {
       return {
         ...store,
         message: action.payload,
+      };
+
+    case "set_token":
+      return {
+        ...store,
+        token: action.payload,
+      };
+
+    case "set_user":
+      return {
+        ...store,
+        token: action.payload,
       };
 
    
