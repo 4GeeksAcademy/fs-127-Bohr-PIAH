@@ -15,7 +15,9 @@ import { Login } from "./pages/Login";
 import { MenuDptoProject } from "./pages/MenuDptoProject";
 import { Dashboard} from "./pages/Dashboard";
 import { Signup } from "./pages/Signup";
-
+import { ForgotPassword } from "./pages/ForgotPassword";
+import { ResetPassword } from "./pages/ResetPassword";
+import { ChangePassword } from "./pages/ChangePassword";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -38,6 +40,9 @@ export const router = createBrowserRouter(
         <Route path="/login" element={<Login />} />
         <Route path="/menudptoproject" element={<MenuDptoProject />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/change-password" element={<ChangePassword />} />
       </Route>
     )
 );
