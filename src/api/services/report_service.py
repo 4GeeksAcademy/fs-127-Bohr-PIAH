@@ -14,6 +14,9 @@ from api.models.task import Task
 from api.models.work_package import WorkPackage
 
 from reportlab.lib import colors
+from reportlab.graphics.charts.barcharts import VerticalBarChart
+from reportlab.graphics.shapes import Drawing, String
+from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -502,3 +505,182 @@ class ReportService:
             )
         )
         return table
+
+    # Charts
+
+    @staticmethod
+    def _status_chart(metrics: dict[str, Any], title: str) -> Drawing:
+        labels = ["To do", "In progress", "In review", "Done"]
+        values = [
+            metrics.get("to_do", 0),
+            metrics.get("in_progress", 0),
+            metrics.get("in_review", 0),
+            metrics.get("done", 0),
+        ]
+
+        drawing = Drawing(170 * mm, 60 * mm)
+        drawing.add(String(0, 56 * mm, title, fontName="Helvetica-Bold",
+                    fontSize=10, fillColor=colors.HexColor("#17324D")))
+
+        chart = VerticalBarChart()
+        chart.x = 10 * mm
+        chart.y = 8 * mm
+        chart.height = 38 * mm
+        chart.width = 140 * mm
+        chart.data = [values]
+        chart.categoryAxis.categoryNames = labels
+        chart.categoryAxis.labels.fontName = "Helvetica"
+        chart.categoryAxis.labels.fontSize = 8
+        chart.valueAxis.labels.fontName = "Helvetica"
+        chart.valueAxis.labels.fontSize = 8
+        chart.valueAxis.valueMin = 0
+        chart.valueAxis.valueMax = max(max(values, default=0), 1)
+        chart.valueAxis.valueStep = max(
+            1, int((chart.valueAxis.valueMax + 3) / 4))
+        chart.barWidth = 14
+        chart.groupSpacing = 12
+        chart.barSpacing = 6
+        chart.bars[0].fillColor = colors.HexColor("#4F81BD")
+        chart.bars[0].strokeColor = colors.HexColor("#385D8A")
+        drawing.add(chart)
+        return drawing
+
+    @staticmethod
+    def _comparison_chart(labels: list[str], values: list[int], title: str, y_label: str) -> Drawing:
+        if not labels:
+            labels = ["No data"]
+            values = [0]
+
+        max_per_block = 8
+        blocks = [
+            (labels[index:index + max_per_block],
+             values[index:index + max_per_block])
+            for index in range(0, len(labels), max_per_block)
+        ]
+
+        block_height = 65 * mm
+        block_spacing = 8 * mm
+        total_height = max(
+            block_height * len(blocks) + block_spacing * (len(blocks) - 1),
+            block_height,
+        )
+
+        drawing = Drawing(170 * mm, total_height)
+
+        for block_index, (block_labels, block_values) in enumerate(blocks):
+            y_offset = total_height - \
+                ((block_index + 1) * block_height) - \
+                (block_index * block_spacing)
+            title_suffix = f" (Block {block_index + 1})" if len(blocks) > 1 else ""
+
+            drawing.add(
+                String(
+                    0,
+                    y_offset + 61 * mm,
+                    title + title_suffix,
+                    fontName="Helvetica-Bold",
+                    fontSize=10,
+                    fillColor=colors.HexColor("#17324D"),
+                )
+            )
+            drawing.add(
+                String(
+                    0,
+                    y_offset + 56 * mm,
+                    y_label,
+                    fontName="Helvetica",
+                    fontSize=8,
+                    fillColor=colors.HexColor("#4F6174"),
+                )
+            )
+
+            chart = VerticalBarChart()
+            chart.x = 10 * mm
+            chart.y = y_offset + 8 * mm
+            chart.height = 42 * mm
+            chart.width = 145 * mm
+            chart.data = [block_values]
+            chart.categoryAxis.categoryNames = block_labels
+            chart.categoryAxis.labels.fontName = "Helvetica"
+            chart.categoryAxis.labels.fontSize = 7
+            chart.categoryAxis.labels.angle = 20
+            chart.valueAxis.labels.fontName = "Helvetica"
+            chart.valueAxis.labels.fontSize = 8
+            chart.valueAxis.valueMin = 0
+            chart.valueAxis.valueMax = max(max(block_values, default=0), 1)
+            chart.valueAxis.valueStep = max(
+                1, int((chart.valueAxis.valueMax + 3) / 4))
+            chart.barWidth = 12
+            chart.groupSpacing = 10
+            chart.barSpacing = 5
+            chart.bars[0].fillColor = colors.HexColor("#7AA6D8")
+            chart.bars[0].strokeColor = colors.HexColor("#4F81BD")
+            drawing.add(chart)
+
+        return drawing
+
+    @staticmethod
+    def _comparison_chart_from_projects(projects_payload: list[dict[str, Any]], title: str, y_label: str) -> Drawing:
+        labels = [
+            ReportService._short_label(
+                project_payload["project"]["name"], max_length=14)
+            for project_payload in projects_payload
+        ]
+        values = [project_payload["metrics"]["total_tasks"]
+                  for project_payload in projects_payload]
+        return ReportService._comparison_chart(labels, values, title, y_label)
+
+    @staticmethod
+    def _comparison_chart_from_departments(departments_payload: list[dict[str, Any]], title: str, y_label: str) -> Drawing:
+        labels = [
+            ReportService._short_label(
+                department_payload["department"]["name"], max_length=14)
+            for department_payload in departments_payload
+        ]
+        values = [department_payload["metrics"]["total_tasks"]
+                  for department_payload in departments_payload]
+        return ReportService._comparison_chart(labels, values, title, y_label)
+
+    # Decorators for pages
+
+    @staticmethod
+    def _draw_header_footer(canvas: Canvas, doc, scope: ReportScope, generated_at: datetime):
+        canvas.saveState()
+        page_width, page_height = A4
+
+        header_y = page_height - 12 * mm
+        footer_y = 10 * mm
+
+        canvas.setStrokeColor(colors.HexColor("#C7D2E0"))
+        canvas.setLineWidth(0.6)
+        canvas.line(doc.leftMargin, page_height - 16 * mm,
+                    page_width - doc.rightMargin, page_height - 16 * mm)
+        canvas.line(doc.leftMargin, 15 * mm,
+                    page_width - doc.rightMargin, 15 * mm)
+
+        canvas.setFont("Helvetica-Bold", 9)
+        canvas.setFillColor(colors.HexColor("#17324D"))
+        canvas.drawString(doc.leftMargin, header_y, scope.title)
+
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(colors.HexColor("#4F6174"))
+        right_header = scope.subtitle
+        canvas.drawRightString(
+            page_width - doc.rightMargin, header_y, right_header)
+
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(colors.HexColor("#6C7A89"))
+        generated_text = f"Generado: {ReportService._fmt_dt(generated_at)}"
+        canvas.drawString(doc.leftMargin, footer_y, generated_text)
+
+        page_text = f"Página {canvas.getPageNumber()}"
+        canvas.drawRightString(
+            page_width - doc.rightMargin, footer_y, page_text)
+
+        canvas.restoreState()
+
+    @staticmethod
+    def _build_page_decorator(scope: ReportScope, generated_at: datetime):
+        def decorate(canvas: Canvas, doc):
+            ReportService._draw_header_footer(canvas, doc, scope, generated_at)
+        return decorate
