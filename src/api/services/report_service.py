@@ -893,7 +893,6 @@ class ReportService:
         if show_page_break:
             story.append(PageBreak())
 
-
     @staticmethod
     def _render_pdf(scope: ReportScope, payload: dict[str, Any], generated_at: datetime) -> bytes:
         buffer = BytesIO()
@@ -926,15 +925,20 @@ class ReportService:
         story.append(Spacer(1, 8))
 
         if scope.kind == "project":
-            story.append(ReportService._status_chart(payload["metrics"], "Tasks by status"))
+            story.append(ReportService._status_chart(
+                payload["metrics"], "Tasks by status"))
         elif scope.kind == "department":
-            story.append(ReportService._status_chart(payload["metrics"], "Tasks by department"))
+            story.append(ReportService._status_chart(
+                payload["metrics"], "Tasks by department"))
             story.append(Spacer(1, 8))
-            story.append(ReportService._comparison_chart_from_projects(payload["projects"], "Workload by project", "Tasks"))
+            story.append(ReportService._comparison_chart_from_projects(
+                payload["projects"], "Workload by project", "Tasks"))
         elif scope.kind == "organization":
-            story.append(ReportService._status_chart(payload["metrics"], "Global distribution of tasks"))
+            story.append(ReportService._status_chart(
+                payload["metrics"], "Global distribution of tasks"))
             story.append(Spacer(1, 8))
-            story.append(ReportService._comparison_chart_from_departments(payload["departments"], "Workload by department", "Tasks"))
+            story.append(ReportService._comparison_chart_from_departments(
+                payload["departments"], "Workload by department", "Tasks"))
 
         story.append(Spacer(1, 10))
 
@@ -949,9 +953,88 @@ class ReportService:
 
         doc.build(
             story,
-            onFirstPage=ReportService._build_page_decorator(scope, generated_at),
-            onLaterPages=ReportService._build_page_decorator(scope, generated_at),
+            onFirstPage=ReportService._build_page_decorator(
+                scope, generated_at),
+            onLaterPages=ReportService._build_page_decorator(
+                scope, generated_at),
         )
         pdf_bytes = buffer.getvalue()
         buffer.close()
         return pdf_bytes
+
+    # Report generation
+
+    @staticmethod
+    def generate_project_pdf(project_id: int):
+        project = ReportService._get_project_tree(project_id)
+        payload = ReportService._build_project_payload(project)
+        scope = ReportScope(
+            kind="project",
+            entity_id=project.id,
+            title=f"Project name: {project.name}",
+            # subtitle=f"Project #{project.id}",
+        )
+        generated_at = datetime.now(timezone.utc)
+        pdf_bytes = ReportService._render_pdf(scope, payload, generated_at)
+        return ReportService._pdf_response(
+            pdf_bytes,
+            filename=f"Report_{project.name}.pdf",
+        )
+
+    @staticmethod
+    def generate_department_pdf(department_id: int):
+        department = ReportService._get_department_tree(department_id)
+        payload = ReportService._build_department_payload(department)
+
+        if not payload["projects"]:
+            abort(
+                404, description=f"Department with id {department_id} has no active projects")
+
+        scope = ReportScope(
+            kind="department",
+            entity_id=department.id,
+            title=f"Department report: {department.name}",
+            # subtitle=f"Departamento #{department.id}",
+        )
+        generated_at = datetime.now(timezone.utc)
+        pdf_bytes = ReportService._render_pdf(scope, payload, generated_at)
+        return ReportService._pdf_response(
+            pdf_bytes,
+            filename=f"Report_{department.name}.pdf",
+        )
+
+    @staticmethod
+    def generate_organization_pdf():
+        departments = ReportService._get_organization_tree()
+        payload = ReportService._build_organization_payload(departments)
+
+        active_departments = [
+            department_payload
+            for department_payload in payload["departments"]
+            if department_payload["projects"]
+        ]
+        if not active_departments:
+            abort(404, description="Organization has no active projects")
+
+        scope = ReportScope(
+            kind="organization",
+            entity_id=None,
+            title="General management report",
+            subtitle="General view - Departments, projects and tasks",
+        )
+        generated_at = datetime.now(timezone.utc)
+        pdf_bytes = ReportService._render_pdf(scope, payload, generated_at)
+        return ReportService._pdf_response(
+            pdf_bytes,
+            filename="organization_report.pdf",
+        )
+
+    
+    @staticmethod
+    def _pdf_response(pdf_bytes: bytes, filename: str):
+        return send_file(
+            BytesIO(pdf_bytes),
+            mimetype="application/pdf",
+            as_attachment=True,
+            download_name=filename,
+        )
