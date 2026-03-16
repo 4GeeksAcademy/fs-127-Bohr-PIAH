@@ -23,6 +23,7 @@ bcrypt = "*"
 flask = "*"
 resend = "*"
 reportlab = "*"
+faker = "*"
 
 [requires]
 python_version = "3.13"
