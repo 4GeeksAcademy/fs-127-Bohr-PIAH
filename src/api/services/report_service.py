@@ -1029,7 +1029,6 @@ class ReportService:
             filename="organization_report.pdf",
         )
 
-    
     @staticmethod
     def _pdf_response(pdf_bytes: bytes, filename: str):
         return send_file(

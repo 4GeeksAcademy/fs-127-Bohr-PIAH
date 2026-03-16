@@ -24,4 +24,8 @@ PERMISSIONS = {
     "departments:create": ["admin"],
     "departments:update": ["admin"],
     "departments:delete": ["admin"],
+
+    "reports_project:create": ALL_ROLES,
+    "reports_department:create": ["admin", "head"],
+    "reports_organization:create": ["admin"]
 }
