@@ -3,14 +3,14 @@ import { KanbanTask } from "./KanbanTasks";
 import { CirclePlus } from "lucide-react";
 import { useRef } from "react";
 
-export const KanbanColumn = ({ columnRef, tasks, title, borderColor, ledColor, onAddTask, addingTask, newTaskText, setNewTaskText, confirmAddTask, setAddingTask }) => {
+export const KanbanColumn = ({ columnRef, tasks, title, borderColor, ledColor, onAddTask, addingTask, newTaskText, setNewTaskText, confirmAddTask, setAddingTask, onEditTask }) => {
 
 
     const containerRef = useRef(null);
 
     // Maneja click dentro de la columna: si hay input visible, se oculta
     const handleColumnClick = (event) => {
-        // Evita cerrar el input si se hace click sobre el input o el botón +
+        // no cierra el input si se hace click sobre el input o el botón +
         if (
             addingTask &&
             !event.target.closest('input') &&
@@ -68,7 +68,7 @@ export const KanbanColumn = ({ columnRef, tasks, title, borderColor, ledColor, o
             {/* Lista de tareas */}
             <div ref={columnRef} className="d-flex flex-column gap-2" style={{ minHeight: "150px" }}>
                 {tasks.map((task, index) => (
-                    <KanbanTask key={`${title}-${index}`} task={task} />
+                    <KanbanTask key={`${title}-${index}`} task={task} onEdit={onEditTask} />
                 ))}
             </div>
 

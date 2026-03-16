@@ -62,21 +62,26 @@ export default function storeReducer(store, action = {}) {
         tasks: [...(store.tasks || []), action.payload],
       };
 
+    case "edit_task":
+      return {
+        ...store,
+        tasks: store.tasks.map((task) =>
+        task.id === action.payload.id ? action.payload : task)
+      };
+
+      case "delete_task":
+        return {
+          ...store,
+          tasks: store.tasks.filter((task) => task.id !== action.payload)
+        };
+
     case "set_hello":
       return {
         ...store,
         message: action.payload,
       };
 
-    case "add_task":
-      const { id, color } = action.payload;
-
-      return {
-        ...store,
-        todos: store.todos.map((todo) =>
-          todo.id === id ? { ...todo, background: color } : todo,
-        ),
-      };
+   
     default:
       throw Error("Unknown action.");
   }
