@@ -1,97 +1,20 @@
-/* LAYOUT GENERAL DEL MODAL */
-
-.profile-layout {
-  display: grid;
-  grid-template-columns: minmax(250px, 350px) 1fr;
-  gap: 40px;
-  align-items: start;
-  width: 100%;
+/* ================================
+   VARIABLES (opcional pero útil)
+================================ */
+:root {
+  --cyber: var(--c-cyber);
+  --nuc: var(--c-nuc);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-hover: rgba(255, 255, 255, 0.12);
 }
 
-/* Móviles y tablets */
-@media (max-width: 900px) {
-  .profile-layout {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 0 10px;
-  }
-
-  .profile-left {
-    align-items: center;
-    text-align: center;
-  }
-
-  .profile-left section {
-    margin-top: 10px;
-  }
-}
-
-
-/*COLUMNA IZQUIERDA*/
-
-.profile-left {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.profile-left section {
-  width: 100%;
-  margin-top: 20px;
-}
-
-/* PROJECTS */
-
-.features-grid {
-  display: flex;
-  flex-direction: column; 
-  gap: 20px;
-}
-
-.project-rect {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(39, 230, 214, 0.3);
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  color: var(--c-cyber);
-  font-size: 1rem;
-  transition: 0.25s ease;
-  cursor: pointer;
-}
-
-.project-rect:hover {
-  background: rgba(39, 230, 214, 0.15);
-  transform: translateY(-4px);
-  box-shadow: 0 0 12px rgba(39, 230, 214, 0.4);
-}
-
-/*BOTONES*/
-
-.btn-small {
-  margin: 20px;
-  padding: 3px 6px;
-  font-size: 0.8rem;
-  border-radius: 6px;
-  background: var(--c-cyber);
-  color: black;
-  border: none;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.btn-small:hover {
-  background: var(--c-nuc);
-  color: black;
-  transform: translateY(-2px);
-}
-
-/*MODAL*/
-
+/* ================================
+   MODAL GENERAL
+================================ */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100vw;
   height: 100vh;
   background: rgba(0,0,0,0.6);
@@ -109,8 +32,10 @@
   max-height: 90vh;
   overflow-y: auto;
   border-radius: 12px;
-  padding: 20px;
+  padding: 25px;
   animation: fadeIn 0.25s ease;
+  border: 1px solid rgba(255, 255, 0, 0.4);
+  box-shadow: 0 0 20px rgba(255, 255, 0, 0.2);
 }
 
 .modal-close-btn {
@@ -121,52 +46,113 @@
   border: none;
   font-size: 22px;
   cursor: pointer;
-  color: var(--c-nuc);
+  color: var(--nuc);
+  transition: 0.2s ease;
 }
 
-/*ANIMACIÓN */
+.modal-close-btn:hover {
+  transform: scale(1.2);
+  color: var(--cyber);
+}
 
+/* ================================
+   ANIMACIÓN
+================================ */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ================================
+   LAYOUT DEL PERFIL
+================================ */
+.profile-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 350px) 1fr;
+  gap: 40px;
+  width: 100%;
+  align-items: start;
+}
+
+/* Responsivo */
+@media (max-width: 900px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 10px;
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
+
+  .profile-left {
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: center;
   }
 }
 
+/* ================================
+   COLUMNA IZQUIERDA
+================================ */
+.profile-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-.cyber-btn-primary,
-.cyber-btn-secondary,
-.cyber-btn-success {
-  padding: 6px 8px;
-  font-size: 0.85rem;
+.profile-left section {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* ================================
+   INPUTS
+================================ */
+.cyber-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--cyber);
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  margin-top: 5px;
+  transition: 0.2s ease;
+}
+
+.cyber-input:focus {
+  outline: none;
+  box-shadow: 0 0 8px var(--cyber);
+}
+
+/* ================================
+   BOTONES
+================================ */
+.cyber-btn {
+  padding: 8px 10px;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.25s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
   width: 100%;
   margin-top: 10px;
 }
 
+/* Primario */
 .cyber-btn-primary {
   background: transparent;
-  border: 1px solid var(--c-cyber);
-  color: var(--c-cyber);
+  border: 1px solid var(--cyber);
+  color: var(--cyber);
 }
 
 .cyber-btn-primary:hover {
-  background: var(--c-cyber);
+  background: var(--cyber);
   color: #000;
 }
 
+/* Secundario */
 .cyber-btn-secondary {
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--glass-border);
   color: white;
 }
 
@@ -174,6 +160,7 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* Éxito */
 .cyber-btn-success {
   background: #4da3ff;
   border: none;
@@ -182,4 +169,48 @@
 
 .cyber-btn-success:hover {
   box-shadow: 0 0 10px #3bb7ff;
+}
+
+/* Botón pequeño */
+.btn-small {
+  padding: 3px 6px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  background: var(--cyber);
+  color: black;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-small:hover {
+  background: var(--nuc);
+  transform: translateY(-2px);
+}
+
+/* ================================
+   PROYECTOS
+================================ */
+.features-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.project-rect {
+  background: var(--glass-bg);
+  border: 1px solid rgba(39, 230, 214, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: var(--cyber);
+  font-size: 1rem;
+  transition: 0.25s ease;
+  cursor: pointer;
+}
+
+.project-rect:hover {
+  background: rgba(39, 230, 214, 0.2);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 0 15px rgba(39, 230, 214, 0.5);
 }
