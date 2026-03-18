@@ -1,8 +1,8 @@
 from functools import wraps
 from flask import jsonify
-from api.services.auth_service import AuthService, get_current_user
-from flask_jwt_extended import get_jwt_identity
-from auth.permissions import PERMISSIONS
+from api.services.auth_service import AuthService
+from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
+from .permissions import PERMISSIONS
 
 
 def require_permission(permission):
@@ -10,6 +10,7 @@ def require_permission(permission):
         @wraps(fn)
         def wrapper(*args, **kwargs):
 
+            verify_jwt_in_request()
             user_id = get_jwt_identity()
             user = AuthService.get_current_user(user_id)
 

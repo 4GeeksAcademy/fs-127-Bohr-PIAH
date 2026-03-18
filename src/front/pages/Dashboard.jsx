@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { DashboardNavbar } from "../components/Dashboard/DashboardNavbar";
 import { Sidebar } from "../components/Dashboard/Sidebar";
@@ -8,12 +8,15 @@ import { BohrLogo } from "../components/BohrLogo";
 import { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import ModalProject from "../components/ModalProject/ModalProject"
-
+import { useActionState } from "react";
+import { Spinner } from "../components/Spinner";
 
 export const Dashboard = () => {
 
-    const { store, dispatch } = useGlobalReducer();
+    const { store, dispatch, actions } = useGlobalReducer();
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
 
     const [newProjectData, setNewProjectData] = useState({
         nombre: "",
@@ -32,6 +35,31 @@ export const Dashboard = () => {
     const activeProject = store.projects.find(p => p.id === store.currentProjectId);
 
     const projectsToShow = store.projects || [];
+
+
+
+    // useEffect
+
+    useEffect(() => {
+        const loadData = async () => {
+            setIsLoading(true);
+            await actions.getProjects();
+           
+            setTimeout(() => setIsLoading(false), 1000);
+        };
+        loadData();
+    }, []);
+
+    // SI ESTÁ CARGANDO, MUESTRA EL SPINNER
+    if (isLoading) {
+        return <Spinner />;
+    }
+
+
+
+
+
+
 
     const handleAddProject = () => {
         const newId = crypto.randomUUID();
