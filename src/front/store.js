@@ -1,6 +1,8 @@
 export const initialStore = () => {
   return {
     message: null,
+    token: null,
+    user: null,
     projects: [],
     currentProjectId: null,
     tasks: [],
