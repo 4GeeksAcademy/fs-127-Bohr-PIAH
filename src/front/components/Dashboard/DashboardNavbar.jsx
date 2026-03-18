@@ -46,7 +46,7 @@ export const DashboardNavbar = () => {
                         </div>
 
                         <div className="ms-auto">
-                            <Link to="/admin">
+                            <Link to="/menuadmin">
                                 <button className="nav-login-cyber">Admin Panel</button>
                             </Link>
                         </div>
