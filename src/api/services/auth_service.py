@@ -28,7 +28,8 @@ class AuthService:
                 email=data["email"],
                 first_name=data["first_name"],
                 last_name=data["last_name"],
-                is_active=True
+                is_active=True,
+                role=RoleName[data["role"].lower()] if "role" in data and data["role"] else RoleName.GUEST,
             )
             new_user.set_password(data["password"])
             db.session.add(new_user)
