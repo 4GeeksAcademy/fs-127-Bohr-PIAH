@@ -1,14 +1,8 @@
 from functools import wraps
 from flask import jsonify
 from api.services.auth_service import AuthService
-<<<<<<< feat/1.7.2_Make_token_permanent
-from flask_jwt_extended import get_jwt_identity
-from api.auth.permissions import PERMISSIONS
-=======
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from .permissions import PERMISSIONS
->>>>>>> dev
-
 
 def require_permission(permission):
     def decorator(fn):
