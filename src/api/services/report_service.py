@@ -31,6 +31,17 @@ from reportlab.platypus import (
 )
 from reportlab.pdfgen.canvas import Canvas
 
+# to test:
+# pipenv shell
+# flask shell
+# from api.services.report_service import ReportService
+# from api.models.project import Project
+# from api.models.department import Department
+# project = Project.query.filter_by(finalized=False).first()
+# project.id
+# response = ReportService.generate_project_pdf(project.id)
+# response
+
 
 @dataclass  # Método típico para clases que solo almacenan datos, genera dunder methods
 class ReportScope:
@@ -972,7 +983,7 @@ class ReportService:
             kind="project",
             entity_id=project.id,
             title=f"Project name: {project.name}",
-            # subtitle=f"Project #{project.id}",
+            subtitle=f"Project #{project.id}",
         )
         generated_at = datetime.now(timezone.utc)
         pdf_bytes = ReportService.render_pdf(scope, payload, generated_at)
@@ -994,7 +1005,7 @@ class ReportService:
             kind="department",
             entity_id=department.id,
             title=f"Department report: {department.name}",
-            # subtitle=f"Departamento #{department.id}",
+            subtitle=f"Departamento #{department.id}",
         )
         generated_at = datetime.now(timezone.utc)
         pdf_bytes = ReportService.render_pdf(scope, payload, generated_at)

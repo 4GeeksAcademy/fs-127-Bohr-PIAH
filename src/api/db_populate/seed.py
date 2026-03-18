@@ -20,6 +20,7 @@ fake = Faker()
 
 print("Starting DB seed...")
 # to run:
+# pipenv shell
 # flask shell
 # exec(open("/workspaces/fs-127-Bohr-PIAH/src/api/db_populate/seed.py").read())
 
