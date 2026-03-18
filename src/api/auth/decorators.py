@@ -1,8 +1,8 @@
 from functools import wraps
 from flask import jsonify
-from api.services.auth_service import AuthService, get_current_user
+from api.services.auth_service import AuthService
 from flask_jwt_extended import get_jwt_identity
-from auth.permissions import PERMISSIONS
+from api.auth.permissions import PERMISSIONS
 
 
 def require_permission(permission):
