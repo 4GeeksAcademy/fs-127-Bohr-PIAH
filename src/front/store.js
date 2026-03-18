@@ -1,6 +1,8 @@
 export const initialStore = () => {
   return {
     message: null,
+    token: null,
+    user: null,
     projects: [],
     currentProjectId: null,
     tasks: [],
@@ -35,15 +37,22 @@ export default function storeReducer(store, action = {}) {
         ),
       };
 
-    case "set_current_project":
+    case "set_current_project": // recuerda cual de los proyectos es el seleccionado
       return {
         ...store,
-        currentProjectId: action.payload
+        currentProjectId: action.payload,
       };
+
+      case "set_projects": //guarda TODOS los proyectos.  
+      return {
+        ...store,
+        projects: action.payload, 
+      };
+
 
     case "add_work_package":
       if (!action.payload.projectId) return store;
-      
+
       return {
         ...store,
         projects: store.projects.map((project) =>
@@ -66,14 +75,15 @@ export default function storeReducer(store, action = {}) {
       return {
         ...store,
         tasks: store.tasks.map((task) =>
-        task.id === action.payload.id ? action.payload : task)
+          task.id === action.payload.id ? action.payload : task,
+        ),
       };
 
-      case "delete_task":
-        return {
-          ...store,
-          tasks: store.tasks.filter((task) => task.id !== action.payload)
-        };
+    case "delete_task":
+      return {
+        ...store,
+        tasks: store.tasks.filter((task) => task.id !== action.payload),
+      };
 
     case "set_hello":
       return {
@@ -81,8 +91,52 @@ export default function storeReducer(store, action = {}) {
         message: action.payload,
       };
 
-   
     default:
       throw Error("Unknown action.");
   }
 }
+
+export const useActions = (store, dispatch) => {
+  return {
+
+     // TRAER PROYECTOS (GET)
+    getProjects: async () => {
+      try{
+      const response = await fetch(
+        import.meta.env.VITE_BACKEND_URL + "/api/projects",
+      );
+      if (response.ok) {
+        const data = await response.json();
+        dispatch({ type: "set_projects", payload: data });
+        return true;
+      }
+    } catch (error) {
+      console.error("Error en getProjects", error);
+      return false;
+    }
+    },
+
+     // CREAR TAREA (POST)
+
+    addTask: async (newTask) => {
+      try{
+        const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/tasks", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body:JSON.stringify(newTask)
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // Guardamos en el store la tarea que nos devuelve el Back (ya con su ID real)
+          dispatch({ type: "add_task", payload: data });
+          return data; 
+        }
+      } catch (error) {
+        console.error("Error en addTask", error);
+        return null;
+      }
+    }
+  };
+};
+
