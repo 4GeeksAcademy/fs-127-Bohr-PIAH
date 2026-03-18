@@ -29,7 +29,7 @@ class AuthService:
                 first_name=data["first_name"],
                 last_name=data["last_name"],
                 is_active=True,
-                role=RoleName[data["role"].upper()] if "role" in data and data["role"] else RoleName.GUEST
+                role=RoleName[data["role"].lower()] if "role" in data and data["role"] else RoleName.GUEST,
             )
             new_user.set_password(data["password"])
             db.session.add(new_user)
@@ -184,5 +184,22 @@ class AuthService:
             db.session.rollback()
             abort(500, description=f"Error updating password: {error}")
 
+    @staticmethod
+    def change_password(user_id, data):
+        if "current_password" not in data or "new_password" not in data:
+            abort(400, description="Current password and new password are required")
 
+        user = User.query.get(int(user_id))
+        if user is None:
+            abort(404, description="User not found")
 
+        if not user.check_password(data["current_password"]):
+            abort(401, description="Current password is incorrect")
+
+        user.set_password(data["new_password"])
+        try:
+            db.session.commit()
+            return {"message": "Password changed successfully"}
+        except Exception as error:
+            db.session.rollback()
+            abort(500, description=f"Error changing password: {error}")

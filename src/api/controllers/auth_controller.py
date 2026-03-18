@@ -76,3 +76,14 @@ def reset_password():
         abort(400, description="El body no puede estar vacio")
     result = AuthService.reset_password(body)
     return jsonify(result), 200
+
+# POST /api/auth/change-password - Change password
+@auth_bp.route('/change-password', methods=['POST'])
+@jwt_required()
+def change_password():
+    current_user_id = get_jwt_identity()
+    body = request.get_json()
+    if not body:
+        abort(400, description="Body cannot be empty")
+    result = AuthService.change_password(current_user_id, body)
+    return jsonify(result), 200
