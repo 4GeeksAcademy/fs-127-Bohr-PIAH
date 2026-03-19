@@ -36,11 +36,12 @@ export const ProfileModal = ({ show, onHide }) => {
     setPasswordMessage(null);
 
     try {
-      // Aquí iría la llamada real a tu API para cambiar la contraseña.
-      // Ejemplo (pseudo):
-      // await api.changePassword({ currentPassword, newPassword });
+      // Aquí iría la llamada real a API para cambiar la contraseña.
 
-      // Simulación de espera
+
+
+
+
       await new Promise((r) => setTimeout(r, 800));
 
       setCurrentPassword("");
@@ -63,7 +64,7 @@ export const ProfileModal = ({ show, onHide }) => {
 
         <div className="profile-layout">
           <div className="profile-left">
-            <h2 style={{ color: "var(--c-nuc)", textShadow: "0 0 10px var(--c-nuc)" }}>
+            <h2 className="name-user" style={{ color: "var(--c-nuc)", textShadow: "0 0 10px var(--c-nuc)", margin: "30px", padding: "30px" }}>
               {name}
             </h2>
 
@@ -132,7 +133,7 @@ export const ProfileModal = ({ show, onHide }) => {
           </div>
 
           <main style={{ width: "100%" }}>
-            <div className="glass-card-yellow" style={{ padding: "25px" }}>
+            <div className="glass-card-yellow" style={{ marginTop: "80px", padding: "40px" }}>
               <h3 className="section-sub-title">My Projects</h3>
 
               <div className="features-grid">
