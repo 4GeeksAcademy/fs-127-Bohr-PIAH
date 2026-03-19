@@ -40,7 +40,7 @@ export const Sidebar = ({ activeProjects, onNewProjectClick, onProjectSelect, se
                             }}
                         >
                             <p className="feature-description mb-0 text-white opacity-75" style={{ fontSize: "0.8rem" }}>
-                                • {project.nombre || "Untitled Project"}
+                                • {project.name || project.nombre || "Untitled Project"}
                             </p>
                         </div>
                     ))}

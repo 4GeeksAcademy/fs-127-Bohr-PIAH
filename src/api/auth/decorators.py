@@ -4,7 +4,6 @@ from api.services.auth_service import AuthService
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from .permissions import PERMISSIONS
 
-
 def require_permission(permission):
     def decorator(fn):
         @wraps(fn)
