@@ -124,12 +124,17 @@ export const useActions = (store, dispatch) => {
   return {
     // TRAER PROYECTOS (GET)
     getProjects: async () => {
-    try {
-    const response = await fetch(
-      import.meta.env.VITE_BACKEND_URL + "/api/projects",
-      {
-        headers: {
-          "Authorization": `Bearer ${store.token}`
+      try {
+        console.log(store.token)
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + "/api/projects",
+        {
+          headers: {Authorization: `Bearer ${store.token}`}
+        });
+        if (response.ok) {
+          const data = await response.json();
+          dispatch({ type: "set_projects", payload: data });
+          return true;
         }
       }
     );
@@ -152,7 +157,7 @@ export const useActions = (store, dispatch) => {
           import.meta.env.VITE_BACKEND_URL + "/api/tasks",
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${store.token}`},
             body: JSON.stringify(newTask),
           },
         );
