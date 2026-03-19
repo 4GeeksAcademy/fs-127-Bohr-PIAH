@@ -10,17 +10,38 @@ export const KanbanBoard = ({ packageId }) => {
     const { store, dispatch } = useGlobalReducer();
     const wpTasks = store.tasks?.filter(t => t.wpId === packageId) || [];
 
+    const handleEnd = (event) => {
+    const { targetData, dragContext } = event;
+    const task = dragContext.item.data;
+    // El id de la lista de destino nos dice el nuevo status
+    const newStatus = targetData.parent.id; 
 
+    // Avisamos al Store para que la barra de progreso se entere
+    dispatch({
+        type: "edit_task",
+        payload: { ...task, status: newStatus }
+    });
+};
 
-    //const [todoRef, todoTasks] = useDragAndDrop(["Task 1", "Task 2"], { group: "bohrTasks" });
-    // const [progressRef, progressTasks] = useDragAndDrop(["Task 3"], { group: "bohrTasks" });
-    //const [reviewRef, reviewTasks] = useDragAndDrop(["Task 4"], { group: "bohrTasks" });
-    // const [doneRef, doneTasks] = useDragAndDrop(["Task 5"], { group: "bohrTasks" });
-    // const [, setUpdate] = useState(0);
-    const [todoRef, todoTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "to_do"), { group: "bohrTasks" });
-    const [progressRef, progressTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_progress"), { group: "bohrTasks" });
-    const [reviewRef, reviewTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_review"), { group: "bohrTasks" });
-    const [doneRef, doneTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "done"), { group: "bohrTasks" });
+const [todoRef, todoTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "to_do"), { 
+        group: "bohrTasks",
+        id: "to_do"
+    });
+
+    const [progressRef, progressTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_progress"), { 
+        group: "bohrTasks",
+        id: "in_progress"
+    });
+
+    const [reviewRef, reviewTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_review"), { 
+        group: "bohrTasks",
+        id: "in_review"
+    });
+
+    const [doneRef, doneTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "done"), { 
+        group: "bohrTasks",
+        id: "done"
+    });
 
     // estados para el MODAL de TASKS
 
@@ -56,7 +77,7 @@ export const KanbanBoard = ({ packageId }) => {
         setIsTaskModalOpen(true);
     };
 
-    // GUARDA UNA TAREA TOTALMENTE NUEVA ---
+    // GUARDA UNA TAREA  NUEVA ---
     const handleSaveNewTask = () => {
         if (!newTaskData.name.trim()) return;
 

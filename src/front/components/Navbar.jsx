@@ -14,7 +14,7 @@ export const Navbar = () => {
                     
                     
                         <div className="atom-nav-container" style={{ width: "80px", height: "80px" }}>
-                            <svg viewBox="0 0 120 120" className="atom-nav" xmlns="http://www.w3.org">
+                            <svg viewBox="0 0 120 120" className="atom-nav" xmlns="http://www.w3.org/2000/svg">
                     
                                 <circle cx="60" cy="60" r="10" className="nucleus-glow" />
                                 <circle cx="60" cy="60" r="10" className="nucleus" />
@@ -42,6 +42,8 @@ export const Navbar = () => {
                                 </g>
                             </svg>
                         </div>
+
+                        
                         <span className="wellcome-text ms-2" style={{ fontSize: "1.2rem", marginTop: "0", display: "inline-block", textShadow: "0 0 10px var(--c-nuc)", color: "var(--c-nuc)" }} >BOHR</span>
                     </Link>
                 </div>

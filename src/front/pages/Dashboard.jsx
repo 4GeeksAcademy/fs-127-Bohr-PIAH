@@ -27,11 +27,6 @@ export const Dashboard = () => {
         users: []
     });
 
-    //  const workModes = [
-    //      { id: 1, title: "WORK PACKAGE 1", status: "Active" },
-    //      { id: 2, title: "WORK PACKAGE 2", status: "Pending" },
-    //       { id: 3, title: "WORK PACKAGE 3", status: "Review" }
-    //  ];
 
     const activeProject = store.projects.find(p => p.id === store.currentProjectId);
 
