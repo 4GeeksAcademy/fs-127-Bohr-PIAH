@@ -1,8 +1,11 @@
-import { useState } from "react";
+// ====== INICIO CAMBIOS PATY ======
+import { useState, useEffect } from "react";
+// ====== FIN CAMBIOS PATY ======
 import ModalProject from "../components/ModalProject/ModalProject";
-import useGlobalReducer from "../hooks/useGlobalReducer"; 
-
-
+import useGlobalReducer from "../hooks/useGlobalReducer";
+// ====== INICIO CAMBIOS PATY ======
+import { getAllProjects, createProject, deleteProject as deleteProjectService } from "../services/projectService";
+// ====== FIN CAMBIOS PATY ======
 
 // Estado inicial del proyecto
 const initialProject = {
@@ -15,32 +18,29 @@ const initialProject = {
 
 export const MenuProjects = () => {
   const [showModal, setShowModal] = useState(false);
-  const { store, dispatch } = useGlobalReducer(); 
+  const { store, dispatch } = useGlobalReducer();
   const [projectData, setProjectData] = useState(initialProject);
-   const projects = store.projects || []; 
-
-  // Saber si estamos editando
+  const projects = store.projects || [];
   const [editingId, setEditingId] = useState(null);
 
-  // Cambios generales del formulario
+  // ====== INICIO CAMBIOS PATY ======
+  useEffect(() => {
+    getAllProjects(store.token).then(data => {
+      dispatch({ type: "set_projects", payload: data });
+    }).catch(err => console.error("Error cargando proyectos", err));
+  }, []);
+  // ====== FIN CAMBIOS PATY ======
+
   const handleChange = (field, value) => {
     setProjectData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Lider
   const onChangeLeader = (value) => {
-    setProjectData(prev => ({
-      ...prev,
-      teamLeader: value
-    }));
+    setProjectData(prev => ({ ...prev, teamLeader: value }));
   };
 
-  // Usuarios 
   const onAddUser = () => {
-    setProjectData(prev => ({
-      ...prev,
-      users: [...prev.users, ""]
-    }));
+    setProjectData(prev => ({ ...prev, users: [...prev.users, ""] }));
   };
 
   const onDeleteUser = (index) => {
@@ -58,93 +58,73 @@ export const MenuProjects = () => {
     });
   };
 
-  // Guardar proyecto (crear o editar)
-  const handleSaveProject = () => {
+  // ====== INICIO CAMBIOS PATY ======
+  const handleSaveProject = async () => {
     if (editingId) {
-
-      // MODO EDICIÓN: Enviamos una acción de editar 
-      dispatch({
-        type: 'edit_project',
-        payload: { id: editingId, ...projectData }
-      });
+      dispatch({ type: 'edit_project', payload: { id: editingId, ...projectData } });
     } else {
-      // MODO CREACIÓN: Usamos la que ya creamos tú y yo
-      dispatch({
-        type: 'add_project',
-        payload: { id: crypto.randomUUID(), ...projectData }
-      });
+      try {
+        const data = await createProject(store.token, projectData);
+        if (data) {
+          dispatch({ type: "add_project", payload: data });
+        }
+      } catch (err) {
+        console.error("Error creando proyecto", err);
+      }
     }
-
-    // Reset
     setProjectData(initialProject);
     setEditingId(null);
     setShowModal(false);
   };
+  // ====== FIN CAMBIOS PATY ======
 
-  // Borrar proyecto
-  const deleteProject = (id) => {
-    dispatch({
-      type: 'delete_project',
-      payload: id
-    });
+  // ====== INICIO CAMBIOS PATY ======
+  const handleDeleteProject = async (id) => {
+    try {
+      await deleteProjectService(store.token, id);
+      dispatch({ type: 'delete_project', payload: id });
+    } catch (err) {
+      console.error("Error borrando proyecto", err);
+    }
   };
+  // ====== FIN CAMBIOS PATY ======
 
-  // Click en proyecto → editar
   const handleProjectClick = (project) => {
-    setProjectData(project);   // cargar datos en el modal
-    setEditingId(project.id);  // activar modo edición
+    setProjectData(project);
+    setEditingId(project.id);
     setShowModal(true);
   };
 
   return (
     <div className="home-wrapper">
-
       <h2 className="welcome-text p-3">My Projects</h2>
 
       <div className="action-grid d-flex">
-        <div
-          className="sub-feature m-1"
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            setProjectData(initialProject);
-            setEditingId(null);
-            setShowModal(true);
-          }}
-        >
+        <div className="sub-feature m-1" style={{ cursor: 'pointer' }}
+          onClick={() => { setProjectData(initialProject); setEditingId(null); setShowModal(true); }}>
           <div className="feature-title">New Project</div>
         </div>
-
         <div className="sub-feature m-1" style={{ cursor: 'pointer' }}>
           <p>New Report</p>
         </div>
       </div>
 
-      {/* LISTA DE PROYECTOS */}
       <div className="projects-grid">
         {projects.map((project) => (
-          <div
-            key={project.id}
-            className="project-rect"
-            onClick={() => handleProjectClick(project)}
-          >
-
+          <div key={project.id} className="project-rect" onClick={() => handleProjectClick(project)}>
             <h3 className="project-title">{project.nombre}</h3>
-
             <div className="project-section">
               <span className="project-label">Start Project</span>
               <span className="project-value">{project.wpDeadline || "Sin fecha"}</span>
             </div>
-
             <div className="project-section">
               <span className="project-label">End Project</span>
               <span className="project-value">{project.taskDeadline || "Sin fecha"}</span>
             </div>
-
             <div className="project-section">
               <span className="project-label">Leader</span>
               <span className="project-value">• {project.teamLeader || "Sin líder"}</span>
             </div>
-
             <div className="project-section">
               <span className="project-label">Users</span>
               <div className="project-users">
@@ -153,29 +133,19 @@ export const MenuProjects = () => {
                 ))}
               </div>
             </div>
-
-            <button
-              className="delete-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteProject(project.id);
-              }}
-            >
+            {/* ====== INICIO CAMBIOS PATY ====== */}
+            <button className="delete-btn"
+              onClick={(e) => { e.stopPropagation(); handleDeleteProject(project.id); }}>
               Delete
             </button>
-
+            {/* ====== FIN CAMBIOS PATY ====== */}
           </div>
         ))}
       </div>
 
-      {/* MODAL */}
       <ModalProject
         isOpen={showModal}
-        onClose={() => {
-          setShowModal(false);
-          setEditingId(null);
-          setProjectData(initialProject);
-        }}
+        onClose={() => { setShowModal(false); setEditingId(null); setProjectData(initialProject); }}
         title={editingId ? "Edit Project" : "Add New Project"}
         data={projectData}
         onChange={handleChange}
@@ -185,7 +155,6 @@ export const MenuProjects = () => {
         onChangeLeader={onChangeLeader}
         onSubmit={handleSaveProject}
       />
-
     </div>
   );
 };
