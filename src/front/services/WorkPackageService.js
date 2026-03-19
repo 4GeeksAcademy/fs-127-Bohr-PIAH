@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_BACKEND_URL + "api/work_packages";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL + "/api/work_packages";
 
 async function handleResponse(response) {
   let data = null;

@@ -23,8 +23,7 @@ class TaskService:
 
     @staticmethod
     def create(data):
-        required_fields = ["wp_id", "name",
-                           "task_description", "status", "todo_by", "deadline"]
+        required_fields = ["wp_id", "name"]
         for field in required_fields:
             if field not in data or not data[field]:
                 abort(400, description=f"Field '{field}' is mandatory")
@@ -32,7 +31,7 @@ class TaskService:
         if not WorkPackage.query.filter_by(id=data["wp_id"]).first():
             abort(409, description="Work package non existant")
 
-        if not User.query.filter_by(id=data["todo_by"]).first():
+        if data.get("todo_by") and not User.query.filter_by(id=data["todo_by"]).first():
             abort(404, description="Asignee not found")
 
         now_utc = datetime.now(timezone.utc)
@@ -62,10 +61,10 @@ class TaskService:
             new_task = Task(
                 wp_id=data["wp_id"],
                 name=data["name"],
-                task_description=data["task_description"],
+                task_description=data.get("task_description") or None,
                 status=data.get("status", "to_do"),
                 alert=data.get("alert", False),
-                todo_by=data["todo_by"],
+                todo_by=data.get("todo_by") or None,
                 created_at=created_at,
                 deadline=deadline
             )
