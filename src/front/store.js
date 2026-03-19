@@ -4,6 +4,7 @@ export const initialStore = () => {
     token:  localStorage.getItem("token") || null,
     user: JSON.parse(localStorage.getItem("user")) || null,
     projects: [],
+    departments: [], //Añadido por Paty
     currentProjectId: null,
     tasks: [],
     todos: [
@@ -93,22 +94,29 @@ export default function storeReducer(store, action = {}) {
         message: action.payload,
       };
 
+    case "set_departments":
+      return {
+        ...store,
+        departments: action.payload,
+  };
+
     case "set_token":
       localStorage.setItem("token", action.payload);
       return {
         ...store,
-        user: action.payload
+        token: action.payload
       };
 
     case "set_user":
       localStorage.setItem("user", JSON.stringify(action.payload));
       return {
         ...store,
-        token: action.payload,
+        user: action.payload,
       };
 
     default:
-      throw Error("Unknown action.");
+      console.log("Unknown action:", action.type);
+      return store;
   }
 }
 
@@ -116,20 +124,25 @@ export const useActions = (store, dispatch) => {
   return {
     // TRAER PROYECTOS (GET)
     getProjects: async () => {
-      try {
-        const response = await fetch(
-          import.meta.env.VITE_BACKEND_URL + "/api/projects",
-        );
-        if (response.ok) {
-          const data = await response.json();
-          dispatch({ type: "set_projects", payload: data });
-          return true;
+    try {
+    const response = await fetch(
+      import.meta.env.VITE_BACKEND_URL + "/api/projects",
+      {
+        headers: {
+          "Authorization": `Bearer ${store.token}`
         }
-      } catch (error) {
-        console.error("Error en getProjects", error);
-        return false;
       }
-    },
+    );
+    if (response.ok) {
+      const data = await response.json();
+      dispatch({ type: "set_projects", payload: data });
+      return true;
+    }
+  } catch (error) {
+    console.error("Error en getProjects", error);
+    return false;
+  }
+},
 
     // CREAR TAREA (POST)
 

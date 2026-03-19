@@ -10,6 +10,7 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 import ModalProject from "../components/ModalProject/ModalProject"
 import { useActionState } from "react";
 import { Spinner } from "../components/Spinner";
+import { createProject } from "../services/projectService";
 
 export const Dashboard = () => {
 
@@ -38,17 +39,17 @@ export const Dashboard = () => {
 
 
 
-    // useEffect
+    // useEffect // MODIFICADO POR PATY//
 
     useEffect(() => {
-        const loadData = async () => {
-            setIsLoading(true);
-            await actions.getProjects();
-           
-            setTimeout(() => setIsLoading(false), 1000);
-        };
-        loadData();
-    }, []);
+    const loadData = async () => {
+        if (!store.token) return; // ← espera a que haya token
+        setIsLoading(true);
+        await actions.getProjects();
+        setTimeout(() => setIsLoading(false), 1000);
+    };
+    loadData();
+}, [store.token]); 
 
     // SI ESTÁ CARGANDO, MUESTRA EL SPINNER
     if (isLoading) {
@@ -60,22 +61,26 @@ export const Dashboard = () => {
 
 
 
-
-    const handleAddProject = () => {
-        const newId = crypto.randomUUID();
-        dispatch({
-            type: "add_project",
-            payload: { id: newId, ...newProjectData, workPackages: [] }
+//MODIFICADO POR PATY//
+    const handleAddProject = async () => {
+    try {
+        const data = await createProject(store.token, {
+            name: newProjectData.nombre,
+            department_id: 4, // temporal - departamento BOHR
+            created_by: store.user.id,
+            deadline: newProjectData.taskDeadline || null,
         });
-        dispatch({
-            type: "set_current_project",
-            payload: newId
-        });
-
-        setIsProjectModalOpen(false);
-        setNewProjectData({ nombre: "", wpDeadline: "", taskDeadline: "", teamLeader: "", users: [] });
-    };
-
+        if (data) {
+            dispatch({ type: "add_project", payload: data });
+            dispatch({ type: "set_current_project", payload: data.id });
+        }
+    } catch (err) {
+        console.error("Error creando proyecto", err);
+    }
+    setIsProjectModalOpen(false);
+    setNewProjectData({ nombre: "", wpDeadline: "", taskDeadline: "", teamLeader: "", users: [] });
+};
+//DIN MODIFICACION PATY//
 
 
     // Sacamos sus Work Packages reales. Si no hay, devolvemos un array vacío.
