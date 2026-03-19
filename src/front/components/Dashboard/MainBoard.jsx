@@ -48,7 +48,7 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
                     {store.currentProjectId && (
                         <div className="d-flex align-items-center">
                             <h2 className="section-sub-title mb-0" style={{ color: "#27E6D6", fontSize: "1 rem", letterSpacing: "1.5px", borderBottom: "2px solid rgba(39, 230, 214, 0.3)", }}>
-                                {store.projects.find(p => p.id === store.currentProjectId)?.nombre}
+                                {store.projects.find(p => p.id === store.currentProjectId)?.name}
                             </h2>
                         </div>
                     )}
@@ -111,12 +111,6 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
                             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
 
-                            //prueba en consola a ver:
-
-
-                         
-
-
                             return (
                                 <div className="accordion-item bg-transparent border-info border-opacity-10 mb-3" key={wp.id}>
                                     <h2 className="accordion-header">
@@ -124,7 +118,7 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
                                             type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${wp.id}`}>
 
                                             {/* TÍTULO A LA IZQUIERDA */}
-                                            <span className="section-sub-title mb-0" style={{ fontSize: "1.1rem" }}>{wp.title}</span>
+                                            <span className="section-sub-title mb-0" style={{ fontSize: "1.1rem" }}>{wp.name}</span>
 
                                             {/* BARRA A LA DERECHA */}
                                             <div className="ms-auto me-4 d-flex align-items-center" style={{ width: "160px" }}>
