@@ -1,20 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NewUser from "../components/NewUser/New_User.jsx";
 import NewDpto from "../components/NewDpto/New_Dpto.jsx";
+// Añadido por Paty
+import useGlobalReducer from "../hooks/useGlobalReducer";
+import { getAllDepartments, createDepartment, deleteDepartment as deleteDepartmentService } from "../services/departmentService";
 
 export const MenuAdmin = () => {
   const [showNewUserForm, setShowNewUserForm] = useState(false);
   const [showNewDpto, setShowNewDpto] = useState(false);
 
-  const [departments, setDepartments] = useState([]);
+  // Añadido por Paty
+  const { store, dispatch } = useGlobalReducer();
 
-  // Para edición
+  // Añadido por Paty - carga departamentos del backend
+  useEffect(() => {
+    getAllDepartments(store.token).then(data => {
+      dispatch({ type: "set_departments", payload: data });
+    }).catch(err => console.error("Error cargando departamentos", err));
+  }, [store.token]);
+
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingData, setEditingData] = useState(null);
 
   const handleCreateUser = () => setShowNewUserForm(true);
 
-  // Crear nuevo (abrir modal vacío)
   const handleCreateDepartment = () => {
     setEditingIndex(null);
     setEditingData(null);
@@ -27,44 +36,41 @@ export const MenuAdmin = () => {
     setEditingData(null);
   };
 
-  // Guardar nuevo departamento
-  const handleSaveNewDpto = (data) => {
-    setDepartments(prev => [
-      ...prev,
-      {
-        name: data.department_name,
-        leader: data.leader,
-        staf: data.staf
+  // Modificado por Paty - conectado al backend
+  const handleSaveNewDpto = async (data) => {
+    try {
+      const result = await createDepartment(store.token, {
+        name: data.department_name
+      });
+      if (result) {
+        dispatch({ type: "set_departments", payload: [...store.departments, result] });
       }
-    ]);
+    } catch (err) {
+      console.error("Error creando departamento", err);
+    }
     setShowNewDpto(false);
   };
 
-  // Guardar departamento editado
   const handleSaveEditedDpto = (data) => {
-    setDepartments(prev => prev.map((d, i) => {
-      if (i === editingIndex) {
-        return {
-          name: data.department_name,
-          leader: data.leader,
-          staf: data.staf
-        };
-      }
-      return d;
-    }));
     setEditingIndex(null);
     setEditingData(null);
     setShowNewDpto(false);
   };
 
-  // Borrar departamento
-  const deleteDepartment = (index) => {
-    setDepartments(prev => prev.filter((_, i) => i !== index));
+  // Modificado por Paty - conectado al backend
+  const deleteDepartment = async (index) => {
+    const dpto = store.departments[index];
+    try {
+      await deleteDepartmentService(store.token, dpto.id);
+      dispatch({ type: "set_departments", payload: store.departments.filter((_, i) => i !== index) });
+    } catch (err) {
+      console.error("Error borrando departamento", err);
+    }
   };
 
-  // Al hacer click en la tarjeta: abrir modal en modo edición
+  // Modificado por Paty - usa store.departments
   const handleDptoClick = (index) => {
-    const d = departments[index];
+    const d = store.departments[index];
     setEditingIndex(index);
     setEditingData({
       department_name: d.name,
@@ -88,10 +94,10 @@ export const MenuAdmin = () => {
         </div>
       </div>
 
-      {/* LISTA DE Dpto */}
       <div className="dpto-panel">
         <div className="dpto-section">
-          {departments.map((dpto, index) => (
+          {/* Modificado por Paty - usa store.departments */}
+          {store.departments.map((dpto, index) => (
             <div
               key={index}
               className="dpto-rect"
@@ -103,31 +109,31 @@ export const MenuAdmin = () => {
               <div className="personal-section">
                 <p className="section-label">Leader</p>
                 {dpto.leader?.map((person, i) => (
-                  <p key={i} className="item-section">• {person}</p>))}
+                  <p key={i} className="item-section">• {person}</p>
+                ))}
               </div>
 
               <div className="personal-section">
-              <p className="section-label">Team</p>
-              {dpto.staf?.map((person, i) => (
-                <p key={i} className="item-section">• {person}</p>
-              ))}
+                <p className="section-label">Team</p>
+                {dpto.staf?.map((person, i) => (
+                  <p key={i} className="item-section">• {person}</p>
+                ))}
               </div>
 
-                <button
-                  className="delete-btn"
-                  onClick={(e) => {
-                    e.stopPropagation(); // evita abrir el modal al borrar
-                    deleteDepartment(index);
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
+              <button
+                className="delete-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteDepartment(index);
+                }}
+              >
+                Delete
+              </button>
+            </div>
           ))}
         </div>
       </div>
 
-      {/* Modal para crear o editar */}
       {showNewDpto && (
         <NewDpto
           onCancel={handleCancelNewDpto}
