@@ -68,7 +68,7 @@ export const Dashboard = () => {
     const openEditModal = (project) => {
         setIsEditing(true);
         setNewProjectData({
-            nombre: project.nombre,
+            nombre: project.name,
             wpDeadline: project.workPackages ? project.workPackages[0]?.deadline || "" : "",
             taskDeadline: project.workPackages && project.workPackages[0]?.tasks ? project.workPackages[0].tasks[0]?.deadline || "" : "",
             teamLeader: project.teamLeader || "",
@@ -103,7 +103,9 @@ export const Dashboard = () => {
 
     const handleUpdateProject = async () => {
         try {
-            await updateProject(store.token, store.currentProjectId, newProjectData);
+            await updateProject(store.token, store.currentProjectId, {
+                name: newProjectData.nombre,
+            });
             await actions.getProjects();
         } catch (err) {
             console.error("Error actualizando proyecto", err);

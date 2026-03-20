@@ -68,7 +68,7 @@ export default function storeReducer(store, action = {}) {
     case "add_task":
       return {
         ...store,
-        tasks: [...(store.tasks || []), action.payload],
+        tasks: [...(store.tasks || []), { ...action.payload, wpId: action.payload.wp_id }],
       };
 
     case "edit_task":

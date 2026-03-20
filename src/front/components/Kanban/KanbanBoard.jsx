@@ -20,11 +20,18 @@ export const KanbanBoard = ({ packageId }) => {
         }
     }, [store.token]);
 
-    const handleEnd = (event) => {
+    const handleEnd = async (event) => {
         const { targetData, dragContext } = event;
         const task = dragContext.item.data;
         const newStatus = targetData.parent.id;
+        if (task.status === newStatus) return;
         dispatch({ type: "edit_task", payload: { ...task, status: newStatus } });
+        try {
+            await updateTask(store.token, task.id, { status: newStatus });
+        } catch (err) {
+            console.error("Error updating task status:", err);
+            dispatch({ type: "edit_task", payload: task });
+        }
     };
 
     const [todoRef, todoTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "to_do"), {
