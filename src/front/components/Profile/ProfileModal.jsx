@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { EditProfile } from "./EditProfile";
 import "./Profilecss.css";
+import { changePasswordService } from "../../services/authService";
+import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 export const ProfileModal = ({ show, onHide }) => {
+  const { store } = useGlobalReducer();
   const [name, setName] = useState("Add Name");
   const [role, setRole] = useState("Role");
 
@@ -36,19 +39,14 @@ export const ProfileModal = ({ show, onHide }) => {
     setPasswordMessage(null);
 
     try {
-      // Aquí iría la llamada real a tu API para cambiar la contraseña.
-      // Ejemplo (pseudo):
-      // await api.changePassword({ currentPassword, newPassword });
-
-      // Simulación de espera
-      await new Promise((r) => setTimeout(r, 800));
+      await changePasswordService(currentPassword, newPassword, store.token);
 
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       setPasswordMessage({ type: "success", text: "Password updated successfully." });
     } catch (err) {
-      setPasswordMessage({ type: "error", text: "Error updating the password." });
+      setPasswordMessage({ type: "error", text: err.message || "Error updating the password." });
     } finally {
       setIsSavingPassword(false);
     }
@@ -63,7 +61,7 @@ export const ProfileModal = ({ show, onHide }) => {
 
         <div className="profile-layout">
           <div className="profile-left">
-            <h2 style={{ color: "var(--c-nuc)", textShadow: "0 0 10px var(--c-nuc)" }}>
+            <h2 className="name-user" style={{ color: "var(--c-nuc)", textShadow: "0 0 10px var(--c-nuc)", margin: "30px", padding: "30px" }}>
               {name}
             </h2>
 
@@ -132,7 +130,7 @@ export const ProfileModal = ({ show, onHide }) => {
           </div>
 
           <main style={{ width: "100%" }}>
-            <div className="glass-card-yellow" style={{ padding: "25px" }}>
+            <div className="glass-card-yellow" style={{ marginTop: "80px", padding: "40px" }}>
               <h3 className="section-sub-title">My Projects</h3>
 
               <div className="features-grid">

@@ -12,6 +12,9 @@
   --c-cyber: #27e6d6;
 }
 
+.home-wrapper {
+  align-items: center;
+}
 /* CONTENEDOR PRINCIPAL */
 .home-wrapper {
   background-color: var(--bg);
@@ -100,27 +103,33 @@
 /* ==========================================================================
    LAYOUT: GRIDS Y ENVOLTORIOS AMARILLOS
    ========================================================================== */
-.features-grid {
+.glass-card-yellow .features-grid {
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 40px;
-  margin-top: 30px;
-  flex-wrap: wrap;
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .glass-card-yellow {
+  width: min(1150px, 90%);
+  max-width: 1150px;
+  margin: 10px auto;
+  box-sizing: border-box;
   padding: 40px;
   border-radius: 35px;
   background: rgba(184, 233, 148, 0.02);
   border: 1px solid var(--c-elec);
   box-shadow: 0 0 20px rgba(184, 233, 148, 0.15);
-  max-width: 1150px;
-  margin-top: 10px !important;
   transition: all 0.4s ease;
-  width: 90%;
+}
+.glass-card-yellow .features-grid > .feature-item {
+  flex: 0 0 180px;
+  max-width: 180px;
+  width: auto;
+  box-sizing: border-box;
 }
 
 .glass-card-yellow:hover {
@@ -195,7 +204,7 @@
   text-transform: uppercase;
   letter-spacing: 3px;
   font-size: 1.3rem;
-  margin-top: 100px !important;
+  margin-top: 30px !important;
   margin-bottom: 5px !important;
   display: block;
   text-align: center;

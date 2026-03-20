@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { resetPasswordService } from "../services/authService";
 
 export const ResetPassword = () => {
     const [password, setPassword] = useState("");
@@ -16,24 +17,11 @@ export const ResetPassword = () => {
         const token = searchParams.get("token");
 
         try {
-            const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/auth/reset-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token, password })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(data.error || "Something went wrong");
-                return;
-            }
-
+            await resetPasswordService(token, password);
             setMessage("Password updated successfully");
             setTimeout(() => navigate("/login"), 2000);
-
         } catch (err) {
-            setError("Connection error, please try again");
+            setError(err.message || "Something went wrong");
         }
     };
 

@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-import { Zap, ShieldAlert, Users, FileText, Rocket, ArrowLeft } from "lucide-react";
+import { Zap, ShieldAlert, Users, FileText, Rocket, ArrowLeft, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 import { KanbanBoard } from "../Kanban/KanbanBoard";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalWorkPackage from "./ModalWorkPackage";
+import { createWorkPackage } from "../../services/WorkPackageService";
 
 export const MainBoard = ({ workModes, openProjectModal }) => {
 
     const { store, dispatch } = useGlobalReducer();
+
 
 
     // ESTADOS PARA EL MODAL
@@ -16,23 +18,26 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
     const [wpTitleInput, setWpTitleInput] = useState("");
 
     // FUNCIÓN Guardar
-    const handleAddWP = () => {
+    const handleAddWP = async () => {
         if (!wpTitleInput.trim()) return;
 
         const currentProjectId = store.currentProjectId;
 
-        dispatch({
-            type: "add_work_package",
-            payload: {
-                id: crypto.randomUUID(),
-                projectId: currentProjectId,
-                title: wpTitleInput.toUpperCase(),
-                status: "Active"
-            }
-        });
+        try {
+            const wp = await createWorkPackage(
+                { name: wpTitleInput.toUpperCase(), project_id: currentProjectId },
+                store.token
+            );
+            dispatch({
+                type: "add_work_package",
+                payload: { ...wp, projectId: wp.project_id }
+            });
+        } catch (err) {
+            console.error("Error creating work package", err);
+        }
 
-        setWpTitleInput("");     // Limpiar input correcto
-        setIsWpModalOpen(false); // Cerrar modal correcto
+        setWpTitleInput("");
+        setIsWpModalOpen(false);
     };
 
     return (
@@ -43,12 +48,27 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
                 {/* BOTONES DE ARRIBA*/}
                 <div className="d-flex align-items-center justify-content-between mb-5 flex-wrap gap-3">
 
-                    {/* TÍTULO DEL PROYECTO */}
+                    {/* TÍTULO DEL PROYECTO Y LAPIZ PARA EDITAR PROYECTO */}
+
                     {store.currentProjectId && (
-                        <div className="d-flex align-items-center">
+                        <div className="d-flex align-items-center gap-2" style={{ cursor: "pointer" }}
+                            onClick={() => {
+                                const project = store.projects.find(p => p.id === store.currentProjectId);
+                                openProjectModal(project);
+                            }}
+                        >
                             <h2 className="section-sub-title mb-0" style={{ color: "#27E6D6", fontSize: "1 rem", letterSpacing: "1.5px", borderBottom: "2px solid rgba(39, 230, 214, 0.3)", }}>
-                                {store.projects.find(p => p.id === store.currentProjectId)?.nombre}
+                                {store.projects.find(p => p.id === store.currentProjectId)?.name}
                             </h2>
+                            <div style={{ padding: "2px", display: "flex", alignItems: "center" }}>
+                                <Pencil
+                                    size={16}
+                                    color="#27E6D6"
+                                    className="opacity-50 hover-opacity-100"
+                                    style={{ transition: "opacity 0.2s" }}
+                                />
+                            </div>
+
                         </div>
                     )}
                     <div className="ms-auto d-flex gap-3">
@@ -74,8 +94,6 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
                         </button>
 
 
-
-
                     </div>
                 </div>
 
@@ -86,6 +104,8 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
                         style={{ marginTop: "-50px" }}>
 
                         <h2 className="section-sub-title" style={{ color: "#27E6D6" }}>Ready to start?</h2>
+
+
                         <p className="text-white opacity-75 max-w-md">
                             Create your first PROJECT </p>
 
@@ -93,34 +113,65 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
                 ) : (
 
                     <div className="accordion accordion-flush" id="projectAccordion">
-                        {workModes.map((wp) => (
-                            <div className="accordion-item bg-transparent border-info border-opacity-10 mb-3" key={wp.id}>
-                                <h2 className="accordion-header">
-                                    <button className="accordion-button collapsed bg-transparent text-white shadow-none border-0"
-                                        type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${wp.id}`}>
-                                        <span className="section-sub-title mb-0" style={{ fontSize: "1.1rem" }}>{wp.title}</span>
-                                    </button>
-                                </h2>
+                        {workModes.map((wp) => {
 
-                                <div id={`collapse${wp.id}`} className="accordion-collapse collapse" data-bs-parent="#projectAccordion">
+                            // Filtramos usando 'wpId'
+                            const wpTasks = (store.tasks || []).filter(t =>
+                                String(t.wpId) === String(wp.id)
+                            );
+
+                            // miramos que tengan el status 'done'
+
+                            const completed = wpTasks.filter(t =>
+                                t.status?.toLowerCase() === "done"
+                            ).length;
+
+                            const total = wpTasks.length;
+                            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
 
-                                    {/* COMPONENTE DEL KANBAN */}
+                            return (
+                                <div className="accordion-item bg-transparent border-info border-opacity-10 mb-3" key={wp.id}>
+                                    <h2 className="accordion-header">
+                                        <button className="accordion-button collapsed bg-transparent text-white shadow-none border-0 d-flex justify-content-between align-items-center w-100"
+                                            type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${wp.id}`}>
 
-                                    <KanbanBoard packageId={wp.id} />
+                                            {/* TÍTULO A LA IZQUIERDA */}
+                                            <span className="section-sub-title mb-0" style={{ fontSize: "1.1rem" }}>{wp.name}</span>
 
+                                            {/* BARRA A LA DERECHA */}
+                                            <div className="ms-auto me-4 d-flex align-items-center" style={{ width: "160px" }}>
+                                                <span className="me-2 fw-bold" style={{ color: "#27E6D6", fontSize: "0.75rem", minWidth: "35px" }}>
+                                                    {percentage}%
+                                                </span>
+                                                <div className="progress w-100" style={{ height: "6px", backgroundColor: "rgba(39, 230, 214, 0.1)", borderRadius: "10px" }}>
+                                                    <div
+                                                        className="progress-bar"
+                                                        role="progressbar"
+                                                        style={{
+                                                            width: `${percentage}%`,
+                                                            backgroundColor: "#27E6D6",
+                                                            boxShadow: "0 0 10px #27E6D6",
+                                                            transition: "width 0.5s ease-in-out"
+                                                        }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </h2>
 
-
+                                    <div id={`collapse${wp.id}`} className="accordion-collapse collapse" data-bs-parent="#projectAccordion">
+                                        {/* COMPONENTE DEL KANBAN */}
+                                        <KanbanBoard packageId={wp.id} />
+                                    </div>
                                 </div>
-                            </div>
-
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
 
-            {/* MODAL NEW PROJECT) */}
-
+            {/* MODAL NEW WORK PACKAGE */}
             <ModalWorkPackage
                 isOpen={isWpModalOpen} onClose={() => setIsWpModalOpen(false)} title={wpTitleInput} setTitle={setWpTitleInput} onSubmit={handleAddWP}
             />

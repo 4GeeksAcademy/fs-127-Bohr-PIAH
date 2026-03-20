@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { forgotPasswordService } from "../services/authService";
 
 export const ForgotPassword = () => {
     const [email, setEmail] = useState("");
@@ -11,23 +12,10 @@ export const ForgotPassword = () => {
         setError("");
 
         try {
-            const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/auth/forgot-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(data.error || "Ha ocurrido un error");
-                return;
-            }
-
+            await forgotPasswordService(email);
             setMessage("Te hemos enviado un correo con las instrucciones");
-
         } catch (err) {
-            setError("Error de conexión con el servidor");
+            setError(err.message || "Ha ocurrido un error");
         }
     };
 
