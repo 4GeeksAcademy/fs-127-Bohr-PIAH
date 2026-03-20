@@ -6,7 +6,7 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 // ====== INICIO CAMBIOS PATY ======
 import { getAllProjects, createProject, deleteProject as deleteProjectService } from "../services/projectService";
 // ====== FIN CAMBIOS PATY ======
-
+import { NavbarTop } from "../components/NavbarMenu/NavbarMenuTop.jsx";
 // Estado inicial del proyecto
 const initialProject = {
   nombre: "",
@@ -96,65 +96,68 @@ export const MenuProjects = () => {
   };
 
   return (
-    <div className="home-wrapper">
-      <h2 className="welcome-text p-3">My Projects</h2>
+    <>
+      <NavbarTop />
+      <div className="home-wrapper">
+        <h2 className="welcome-text p-3">My Projects</h2>
 
-      <div className="action-grid d-flex">
-        <div className="sub-feature m-1" style={{ cursor: 'pointer' }}
-          onClick={() => { setProjectData(initialProject); setEditingId(null); setShowModal(true); }}>
-          <div className="feature-title">New Project</div>
-        </div>
-        <div className="sub-feature m-1" style={{ cursor: 'pointer' }}>
-          <p>New Report</p>
-        </div>
-      </div>
-
-      <div className="projects-grid">
-        {projects.map((project) => (
-          <div key={project.id} className="project-rect" onClick={() => handleProjectClick(project)}>
-            <h3 className="project-title">{project.nombre}</h3>
-            <div className="project-section">
-              <span className="project-label">Start Project</span>
-              <span className="project-value">{project.wpDeadline || "Sin fecha"}</span>
-            </div>
-            <div className="project-section">
-              <span className="project-label">End Project</span>
-              <span className="project-value">{project.taskDeadline || "Sin fecha"}</span>
-            </div>
-            <div className="project-section">
-              <span className="project-label">Leader</span>
-              <span className="project-value">• {project.teamLeader || "Sin líder"}</span>
-            </div>
-            <div className="project-section">
-              <span className="project-label">Users</span>
-              <div className="project-users">
-                {project.users.map((u, i) => (
-                  <span key={i} className="project-value">• {u}</span>
-                ))}
-              </div>
-            </div>
-            {/* ====== INICIO CAMBIOS PATY ====== */}
-            <button className="delete-btn"
-              onClick={(e) => { e.stopPropagation(); handleDeleteProject(project.id); }}>
-              Delete
-            </button>
-            {/* ====== FIN CAMBIOS PATY ====== */}
+        <div className="action-grid d-flex">
+          <div className="sub-feature m-1" style={{ cursor: 'pointer' }}
+            onClick={() => { setProjectData(initialProject); setEditingId(null); setShowModal(true); }}>
+            <div className="feature-title">New Project</div>
           </div>
-        ))}
-      </div>
+          <div className="sub-feature m-1" style={{ cursor: 'pointer' }}>
+            <p>New Report</p>
+          </div>
+        </div>
 
-      <ModalProject
-        isOpen={showModal}
-        onClose={() => { setShowModal(false); setEditingId(null); setProjectData(initialProject); }}
-        title={editingId ? "Edit Project" : "Add New Project"}
-        data={projectData}
-        onChange={handleChange}
-        onAddUser={onAddUser}
-        onDeleteUser={onDeleteUser}
-        onChangeUser={onChangeUser}
-        onChangeLeader={onChangeLeader}
-        onSubmit={handleSaveProject}
-      />
-    </div>
+        <div className="projects-grid">
+          {projects.map((project) => (
+            <div key={project.id} className="project-rect" onClick={() => handleProjectClick(project)}>
+              <h3 className="project-title">{project.nombre}</h3>
+              <div className="project-section">
+                <span className="project-label">Start Project</span>
+                <span className="project-value">{project.wpDeadline || "Sin fecha"}</span>
+              </div>
+              <div className="project-section">
+                <span className="project-label">End Project</span>
+                <span className="project-value">{project.taskDeadline || "Sin fecha"}</span>
+              </div>
+              <div className="project-section">
+                <span className="project-label">Leader</span>
+                <span className="project-value">• {project.teamLeader || "Sin líder"}</span>
+              </div>
+              <div className="project-section">
+                <span className="project-label">Users</span>
+                <div className="project-users">
+                  {project.users.map((u, i) => (
+                    <span key={i} className="project-value">• {u}</span>
+                  ))}
+                </div>
+              </div>
+              {/* ====== INICIO CAMBIOS PATY ====== */}
+              <button className="delete-btn"
+                onClick={(e) => { e.stopPropagation(); handleDeleteProject(project.id); }}>
+                Delete
+              </button>
+              {/* ====== FIN CAMBIOS PATY ====== */}
+            </div>
+          ))}
+        </div>
+
+        <ModalProject
+          isOpen={showModal}
+          onClose={() => { setShowModal(false); setEditingId(null); setProjectData(initialProject); }}
+          title={editingId ? "Edit Project" : "Add New Project"}
+          data={projectData}
+          onChange={handleChange}
+          onAddUser={onAddUser}
+          onDeleteUser={onDeleteUser}
+          onChangeUser={onChangeUser}
+          onChangeLeader={onChangeLeader}
+          onSubmit={handleSaveProject}
+        />
+      </div>
+    </>
   );
 };

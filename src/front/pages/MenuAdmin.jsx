@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from "react";
 import NewUser from "../components/NewUser/New_User.jsx";
 import NewDpto from "../components/NewDpto/New_Dpto.jsx";
-// Añadido por Paty
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { getAllDepartments, createDepartment, deleteDepartment as deleteDepartmentService } from "../services/departmentService";
+import { NavbarTop } from "../components/NavbarMenu/NavbarMenuTop.jsx"; //
 
 export const MenuAdmin = () => {
   const [showNewUserForm, setShowNewUserForm] = useState(false);
   const [showNewDpto, setShowNewDpto] = useState(false);
-
-  // Añadido por Paty
   const { store, dispatch } = useGlobalReducer();
 
-  // Añadido por Paty - carga departamentos del backend
   useEffect(() => {
     getAllDepartments(store.token).then(data => {
       dispatch({ type: "set_departments", payload: data });
@@ -36,7 +33,6 @@ export const MenuAdmin = () => {
     setEditingData(null);
   };
 
-  // Modificado por Paty - conectado al backend
   const handleSaveNewDpto = async (data) => {
     try {
       const result = await createDepartment(store.token, {
@@ -57,7 +53,6 @@ export const MenuAdmin = () => {
     setShowNewDpto(false);
   };
 
-  // Modificado por Paty - conectado al backend
   const deleteDepartment = async (index) => {
     const dpto = store.departments[index];
     try {
@@ -68,7 +63,6 @@ export const MenuAdmin = () => {
     }
   };
 
-  // Modificado por Paty - usa store.departments
   const handleDptoClick = (index) => {
     const d = store.departments[index];
     setEditingIndex(index);
@@ -81,77 +75,81 @@ export const MenuAdmin = () => {
   };
 
   return (
-    <div className="home-wrapper">
-      <h2 className="welcome-text p-3">Menu Admin</h2>
+    <>
+      <NavbarTop />
 
-      <div className="action-grid d-flex">
-        <div className="sub-feature m-1" onClick={handleCreateDepartment} style={{ cursor: 'pointer' }}>
-          <p className="feature-title">Add New Department</p>
+      {/* Contenedor principal con paddingTop para que no lo tape el fixed-top */}
+      <div className="home-wrapper" style={{ paddingTop: "96px" }}>
+        <h2 className="welcome-text p-3">Menu Admin</h2>
+
+        <div className="action-grid d-flex">
+          <div className="sub-feature m-1" onClick={handleCreateDepartment} style={{ cursor: 'pointer' }}>
+            <p className="feature-title">Add New Department</p>
+          </div>
+
+          <div className="sub-feature m-1" onClick={handleCreateUser} style={{ cursor: 'pointer' }}>
+            <p className="feature-title">Add New User</p>
+          </div>
         </div>
 
-        <div className="sub-feature m-1" onClick={handleCreateUser} style={{ cursor: 'pointer' }}>
-          <p className="feature-title">Add New User</p>
-        </div>
-      </div>
-
-      <div className="dpto-panel">
-        <div className="dpto-section">
-          {/* Modificado por Paty - usa store.departments */}
-          {store.departments.map((dpto, index) => (
-            <div
-              key={index}
-              className="dpto-rect"
-              style={{ cursor: 'pointer' }}
-              onClick={() => handleDptoClick(index)}
-            >
-              <h3 className="dpto-title">{dpto.name}</h3>
-              
-              <div className="personal-section">
-                <p className="section-label">Leader</p>
-                {dpto.leader?.map((person, i) => (
-                  <p key={i} className="item-section">• {person}</p>
-                ))}
-              </div>
-
-              <div className="personal-section">
-                <p className="section-label">Team</p>
-                {dpto.staf?.map((person, i) => (
-                  <p key={i} className="item-section">• {person}</p>
-                ))}
-              </div>
-
-              <button
-                className="delete-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteDepartment(index);
-                }}
+        <div className="dpto-panel">
+          <div className="dpto-section">
+            {store.departments.map((dpto, index) => (
+              <div
+                key={index}
+                className="dpto-rect"
+                style={{ cursor: 'pointer' }}
+                onClick={() => handleDptoClick(index)}
               >
-                Delete
-              </button>
-            </div>
-          ))}
+                <h3 className="dpto-title">{dpto.name}</h3>
+
+                <div className="personal-section">
+                  <p className="section-label">Leader</p>
+                  {dpto.leader?.map((person, i) => (
+                    <p key={i} className="item-section">• {person}</p>
+                  ))}
+                </div>
+
+                <div className="personal-section">
+                  <p className="section-label">Team</p>
+                  {dpto.staf?.map((person, i) => (
+                    <p key={i} className="item-section">• {person}</p>
+                  ))}
+                </div>
+
+                <button
+                  className="delete-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteDepartment(index);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {showNewDpto && (
+          <NewDpto
+            onCancel={handleCancelNewDpto}
+            onCreate={editingIndex === null ? handleSaveNewDpto : handleSaveEditedDpto}
+            initialData={editingData}
+            isEdit={editingIndex !== null}
+          />
+        )}
+
+        {showNewUserForm && (
+          <NewUser
+            onCancel={() => setShowNewUserForm(false)}
+            onCreate={(data) => {
+              console.log("Usuario creado:", data);
+              setShowNewUserForm(false);
+            }}
+          />
+        )}
       </div>
-
-      {showNewDpto && (
-        <NewDpto
-          onCancel={handleCancelNewDpto}
-          onCreate={editingIndex === null ? handleSaveNewDpto : handleSaveEditedDpto}
-          initialData={editingData}
-          isEdit={editingIndex !== null}
-        />
-      )}
-
-      {showNewUserForm && (
-        <NewUser
-          onCancel={() => setShowNewUserForm(false)}
-          onCreate={(data) => {
-            console.log("Usuario creado:", data);
-            setShowNewUserForm(false);
-          }}
-        />
-      )}
-    </div>
+    </>
   );
 };
