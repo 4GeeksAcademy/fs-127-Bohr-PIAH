@@ -109,6 +109,12 @@ export default function storeReducer(store, action = {}) {
         users: action.payload,
     };
 
+    case "set_tasks":
+    return {
+        ...store,
+        tasks: action.payload,
+    };
+
     case "set_token":
       localStorage.setItem("token", action.payload);
       return {
