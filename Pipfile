@@ -20,8 +20,8 @@ wtforms = "==3.1.2"
 sqlalchemy = "*"
 flask-migrate = "*"
 bcrypt = "*"
-flask = "*"
 resend = "*"
+flask = "*"
 
 [requires]
 python_version = "3.13"

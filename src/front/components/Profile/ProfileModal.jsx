@@ -131,18 +131,6 @@ export const ProfileModal = ({ show, onHide }) => {
               </div>
             </div>
           </div>
-
-          <main style={{ width: "100%" }}>
-            <div className="glass-card-yellow" style={{ marginTop: "80px", padding: "40px" }}>
-              <h3 className="section-sub-title">My Projects</h3>
-
-              <div className="features-grid">
-                <div className="project-rect"><p>Project 1</p></div>
-                <div className="project-rect"><p>Project 2</p></div>
-                <div className="project-rect"><p>Project 3</p></div>
-              </div>
-            </div>
-          </main>
         </div>
       </div>
     </div>

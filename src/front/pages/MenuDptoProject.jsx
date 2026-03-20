@@ -31,7 +31,7 @@ export const MenuDptoProject = () => {
   return (
     <div className="home-wrapper">
 
-      <h2 className="welcome-text p-3">Menú de mis departamentos</h2>
+      <h2 className="welcome-text p-3">Department Menu</h2>
 
       <div className="action-grid d-flex">
         <div
@@ -39,7 +39,7 @@ export const MenuDptoProject = () => {
           style={{ cursor: 'pointer' }}
           onClick={() => setShowModal(true)}
         >
-          <div className="feature-title">Nuevo Departamento</div>
+          <div className="feature-title">New Department</div>
         </div>
 
         <div
@@ -47,7 +47,7 @@ export const MenuDptoProject = () => {
           style={{ cursor: 'pointer' }}
           onClick={() => setShowModal(true)}
         >
-          <div className="feature-title">Crear Reporte</div>
+          <div className="feature-title">See Projects</div>
         </div>
       </div>
 
@@ -67,7 +67,7 @@ export const MenuDptoProject = () => {
               </p>
 
               {/* Líder */}
-              <p className="section-label">Líder</p>
+              <p className="section-label">Team leader</p>
               <div>
                 {dpto.lider?.map((person, i) => (
                   <p key={i} className="lider-item">• {person}</p>
@@ -75,7 +75,7 @@ export const MenuDptoProject = () => {
               </div>
 
               {/* Equipo */}
-              <p className="section-label">Equipo</p>
+              <p className="section-label">Team</p>
               <div>
                 {dpto.staf?.map((person, i) => (
                   <p key={i} className="staff-item">• {person}</p>
@@ -87,7 +87,7 @@ export const MenuDptoProject = () => {
                 className="delete-btn"
                 onClick={() => deleteDepartment(index)}
               >
-                Borrar
+                Delete
               </button>
 
             </div>

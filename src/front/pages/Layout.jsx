@@ -16,7 +16,7 @@ export const Layout = () => {
         <ScrollToTop>
            
             {/* Si es la Home (Landing), sale el Navbar */}
-            {isHome && <Navbar />}
+            <Navbar />
             {/* Aquí se carga Home.jsx (en "/") o Dashboard.jsx (en "/dashboard") */}
              <Outlet />
             <Footer />

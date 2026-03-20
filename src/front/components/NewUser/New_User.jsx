@@ -43,13 +43,18 @@ export default function NewUser({ onCancel, onCreate }) {
 
                     <div className="cyber-field">
                         <label>Role</label>
-                        <input
-                            type="text"
+                        <select
                             name="role"
                             value={formData.role}
                             onChange={handleChange}
                             required
-                        />
+                        >
+                            
+                            <option value="Admin">Admin</option>
+                            <option value="Header">Header</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Guess">Guess</option>
+                        </select>
                     </div>
 
                     <div className="cyber-buttons">

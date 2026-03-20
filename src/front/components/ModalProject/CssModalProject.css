@@ -150,3 +150,29 @@
     gap: 10px;
     margin-top: 20px;
 }
+
+/* SELECT DESPLEGABLE */
+.cyber-field select {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 2px solid #4da3ff;
+  background: rgba(186, 239, 234, 0.05);
+  color: white;
+  outline: none;
+  transition: 0.3s;
+  cursor: pointer;
+  appearance: none; /* Quita el estilo por defecto del navegador */
+}
+
+/* FOCUS */
+.cyber-field select:focus {
+  border-color: #4da3ff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.97);
+}
+
+/* OPCIONES DEL SELECT */
+.cyber-field select option {
+  background: #0f172a;
+  color: white;
+}

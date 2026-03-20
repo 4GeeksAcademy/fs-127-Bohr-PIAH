@@ -1,6 +1,17 @@
 import { CircleUser } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const UserDropdown = ({ onOpenProfile }) => {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        // Si guardas un token en localStorage, lo borras aquí
+        localStorage.removeItem("token");
+
+        // Redirige al home
+        navigate("/");
+    };
+
     return (
         <div className="dropdown ms-2">
             <button 
@@ -18,16 +29,22 @@ export const UserDropdown = ({ onOpenProfile }) => {
                 aria-labelledby="userMenu"
                 style={{ backgroundColor: "rgb(25, 28, 45)", border: "1px solid rgba(39, 230, 214, 0.2)", marginTop: "15px" }}
             >
-                <li><button className="dropdown-item py-2" onClick={onOpenProfile}>
-                        Profile Info</button>
+                <li>
+                    <button className="dropdown-item py-2" onClick={onOpenProfile}>
+                        Profile Info
+                    </button>
                 </li>
 
-                <li><button className="dropdown-item py-2">
-                        Color Settings</button>
+                <li>
+                    <button className="dropdown-item py-2">
+                        Color Settings
+                    </button>
                 </li>
 
-                <li><button className="dropdown-item py-2 text-danger fw-bold">
-                        Log Out</button>
+                <li>
+                    <button className="dropdown-item py-2 text-danger fw-bold" onClick={handleLogout}>
+                        Log Out
+                    </button>
                 </li>
             </ul>
         </div>
