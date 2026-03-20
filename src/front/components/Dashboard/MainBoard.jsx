@@ -9,6 +9,7 @@ import { createWorkPackage } from "../../services/WorkPackageService";
 export const MainBoard = ({ openProjectModal }) => {
 
     const { store, dispatch } = useGlobalReducer();
+    const currentProject = store.projects.find(p => p.id === store.currentProjectId);
 
     // ESTADOS PARA EL MODAL
     const [isWpModalOpen, setIsWpModalOpen] = useState(false);
@@ -27,7 +28,7 @@ export const MainBoard = ({ openProjectModal }) => {
             );
             dispatch({
                 type: "add_work_package",
-                payload: { ...wp, projectId: wp.project_id }
+                payload: { ...wp, projectId: wp.project_id, tasks: [] }
             });
         } catch (err) {
             console.error("Error creating work package", err);
@@ -110,7 +111,7 @@ export const MainBoard = ({ openProjectModal }) => {
                 ) : (
 
                     <div className="accordion accordion-flush" id="projectAccordion">
-                        {store.currentProject?.workPackages?.map((wp) => {
+                        {currentProject?.workPackages?.map((wp) => {
 
                             const completed = wp.tasks.filter(t =>
                                 t.status?.toLowerCase() === "done"

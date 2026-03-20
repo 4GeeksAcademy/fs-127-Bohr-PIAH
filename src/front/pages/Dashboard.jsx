@@ -1,21 +1,17 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import { DashboardNavbar } from "../components/Dashboard/DashboardNavbar";
 import { Sidebar } from "../components/Dashboard/Sidebar";
 import { MainBoard } from "../components/Dashboard/MainBoard"
-import { Orbit, UserCheck, Zap, ShieldAlert, BarChart3, Settings } from "lucide-react";
-import { BohrLogo } from "../components/BohrLogo";
 import { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import ModalProject from "../components/ModalProject/ModalProject"
-import { useActionState } from "react";
 import { Spinner } from "../components/Spinner";
-import { createProject, updateProject, deleteProject } from "../services/projectService.js";
 import { getUserWithProjects } from "../services/userService.js";
+import { getDepartmentWithUsers } from "../services/departmentService.js";
 
 export const Dashboard = () => {
 
-    const { store, dispatch, actions } = useGlobalReducer();
+    const { store, dispatch } = useGlobalReducer();
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
@@ -39,6 +35,15 @@ export const Dashboard = () => {
                 setProjectsToShow(data.projects);
             } catch (err) {
                 console.error("Error cargando proyectos del usuario", err);
+            }
+
+            if (store.currentDepartment && store.users.length === 0) {
+                try {
+                    const deptData = await getDepartmentWithUsers(store.token, store.currentDepartment.id);
+                    dispatch({ type: "set_users", payload: deptData.users || [] });
+                } catch (err) {
+                    console.error("Error cargando usuarios del departamento", err);
+                }
             }
 
             setTimeout(() => setIsLoading(false), 1000);
@@ -74,47 +79,6 @@ export const Dashboard = () => {
         setIsProjectModalOpen(true);
     };
 
-    // Modificado por Paty
-    const handleAddProject = async () => {
-        try {
-            const data = await createProject(store.token, {
-                name: newProjectData.nombre,
-                department_id: 4, // TODO: Cambiar esto
-                created_by: store.user.id,
-                deadline: newProjectData.taskDeadline || null,
-            });
-            if (data) {
-                dispatch({ type: "add_project", payload: data });
-                dispatch({ type: "set_current_project", payload: data.id });
-            }
-        } catch (err) {
-            console.error("Error creando proyecto", err);
-        }
-        setIsProjectModalOpen(false);
-        setNewProjectData({ nombre: "", wpDeadline: "", taskDeadline: "", teamLeader: "", users: [] });
-    };
-
-    const handleUpdateProject = async () => {
-        try {
-            await updateProject(store.token, store.currentProjectId, newProjectData);
-            await actions.getProjects();
-        } catch (err) {
-            console.error("Error actualizando proyecto", err);
-        }
-        setIsProjectModalOpen(false);
-    };
-
-    const handleDeleteProject = async () => {
-        try {
-            await deleteProject(store.token, store.currentProjectId);
-            dispatch({ type: "set_current_project", payload: null });
-            await actions.getProjects();
-        } catch (err) {
-            console.error("Error eliminando proyecto", err);
-        }
-        setIsProjectModalOpen(false);
-    };
-
     return (
         <div className="home-wrapper v1 dashboard-container">
             <DashboardNavbar />
@@ -142,22 +106,8 @@ export const Dashboard = () => {
                 isOpen={isProjectModalOpen}
                 onClose={() => setIsProjectModalOpen(false)}
                 isEdit={isEditing}
-                data={newProjectData}
+                initialData={newProjectData}
                 users={store.users}
-                onChange={(field, val) => setNewProjectData({ ...newProjectData, [field]: val })}
-                onAddUser={() => setNewProjectData({ ...newProjectData, users: [...newProjectData.users, null] })}
-                onChangeUser={(index, val) => {
-                    const updated = [...newProjectData.users];
-                    updated[index] = val;
-                    setNewProjectData({ ...newProjectData, users: updated });
-                }}
-                onDeleteUser={(index) => {
-                    const filtered = newProjectData.users.filter((_, i) => i !== index);
-                    setNewProjectData({ ...newProjectData, users: filtered });
-                }}
-                onChangeLeader={(val) => setNewProjectData({ ...newProjectData, teamLeader: val })}
-                onSubmit={isEditing ? handleUpdateProject : handleAddProject}
-                onDeleteProject={handleDeleteProject}
             />
         </div>
     );
