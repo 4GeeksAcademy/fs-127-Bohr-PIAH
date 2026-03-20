@@ -27,18 +27,26 @@ export const KanbanBoard = ({ packageId }) => {
         dispatch({ type: "edit_task", payload: { ...task, status: newStatus } });
     };
 
-    const [todoRef, todoTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "to_do"), {
+    const [todoRef, todoTasks, setTodoTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "to_do"), {
         group: "bohrTasks", id: "to_do"
     });
-    const [progressRef, progressTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_progress"), {
+    const [progressRef, progressTasks, setProgressTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_progress"), {
         group: "bohrTasks", id: "in_progress"
     });
-    const [reviewRef, reviewTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_review"), {
+    const [reviewRef, reviewTasks, setReviewTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_review"), {
         group: "bohrTasks", id: "in_review"
     });
-    const [doneRef, doneTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "done"), {
+    const [doneRef, doneTasks, setDoneTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "done"), {
         group: "bohrTasks", id: "done"
     });
+
+    // Sincronizamos el estado interno del drag-and-drop cuando cambian las tareas del store
+    useEffect(() => {
+        setTodoTasks(wpTasks.filter(t => t.status === "to_do"));
+        setProgressTasks(wpTasks.filter(t => t.status === "in_progress"));
+        setReviewTasks(wpTasks.filter(t => t.status === "in_review"));
+        setDoneTasks(wpTasks.filter(t => t.status === "done"));
+    }, [store.tasks]);
 
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
     const [newTaskData, setNewTaskData] = useState({

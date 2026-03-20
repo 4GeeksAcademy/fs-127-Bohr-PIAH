@@ -13,6 +13,7 @@ import { Spinner } from "../components/Spinner";
 import { createProject, updateProject, deleteProject, getAllProjects } from "../services/projectService.js";
 // Añadido por Paty: importamos getAllTasks para cargar tareas al iniciar
 import { getAllTasks } from "../services/taskService.js";
+import { getAllUsers } from "../services/userService.js";
 
 export const Dashboard = () => {
 
@@ -39,12 +40,19 @@ export const Dashboard = () => {
             setIsLoading(true);
             await actions.getProjects();
 
-            // Añadido por Paty: cargamos las tareas desde el backend
+            // Cargamos tareas y usuarios desde el backend
             try {
                 const tasks = await getAllTasks(store.token);
                 dispatch({ type: "set_tasks", payload: tasks });
             } catch (err) {
                 console.error("Error cargando tareas", err);
+            }
+
+            try {
+                const users = await getAllUsers(store.token);
+                dispatch({ type: "set_users", payload: users });
+            } catch (err) {
+                console.error("Error cargando usuarios", err);
             }
 
             setTimeout(() => setIsLoading(false), 1000);
@@ -153,8 +161,9 @@ export const Dashboard = () => {
                 onClose={() => setIsProjectModalOpen(false)}
                 isEdit={isEditing}
                 data={newProjectData}
+                users={store.users}
                 onChange={(field, val) => setNewProjectData({ ...newProjectData, [field]: val })}
-                onAddUser={() => setNewProjectData({ ...newProjectData, users: [...newProjectData.users, ""] })}
+                onAddUser={() => setNewProjectData({ ...newProjectData, users: [...newProjectData.users, null] })}
                 onChangeUser={(index, val) => {
                     const updated = [...newProjectData.users];
                     updated[index] = val;

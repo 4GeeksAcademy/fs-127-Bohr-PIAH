@@ -60,7 +60,13 @@ class Task(db.Model):
             "name": self.name,
             "task_description": self.task_description,
             "status": self.status.value,
+            "alert": self.alert,
             "todo_by": self.todo_by,
-            "created_at": self.created_at,
-            "deadline": self.deadline
+            "todo_by_user": {
+                "id": self.assignee.id,
+                "first_name": self.assignee.first_name,
+                "last_name": self.assignee.last_name,
+            } if self.assignee else None,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "deadline": self.deadline.isoformat() if self.deadline else None
         }
