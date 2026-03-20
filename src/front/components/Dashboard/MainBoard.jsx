@@ -6,14 +6,11 @@ import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalWorkPackage from "./ModalWorkPackage";
 import { createWorkPackage } from "../../services/WorkPackageService";
 
-export const MainBoard = ({ workModes, openProjectModal }) => {
+export const MainBoard = ({ openProjectModal }) => {
 
     const { store, dispatch } = useGlobalReducer();
 
-
-
     // ESTADOS PARA EL MODAL
-
     const [isWpModalOpen, setIsWpModalOpen] = useState(false);
     const [wpTitleInput, setWpTitleInput] = useState("");
 
@@ -113,20 +110,13 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
                 ) : (
 
                     <div className="accordion accordion-flush" id="projectAccordion">
-                        {workModes.map((wp) => {
+                        {store.currentProject?.workPackages?.map((wp) => {
 
-                            // Filtramos usando 'wpId'
-                            const wpTasks = (store.tasks || []).filter(t =>
-                                String(t.wpId) === String(wp.id)
-                            );
-
-                            // miramos que tengan el status 'done'
-
-                            const completed = wpTasks.filter(t =>
+                            const completed = wp.tasks.filter(t =>
                                 t.status?.toLowerCase() === "done"
                             ).length;
 
-                            const total = wpTasks.length;
+                            const total = wp.tasks.length;
                             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
 
