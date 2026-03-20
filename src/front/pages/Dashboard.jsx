@@ -10,13 +10,15 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 import ModalProject from "../components/ModalProject/ModalProject"
 import { useActionState } from "react";
 import { Spinner } from "../components/Spinner";
-import { createProject } from "../services/projectService";
+import { createProject, updateProject, deleteProject, getAllProjects } from "../services/projectService.js";
 
 export const Dashboard = () => {
 
     const { store, dispatch, actions } = useGlobalReducer();
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
+
 
 
     const [newProjectData, setNewProjectData] = useState({
@@ -30,9 +32,9 @@ export const Dashboard = () => {
 
     const activeProject = store.projects.find(p => p.id === store.currentProjectId);
 
-   const projectsToShow = store.projects || [];
+    const projectsToShow = store.projects || [];
 
-    
+
 
     // useEffect // MODIFICADO POR PATY//
 
@@ -51,7 +53,29 @@ export const Dashboard = () => {
         return <Spinner />;
     }
 
+    const openCreateModal = () => {
+        setIsEditing(false);
+        setNewProjectData({
+            nombre: "",
+            wpDeadline: "",
+            taskDeadline: "",
+            teamLeader: "",
+            users: []
+        });
+        setIsProjectModalOpen(true);
+    };
 
+    const openEditModal = (project) => {
+        setIsEditing(true);
+        setNewProjectData({
+            nombre: project.nombre,
+            wpDeadline: project.workPackages ? project.workPackages[0]?.deadline || "" : "",
+            taskDeadline: project.workPackages && project.workPackages[0]?.tasks ? project.workPackages[0].tasks[0]?.deadline || "" : "",
+            teamLeader: project.teamLeader || "",
+            users: project.users ? project.users.map(u => u.username) : []
+        });
+        setIsProjectModalOpen(true);
+    }
 
 
 
@@ -75,6 +99,32 @@ export const Dashboard = () => {
         setIsProjectModalOpen(false);
         setNewProjectData({ nombre: "", wpDeadline: "", taskDeadline: "", teamLeader: "", users: [] });
     };
+
+
+    const handleUpdateProject = async () => {
+        try {
+            await updateProject(store.token, store.currentProjectId, newProjectData);
+            await actions.getProjects();
+        } catch (err) {
+            console.error("Error actualizando proyecto", err);
+        }
+        setIsProjectModalOpen(false);
+    };
+
+    const handleDeleteProject = async () => {
+        try {
+            await deleteProject(store.token, store.currentProjectId);
+            dispatch({ type: "set_current_project", payload: null });
+            await actions.getProjects();
+        }
+        catch (err) {
+            console.error("Error eliminando proyecto", err);
+        }
+        setIsProjectModalOpen(false);
+    };
+
+
+
     //DIN MODIFICACION PATY//
 
 
@@ -85,7 +135,7 @@ export const Dashboard = () => {
     const workModesToShow = activeProject ? (activeProject.workPackages || []) : [];
 
 
-   
+
 
 
 
@@ -98,22 +148,25 @@ export const Dashboard = () => {
                 <div className="row g-4 px-md-4">
 
                     {/* LADO IZQUIERDO */}
-                    <Sidebar activeProjects={projectsToShow}
-                        onNewProjectClick={() => setIsProjectModalOpen(true)}
-                        // manda el ID al store al hacer clic
+                    <Sidebar 
+                        activeProjects={projectsToShow}
+                        onNewProjectClick={() => openCreateModal()} 
                         onProjectSelect={(id) => dispatch({ type: "set_current_project", payload: id })}
-                        // aqui se le pasa el ID al store asi sabe cual es el que tiene qu eiluminar
-                        selectedId={store.currentProjectId} />
+                        selectedId={store.currentProjectId} 
+                    />
+
 
                     {/* LADO DERECHO */}
-                    <MainBoard workModes={workModesToShow} openProjectModal={() => setIsProjectModalOpen(true)}
-                        projectName={activeProject?.nombre} />
+                    <MainBoard workModes={workModesToShow} openProjectModal={() => openEditModal(activeProject)}
+                        projectName={activeProject?.nombre} 
+                        />
 
                 </div>
             </div>
             <ModalProject
                 isOpen={isProjectModalOpen}
                 onClose={() => setIsProjectModalOpen(false)}
+                isEdit={isEditing}
                 data={newProjectData}
                 onChange={(field, val) => setNewProjectData({ ...newProjectData, [field]: val })}
                 onAddUser={() => setNewProjectData({ ...newProjectData, users: [...newProjectData.users, ""] })}
@@ -122,12 +175,16 @@ export const Dashboard = () => {
                     updated[index] = val;
                     setNewProjectData({ ...newProjectData, users: updated });
                 }}
+
+            
+
                 onDeleteUser={(index) => {
                     const filtered = newProjectData.users.filter((_, i) => i !== index);
                     setNewProjectData({ ...newProjectData, users: filtered });
                 }}
                 onChangeLeader={(val) => setNewProjectData({ ...newProjectData, teamLeader: val })}
-                onSubmit={handleAddProject}
+               onSubmit={isEditing ? handleUpdateProject : handleAddProject}
+                onDeleteProject={handleDeleteProject}
             />
         </div>
     );
