@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { KanbanColumn } from "./KanbanColumn";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalTask from "./ModalTask";
-import { createTask, updateTask, deleteTask } from "../../services/taskService";
+import { createTask, updateTask, deleteTask, getAllTasks } from "../../services/taskService";
 import { getAllUsers } from "../../services/userService";
 
 export const KanbanBoard = ({ packageId }) => {
@@ -70,10 +70,15 @@ export const KanbanBoard = ({ packageId }) => {
         setIsTaskModalOpen(true);
     };
 
-    // CREAR TAREA — Modificado por Paty: ahora llama al backend
+    // Helper — Añadido por Paty: recarga tareas del backend para mantener el kanban sincronizado
+    const reloadTasks = async () => {
+        const tasks = await getAllTasks(store.token);
+        dispatch({ type: "set_tasks", payload: tasks });
+    };
+
+    // CREAR TAREA — Modificado por Paty: llama al backend y recarga
     const handleSaveNewTask = async () => {
         if (!newTaskData.name.trim()) return;
-
         try {
             const taskToSend = {
                 wp_id: packageId,
@@ -84,20 +89,18 @@ export const KanbanBoard = ({ packageId }) => {
                 todo_by: Number(newTaskData.todo_by),
                 deadline: newTaskData.deadline ? newTaskData.deadline + "T00:00:00Z" : null
             };
-
-            const savedTask = await createTask(store.token, taskToSend);
-            dispatch({ type: "add_task", payload: savedTask });
+            await createTask(store.token, taskToSend);
+            await reloadTasks();
             setIsTaskModalOpen(false);
         } catch (err) {
-            console.error("Error creating task:", err);
+            console.error("Error completo:", err);
             alert("Error creating task: " + err.message);
         }
     };
 
-    // EDITAR TAREA — Modificado por Paty: ahora llama al backend
+    // EDITAR TAREA — Modificado por Paty: llama al backend y recarga
     const handleSaveEditedTask = async () => {
         if (!newTaskData.name.trim()) return;
-
         try {
             const taskToSend = {
                 name: newTaskData.name,
@@ -109,9 +112,8 @@ export const KanbanBoard = ({ packageId }) => {
                     ? (newTaskData.deadline.includes("T") ? newTaskData.deadline : newTaskData.deadline + "T00:00:00Z")
                     : null
             };
-
-            const updatedTask = await updateTask(store.token, newTaskData.id, taskToSend);
-            dispatch({ type: "edit_task", payload: updatedTask });
+            await updateTask(store.token, newTaskData.id, taskToSend);
+            await reloadTasks();
             setIsTaskModalOpen(false);
         } catch (err) {
             console.error("Error updating task:", err);
@@ -119,11 +121,11 @@ export const KanbanBoard = ({ packageId }) => {
         }
     };
 
-    // ELIMINAR TAREA — Modificado por Paty: ahora llama al backend
+    // ELIMINAR TAREA — Modificado por Paty: llama al backend y recarga
     const handleDeleteTask = async (taskId) => {
         try {
             await deleteTask(store.token, taskId);
-            dispatch({ type: "delete_task", payload: taskId });
+            await reloadTasks();
             setIsTaskModalOpen(false);
         } catch (err) {
             console.error("Error deleting task:", err);
