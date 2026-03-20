@@ -6,6 +6,7 @@ export const initialStore = () => {
     projects: [],
     departments: [],
     currentProjectId: null,
+    currentDepartment: JSON.parse(localStorage.getItem("currentDepartment")) || null,
     tasks: [],
     users: [],
     todos: [
@@ -108,6 +109,13 @@ export default function storeReducer(store, action = {}) {
         ...store,
         users: action.payload,
     };
+
+    case "set_current_department":
+      localStorage.setItem("currentDepartment", JSON.stringify(action.payload));
+      return {
+        ...store,
+        currentDepartment: action.payload,
+      };
 
     case "set_tasks":
     return {

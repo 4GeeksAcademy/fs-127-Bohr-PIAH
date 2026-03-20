@@ -50,7 +50,7 @@ class ProjectService:
         if creator is None:
             abort(404, description="Creator user not found")
 
-        now_utc = datetime.utcnow()
+        now_utc = datetime.now(timezone.utc)
 
         created_at = now_utc
         if data.get("created_at"):
