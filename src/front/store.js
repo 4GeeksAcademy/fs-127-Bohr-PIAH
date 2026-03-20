@@ -7,6 +7,7 @@ export const initialStore = () => {
     departments: [],
     currentProjectId: null,
     tasks: [],
+    users: [],
     todos: [
       {
         id: 1,
@@ -101,6 +102,12 @@ export default function storeReducer(store, action = {}) {
         ...store,
         departments: action.payload,
       };
+
+    case "set_users":
+    return {
+        ...store,
+        users: action.payload,
+    };
 
     case "set_token":
       localStorage.setItem("token", action.payload);
