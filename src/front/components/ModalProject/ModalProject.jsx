@@ -7,6 +7,8 @@ export default function ModalProject({
   onClose,
   title = "Add New Project",
   data,
+  isEdit,
+  onDeleteProject,
   onChange,
   onAddUser,
   onDeleteUser,
@@ -22,7 +24,7 @@ export default function ModalProject({
     taskDeadline,
     users = [],
     teamLeader = ""
-  } = data;
+  } = data || {};
 
   return (
     <div className="modal-cyber-overlay" onClick={onClose}>
@@ -86,10 +88,27 @@ export default function ModalProject({
           Add User
         </button>
 
-        <div className="modal-cyber-footer">
+        <div className="modal-cyber-footer mt-4 d-flex justify-content-between align-items-center">
+          <div>
+            {/* Solo mostramos el botón eliminar si estamos en modo edición */}
+            {isEdit && (
+              <button 
+                className="cyber-btn-danger" 
+                onClick={() => {
+                  if(window.confirm("¿Estás seguro de eliminar este proyecto?")) {
+                    onDeleteProject();
+                  }
+                }}
+              >
+                Delete Project
+              </button>
+            )}
+          </div>
+           <div className="d-flex gap-2">
           <button className="cyber-btn-outline" onClick={onClose}>Cancel</button>
           <button className="cyber-btn" onClick={onSubmit}>Save</button>
         </div>
+      </div>
       </div>
     </div>
   );

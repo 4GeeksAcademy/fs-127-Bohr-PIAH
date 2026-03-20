@@ -85,6 +85,12 @@ export default function storeReducer(store, action = {}) {
         tasks: store.tasks.filter((task) => task.id !== action.payload),
       };
 
+    case "set_tasks":
+      return {
+        ...store,
+        tasks: action.payload,
+      };
+
     case "set_hello":
       return {
         ...store,
@@ -135,7 +141,27 @@ export const useActions = (store, dispatch) => {
         );
         if (response.ok) {
           const data = await response.json();
-          dispatch({ type: "set_projects", payload: data });
+
+          // Renombramos work_packages a workPackages y añadimos projectId
+          const projects = data.map((project) => {
+            const workPackages = (project.work_packages || []).map((wp) => {
+              return { ...wp, projectId: project.id };
+            });
+            return { ...project, workPackages: workPackages };
+          });
+
+          // Sacamos todas las tareas de todos los work packages
+          const tasks = [];
+          data.map((project) => {
+            (project.work_packages || []).map((wp) => {
+              (wp.tasks || []).map((task) => {
+                tasks.push({ ...task, wpId: task.wp_id });
+              });
+            });
+          });
+
+          dispatch({ type: "set_projects", payload: projects });
+          dispatch({ type: "set_tasks", payload: tasks });
           return true;
         }
       } catch (error) {

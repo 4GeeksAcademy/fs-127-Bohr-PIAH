@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Zap, ShieldAlert, Users, FileText, Rocket, ArrowLeft } from "lucide-react";
+import { Zap, ShieldAlert, Users, FileText, Rocket, ArrowLeft, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 import { KanbanBoard } from "../Kanban/KanbanBoard";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalWorkPackage from "./ModalWorkPackage";
+import { createWorkPackage } from "../../services/WorkPackageService";
 
 export const MainBoard = ({ workModes, openProjectModal }) => {
 
@@ -17,23 +18,26 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
     const [wpTitleInput, setWpTitleInput] = useState("");
 
     // FUNCIÓN Guardar
-    const handleAddWP = () => {
+    const handleAddWP = async () => {
         if (!wpTitleInput.trim()) return;
 
         const currentProjectId = store.currentProjectId;
 
-        dispatch({
-            type: "add_work_package",
-            payload: {
-                id: crypto.randomUUID(),
-                projectId: currentProjectId,
-                title: wpTitleInput.toUpperCase(),
-                status: "Active"
-            }
-        });
+        try {
+            const wp = await createWorkPackage(
+                { name: wpTitleInput.toUpperCase(), project_id: currentProjectId },
+                store.token
+            );
+            dispatch({
+                type: "add_work_package",
+                payload: { ...wp, projectId: wp.project_id }
+            });
+        } catch (err) {
+            console.error("Error creating work package", err);
+        }
 
-        setWpTitleInput("");     // Limpiar input correcto
-        setIsWpModalOpen(false); // Cerrar modal correcto
+        setWpTitleInput("");
+        setIsWpModalOpen(false);
     };
 
     return (
@@ -44,12 +48,27 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
                 {/* BOTONES DE ARRIBA*/}
                 <div className="d-flex align-items-center justify-content-between mb-5 flex-wrap gap-3">
 
-                    {/* TÍTULO DEL PROYECTO */}
+                    {/* TÍTULO DEL PROYECTO Y LAPIZ PARA EDITAR PROYECTO */}
+
                     {store.currentProjectId && (
-                        <div className="d-flex align-items-center">
+                        <div className="d-flex align-items-center gap-2" style={{ cursor: "pointer" }}
+                            onClick={() => {
+                                const project = store.projects.find(p => p.id === store.currentProjectId);
+                                openProjectModal(project);
+                            }}
+                        >
                             <h2 className="section-sub-title mb-0" style={{ color: "#27E6D6", fontSize: "1 rem", letterSpacing: "1.5px", borderBottom: "2px solid rgba(39, 230, 214, 0.3)", }}>
                                 {store.projects.find(p => p.id === store.currentProjectId)?.name}
                             </h2>
+                            <div style={{ padding: "2px", display: "flex", alignItems: "center" }}>
+                                <Pencil
+                                    size={16}
+                                    color="#27E6D6"
+                                    className="opacity-50 hover-opacity-100"
+                                    style={{ transition: "opacity 0.2s" }}
+                                />
+                            </div>
+
                         </div>
                     )}
                     <div className="ms-auto d-flex gap-3">
@@ -102,7 +121,7 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
                             );
 
                             // miramos que tengan el status 'done'
-                            
+
                             const completed = wpTasks.filter(t =>
                                 t.status?.toLowerCase() === "done"
                             ).length;

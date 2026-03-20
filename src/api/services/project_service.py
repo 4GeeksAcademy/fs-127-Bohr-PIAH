@@ -12,7 +12,7 @@ class ProjectService:
     @staticmethod
     def get_all():
         projects = Project.query.all()
-        return [project.serialize() for project in projects]
+        return [project.serialize_with_wps() for project in projects]
 
     @staticmethod
     def get_by_id(project_id):
