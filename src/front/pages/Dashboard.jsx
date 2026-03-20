@@ -15,7 +15,6 @@ export const Dashboard = () => {
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
-    const [projectsToShow, setProjectsToShow] = useState(store.projects || [])
     const [newProjectData, setNewProjectData] = useState({
         nombre: "",
         wpDeadline: "",
@@ -32,7 +31,6 @@ export const Dashboard = () => {
             try {
                 const data = await getUserWithProjects(store.token, store.user.id);
                 dispatch({ type: "set_projects", payload: data.projects });
-                setProjectsToShow(data.projects);
             } catch (err) {
                 console.error("Error cargando proyectos del usuario", err);
             }
@@ -88,7 +86,7 @@ export const Dashboard = () => {
 
                     {/* LADO IZQUIERDO */}
                     <Sidebar
-                        activeProjects={projectsToShow}
+                        activeProjects={store.projects}
                         onNewProjectClick={() => openCreateModal()}
                         onProjectSelect={(id) => dispatch({ type: "set_current_project", payload: id })}
                         selectedId={store.currentProjectId}
