@@ -30,11 +30,30 @@ class DepartmentService:
         if Department.query.filter_by(name=data["name"]).first():
             abort(409, description="Department with that name already exists")
 
+        user_emails = data.get("user_emails", []) or []
+        user_emails = list(set(user_emails))
+
+        users = []
+        if user_emails:
+            users = User.query.filter(User.email.in_(user_emails)).all()
+
+            found_emails = {u.email for u in users}
+            missing_emails = [email for email in user_emails if email not in found_emails]
+
+            if missing_emails:
+                abort(404, description=f"Users not found: {missing_emails}")
+
         try:
             new_department = Department(name=data["name"])
             db.session.add(new_department)
+            db.session.flush()
+
+            for user in users:
+                user.department_id = new_department.id
+
             db.session.commit()
             return new_department.serialize()
+
         except Exception as error:
             db.session.rollback()
             abort(500, description=f"Error creating department: {str(error)}")
@@ -43,13 +62,40 @@ class DepartmentService:
     def update(department_id, data):
         department = Department.query.get(department_id)
         if department is None:
-            abort(
-                404, description=f"Department with id {department_id} not found")
+            abort(404, description=f"Department with id {department_id} not found")
 
         if "name" in data and data["name"] is not None and data["name"] != department.name:
             if Department.query.filter_by(name=data["name"]).first():
                 abort(409, description="Department with name already existing")
             department.name = data["name"]
+
+        if "user_emails" in data:
+            user_emails = data.get("user_emails") or []
+            user_emails = list(set(user_emails))
+
+            users = []
+            if user_emails:
+                users = User.query.filter(User.email.in_(user_emails)).all()
+
+                found_emails = {u.email for u in users}
+                missing_emails = [email for email in user_emails if email not in found_emails]
+
+                if missing_emails:
+                    abort(404, description=f"Users not found: {missing_emails}")
+
+            new_user_ids = {user.id for user in users}
+
+            current_users = User.query.filter_by(department_id=department.id).all()
+
+            for user in current_users:
+                if user.id not in new_user_ids:
+                    user.department_id = None
+
+            for user in users:
+                user.department_id = department.id
+
+            if department.head_id is not None and department.head_id not in new_user_ids:
+                department.head_id = None
 
         if "head_id" in data:
             if data["head_id"] is None:
@@ -57,8 +103,7 @@ class DepartmentService:
             else:
                 head = User.query.get(data["head_id"])
                 if head is None:
-                    abort(
-                        404, description=f"User with id {data['head_id']} not found")
+                    abort(404, description=f"User with id {data['head_id']} not found")
 
                 if head.role not in (RoleName.head, RoleName.admin):
                     abort(400, description="Head user must have role 'head' or 'admin'")
@@ -71,6 +116,7 @@ class DepartmentService:
         try:
             db.session.commit()
             return department.serialize()
+
         except Exception as error:
             db.session.rollback()
             abort(500, description=f"Error updating department: {str(error)}")

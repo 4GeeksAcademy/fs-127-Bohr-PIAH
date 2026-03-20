@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from flask import abort
 from sqlalchemy.orm import selectinload
-from api.models import db, Project, User, Department
+from api.models import UserProject, db, Project, User, Department
 from api.models.user import RoleName
 from api.models.work_package import WorkPackage
 from api.services.common import parse_dt_utc
@@ -46,39 +46,45 @@ class ProjectService:
         if department.head_id is None:
             abort(400, description="Department must have a head before creating projects")
 
-        owner = User.query.get(department.head_id)
-        if owner is None:
-            abort(404, description="Department head user not found")
-
         creator = User.query.get(data["created_by"])
         if creator is None:
             abort(404, description="Creator user not found")
 
-        if creator.role not in (RoleName.admin, RoleName.head):
-            abort(403, description="created_by must be admin or head")
+        now_utc = datetime.utcnow()
 
-        now_utc = datetime.now(timezone.utc)
-
-        if "created_at" in data and data["created_at"] is not None:
+        created_at = now_utc
+        if data.get("created_at"):
             try:
                 created_at = parse_dt_utc(data["created_at"], "created_at")
             except ValueError as e:
                 abort(400, description=str(e))
 
             if created_at > now_utc:
-                abort(400, description="created_at cannot be in the future (UTC)")
-        else:
-            created_at = now_utc
+                abort(400, description="created_at cannot be in the future")
 
         deadline = None
-        if "deadline" in data and data["deadline"] is not None:
+        if data.get("deadline"):
             try:
                 deadline = parse_dt_utc(data["deadline"], "deadline")
             except ValueError as e:
                 abort(400, description=str(e))
 
             if deadline < created_at:
-                abort(400, description="deadline must be >= created_at (UTC)")
+                abort(400, description="deadline must be >= created_at")
+
+        user_emails = data.get("user_emails", []) or []
+        user_emails = list(set(user_emails))
+
+        users = []
+        if user_emails:
+            users = User.query.filter(User.email.in_(user_emails)).all()
+
+            found_emails = {u.email for u in users}
+            missing_emails = [
+                email for email in user_emails if email not in found_emails]
+
+            if missing_emails:
+                abort(404, description=f"Users not found: {missing_emails}")
 
         try:
             new_project = Project(
@@ -92,6 +98,20 @@ class ProjectService:
             )
 
             db.session.add(new_project)
+            db.session.flush()
+
+            for user in users:
+                db.session.add(UserProject(
+                    user_id=user.id,
+                    project_id=new_project.id
+                ))
+
+            if department.head_id not in [u.id for u in users]:
+                db.session.add(UserProject(
+                    user_id=department.head_id,
+                    project_id=new_project.id
+                ))
+
             db.session.commit()
             return new_project.serialize()
 
@@ -185,9 +205,33 @@ class ProjectService:
         if "finalized" in data and data["finalized"] is not None:
             project.finalized = bool(data["finalized"])
 
+        if "user_emails" in data:
+            user_emails = data.get("user_emails") or []
+            user_emails = list(set(user_emails))
+
+            users = []
+            if user_emails:
+                users = User.query.filter(User.email.in_(user_emails)).all()
+
+                found_emails = {u.email for u in users}
+                missing_emails = [
+                    email for email in user_emails if email not in found_emails]
+
+                if missing_emails:
+                    abort(
+                        404, description=f"Users not found: {missing_emails}")
+
+            project.user_projects.clear()
+
+            for user in users:
+                project.user_projects.append(
+                    UserProject(user_id=user.id, project_id=project.id)
+                )
+
         try:
             db.session.commit()
             return project.serialize()
+
         except Exception as error:
             db.session.rollback()
             abort(500, description=f"Error updating project: {str(error)}")
