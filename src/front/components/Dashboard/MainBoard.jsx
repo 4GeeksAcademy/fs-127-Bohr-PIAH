@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { KanbanBoard } from "../Kanban/KanbanBoard";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalWorkPackage from "./ModalWorkPackage";
+import { createWorkPackage } from "../../services/WorkPackageService";
 
 export const MainBoard = ({ workModes, openProjectModal }) => {
 
@@ -17,23 +18,26 @@ export const MainBoard = ({ workModes, openProjectModal }) => {
     const [wpTitleInput, setWpTitleInput] = useState("");
 
     // FUNCIÓN Guardar
-    const handleAddWP = () => {
+    const handleAddWP = async () => {
         if (!wpTitleInput.trim()) return;
 
         const currentProjectId = store.currentProjectId;
 
-        dispatch({
-            type: "add_work_package",
-            payload: {
-                id: crypto.randomUUID(),
-                projectId: currentProjectId,
-                title: wpTitleInput.toUpperCase(),
-                status: "Active"
-            }
-        });
+        try {
+            const wp = await createWorkPackage(
+                { name: wpTitleInput.toUpperCase(), project_id: currentProjectId },
+                store.token
+            );
+            dispatch({
+                type: "add_work_package",
+                payload: { ...wp, projectId: wp.project_id }
+            });
+        } catch (err) {
+            console.error("Error creating work package", err);
+        }
 
-        setWpTitleInput("");     // Limpiar input correcto
-        setIsWpModalOpen(false); // Cerrar modal correcto
+        setWpTitleInput("");
+        setIsWpModalOpen(false);
     };
 
     return (

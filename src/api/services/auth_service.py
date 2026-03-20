@@ -161,8 +161,8 @@ class AuthService:
 
     @staticmethod
     def reset_password(data):
-        if "token" not in data or "password" not in data:
-            abort(400, description="Token and password are required")
+        if "token" not in data or "new_password" not in data:
+            abort(400, description="Token and new password are required")
 
         try:
             decoded = decode_token(data["token"])
@@ -176,7 +176,7 @@ class AuthService:
         if user is None:
             abort(404, description="User not found")
 
-        user.set_password(data["password"])
+        user.set_password(data["new_password"])
         try:
             db.session.commit()
             return {"message": "Password updated successfully"}

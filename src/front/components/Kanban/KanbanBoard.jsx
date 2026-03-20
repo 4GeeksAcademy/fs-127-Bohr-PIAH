@@ -4,23 +4,28 @@ import { useState, useRef, useEffect } from "react";
 import { CirclePlus } from "lucide-react";
 import { KanbanColumn } from "./KanbanColumn";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
-import ModalTask from "./ModalTask"
+import ModalTask from "./ModalTask";
+import { createTask, updateTask, deleteTask } from "../../services/taskService";
 
 export const KanbanBoard = ({ packageId }) => {
     const { store, dispatch } = useGlobalReducer();
     const wpTasks = store.tasks?.filter(t => t.wpId === packageId) || [];
 
-    const handleEnd = (event) => {
+    const handleEnd = async (event) => {
     const { targetData, dragContext } = event;
     const task = dragContext.item.data;
-    // El id de la lista de destino nos dice el nuevo status
-    const newStatus = targetData.parent.id; 
+    const newStatus = targetData.parent.id;
 
-    // Avisamos al Store para que la barra de progreso se entere
     dispatch({
         type: "edit_task",
         payload: { ...task, status: newStatus }
     });
+
+    try {
+        await updateTask(store.token, task.id, { status: newStatus });
+    } catch (err) {
+        console.error("Error updating task status", err);
+    }
 };
 
 const [todoRef, todoTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "to_do"), { 
@@ -78,51 +83,68 @@ const [todoRef, todoTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "to
     };
 
     // GUARDA UNA TAREA  NUEVA ---
-    const handleSaveNewTask = () => {
+    const handleSaveNewTask = async () => {
         if (!newTaskData.name.trim()) return;
 
-        const newTask = {
-            ...newTaskData,
-            id: crypto.randomUUID(),
-            wpId: packageId,
-            status: "to_do"
-        };
+        try {
+            const created = await createTask(store.token, {
+                wp_id: packageId,
+                name: newTaskData.name,
+                task_description: newTaskData.task_description || "",
+                status: "to_do",
+                alert: newTaskData.alert || false,
+                todo_by: newTaskData.todo_by || null,
+                deadline: newTaskData.deadline || null,
+            });
+            const newTask = { ...created, wpId: created.wp_id };
+            dispatch({ type: "add_task", payload: newTask });
+            todoTasks.push(newTask);
+        } catch (err) {
+            console.error("Error creating task", err);
+        }
 
-        dispatch({ type: "add_task", payload: newTask });
-        todoTasks.push(newTask);
         setIsTaskModalOpen(false);
     };
 
     // GUARDAMOS LOS CAMBIOS SI SE EDITA
-    const handleSaveEditedTask = () => {
+    const handleSaveEditedTask = async () => {
         if (!newTaskData.name.trim()) return;
 
-        dispatch({
-            type: "edit_task",
-            payload: newTaskData
-        });
+        try {
+            const updated = await updateTask(store.token, newTaskData.id, {
+                name: newTaskData.name,
+                task_description: newTaskData.task_description,
+                status: newTaskData.status,
+                alert: newTaskData.alert,
+                todo_by: newTaskData.todo_by || null,
+                deadline: newTaskData.deadline || null,
+            });
+            const updatedTask = { ...updated, wpId: updated.wp_id };
+            dispatch({ type: "edit_task", payload: updatedTask });
 
-        const index = todoTasks.findIndex(t => t.id === newTaskData.id);
-
-        if (index !== -1) {
-            // Usamos splice para reemplazar la vieja tarea por la nueva en esa posición
-            todoTasks.splice(index, 1, { ...newTaskData });
+            const index = todoTasks.findIndex(t => t.id === updatedTask.id);
+            if (index !== -1) {
+                todoTasks.splice(index, 1, { ...updatedTask });
+            }
+        } catch (err) {
+            console.error("Error updating task", err);
         }
 
         setIsTaskModalOpen(false);
     };
 
     // ELIMINAMOS TAREA
-    const handleDeleteTask = (taskId) => {
-        
-        dispatch({
-            type: "delete_task",
-            payload: taskId
-        });
+    const handleDeleteTask = async (taskId) => {
+        try {
+            await deleteTask(store.token, taskId);
+            dispatch({ type: "delete_task", payload: taskId });
 
-        const index = todoTasks.findIndex(t => t.id === taskId);
-        if (index !== -1) {
-            todoTasks.splice(index, 1); // Borramos 1 elemento en esa posición
+            const index = todoTasks.findIndex(t => t.id === taskId);
+            if (index !== -1) {
+                todoTasks.splice(index, 1);
+            }
+        } catch (err) {
+            console.error("Error deleting task", err);
         }
 
         setIsTaskModalOpen(false);
