@@ -11,7 +11,7 @@ export const Footer = () => {
 						BOHR
 					</h2>
 					<p style={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "0.85rem", letterSpacing: "1px", marginTop: "5px", marginBottom: 0 }}>
-						LA ESTRUCTURA DETRÁS DE CADA PROYECTO
+						BEHIND THE GREAT IDEAS
 					</p>
 				</div>
 
