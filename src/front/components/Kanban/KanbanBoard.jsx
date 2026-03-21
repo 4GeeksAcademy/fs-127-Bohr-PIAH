@@ -20,25 +20,24 @@ export const KanbanBoard = ({ packageId }) => {
         }
     }, [store.token]);
 
-    const handleEnd = (event) => {
-        const { targetData, dragContext } = event;
-        const task = dragContext.item.data;
-        const newStatus = targetData.parent.id;
+    const handleDragend = async (data) => {
+        const task = data.draggedNode.data.value;
+        const newStatus = data.parent.data.config.id;
+        if (task.status === newStatus) return;
         dispatch({ type: "edit_task", payload: { ...task, status: newStatus } });
+        try {
+            await updateTask(store.token, task.id, { status: newStatus });
+        } catch (err) {
+            console.error("Error updating task status:", err);
+        }
     };
 
-    const [todoRef, todoTasks, setTodoTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "to_do"), {
-        group: "bohrTasks", id: "to_do"
-    });
-    const [progressRef, progressTasks, setProgressTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_progress"), {
-        group: "bohrTasks", id: "in_progress"
-    });
-    const [reviewRef, reviewTasks, setReviewTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_review"), {
-        group: "bohrTasks", id: "in_review"
-    });
-    const [doneRef, doneTasks, setDoneTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "done"), {
-        group: "bohrTasks", id: "done"
-    });
+    const dragOptions = (status) => ({ group: "bohrTasks", id: status, onDragend: handleDragend });
+
+    const [todoRef, todoTasks, setTodoTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "to_do"), dragOptions("to_do"));
+    const [progressRef, progressTasks, setProgressTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_progress"), dragOptions("in_progress"));
+    const [reviewRef, reviewTasks, setReviewTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_review"), dragOptions("in_review"));
+    const [doneRef, doneTasks, setDoneTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "done"), dragOptions("done"));
 
     // Sincronizamos el estado interno del drag-and-drop cuando cambian las tareas del store
     useEffect(() => {

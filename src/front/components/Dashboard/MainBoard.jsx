@@ -113,11 +113,12 @@ export const MainBoard = ({ openProjectModal }) => {
                     <div className="accordion accordion-flush" id="projectAccordion">
                         {currentProject?.workPackages?.map((wp) => {
 
-                            const completed = wp.tasks.filter(t =>
+                            const wpTasks = store.tasks.filter(t => t.wp_id === wp.id);
+                            const completed = wpTasks.filter(t =>
                                 t.status?.toLowerCase() === "done"
                             ).length;
 
-                            const total = wp.tasks.length;
+                            const total = wpTasks.length;
                             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
 

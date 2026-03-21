@@ -6,12 +6,11 @@ import { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import ModalProject from "../components/ModalProject/ModalProject"
 import { Spinner } from "../components/Spinner";
-import { getUserWithProjects } from "../services/userService.js";
 import { getDepartmentWithUsers } from "../services/departmentService.js";
 
 export const Dashboard = () => {
 
-    const { store, dispatch } = useGlobalReducer();
+    const { store, dispatch, actions } = useGlobalReducer();
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
@@ -29,8 +28,7 @@ export const Dashboard = () => {
             setIsLoading(true);
 
             try {
-                const data = await getUserWithProjects(store.token, store.user.id);
-                dispatch({ type: "set_projects", payload: data.projects });
+                await actions.getProjects();
             } catch (err) {
                 console.error("Error cargando proyectos del usuario", err);
             }
