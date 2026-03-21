@@ -1,15 +1,22 @@
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { Navbar } from "../components/Navbar";
 import { DashboardNavbar } from "../components/Dashboard/DashboardNavbar";
 
 export default function ContactPage() {
     const { store } = useGlobalReducer();
+    const navigate = useNavigate();
 
     return (
         <div className="home-wrapper v1" style={{ minHeight: "100vh" }}>
             {store.token ? <DashboardNavbar /> : <Navbar />}
 
             <div style={styles.container}>
+                <button onClick={() => navigate(-1)} style={styles.backBtn}>
+                    <ArrowLeft size={18} strokeWidth={2} />
+                    Back
+                </button>
                 <h1 style={styles.title}>Contact Us</h1>
                 <p style={styles.text}>
                     We would love to hear from you. If you have questions, feedback, or
@@ -80,5 +87,18 @@ const styles = {
     },
     link: {
         color: "var(--c-cyber)",
+    },
+    backBtn: {
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "6px",
+        background: "transparent",
+        border: "1px solid rgba(39,230,214,0.3)",
+        color: "rgba(39,230,214,0.8)",
+        borderRadius: "8px",
+        padding: "6px 14px",
+        fontSize: "0.85rem",
+        cursor: "pointer",
+        marginBottom: "24px",
     },
 };
