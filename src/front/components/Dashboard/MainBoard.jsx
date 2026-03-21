@@ -1,19 +1,25 @@
 import React, { useState } from "react";
-import { Zap, ShieldAlert, Users, FileText, Rocket, ArrowLeft, Pencil } from "lucide-react";
+import { Pencil, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { KanbanBoard } from "../Kanban/KanbanBoard";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalWorkPackage from "./ModalWorkPackage";
-import { createWorkPackage } from "../../services/WorkPackageService";
+import { createWorkPackage, updateWorkPackage, deleteWorkPackage } from "../../services/WorkPackageService";
 
 export const MainBoard = ({ openProjectModal }) => {
 
     const { store, dispatch } = useGlobalReducer();
     const currentProject = store.projects.find(p => p.id === store.currentProjectId);
 
-    // ESTADOS PARA EL MODAL
+    // ESTADOS PARA EL MODAL DE CREAR WP
     const [isWpModalOpen, setIsWpModalOpen] = useState(false);
     const [wpTitleInput, setWpTitleInput] = useState("");
+
+    // ESTADOS PARA EL MODAL DE EDITAR/ELIMINAR WP
+    const [isWpEditModalOpen, setIsWpEditModalOpen] = useState(false);
+    const [editingWp, setEditingWp] = useState(null);
+    const [wpEditTitle, setWpEditTitle] = useState("");
+    const [isWpSaving, setIsWpSaving] = useState(false);
 
     // FUNCIÓN Guardar
     const handleAddWP = async () => {
@@ -36,6 +42,42 @@ export const MainBoard = ({ openProjectModal }) => {
 
         setWpTitleInput("");
         setIsWpModalOpen(false);
+    };
+
+    const handleOpenEditWp = (e, wp) => {
+        e.stopPropagation();
+        setEditingWp(wp);
+        setWpEditTitle(wp.name);
+        setIsWpEditModalOpen(true);
+    };
+
+    const handleSaveEditWp = async () => {
+        if (!wpEditTitle.trim() || !editingWp) return;
+        setIsWpSaving(true);
+        try {
+            const updated = await updateWorkPackage(editingWp.id, { name: wpEditTitle.toUpperCase() }, store.token);
+            dispatch({ type: "edit_work_package", payload: { ...editingWp, name: updated.name } });
+            setIsWpEditModalOpen(false);
+        } catch (err) {
+            console.error("Error updating work package", err);
+        } finally {
+            setIsWpSaving(false);
+        }
+    };
+
+    const handleDeleteWp = async () => {
+        if (!editingWp) return;
+        if (!window.confirm(`¿Eliminar "${editingWp.name}" y todas sus tareas?`)) return;
+        setIsWpSaving(true);
+        try {
+            await deleteWorkPackage(editingWp.id, store.token);
+            dispatch({ type: "delete_work_package", payload: editingWp.id });
+            setIsWpEditModalOpen(false);
+        } catch (err) {
+            console.error("Error deleting work package", err);
+        } finally {
+            setIsWpSaving(false);
+        }
     };
 
     return (
@@ -113,11 +155,12 @@ export const MainBoard = ({ openProjectModal }) => {
                     <div className="accordion accordion-flush" id="projectAccordion">
                         {currentProject?.workPackages?.map((wp) => {
 
-                            const completed = wp.tasks.filter(t =>
+                            const wpTasks = store.tasks.filter(t => t.wp_id === wp.id);
+                            const completed = wpTasks.filter(t =>
                                 t.status?.toLowerCase() === "done"
                             ).length;
 
-                            const total = wp.tasks.length;
+                            const total = wpTasks.length;
                             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
 
@@ -128,7 +171,15 @@ export const MainBoard = ({ openProjectModal }) => {
                                             type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${wp.id}`}>
 
                                             {/* TÍTULO A LA IZQUIERDA */}
-                                            <span className="section-sub-title mb-0" style={{ fontSize: "1.1rem" }}>{wp.name}</span>
+                                            <span className="section-sub-title mb-0 d-flex align-items-center gap-2" style={{ fontSize: "1.1rem" }}>
+                                                {wp.name}
+                                                <Pencil
+                                                    size={14}
+                                                    color="#27E6D6"
+                                                    style={{ opacity: 0.6, cursor: "pointer", flexShrink: 0 }}
+                                                    onClick={(e) => handleOpenEditWp(e, wp)}
+                                                />
+                                            </span>
 
                                             {/* BARRA A LA DERECHA */}
                                             <div className="ms-auto me-4 d-flex align-items-center" style={{ width: "160px" }}>
@@ -166,6 +217,51 @@ export const MainBoard = ({ openProjectModal }) => {
             <ModalWorkPackage
                 isOpen={isWpModalOpen} onClose={() => setIsWpModalOpen(false)} title={wpTitleInput} setTitle={setWpTitleInput} onSubmit={handleAddWP}
             />
+
+            {/* MODAL EDIT/DELETE WORK PACKAGE */}
+            {isWpEditModalOpen && (
+                <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.4)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, backdropFilter: "blur(4px)" }}>
+                    <div className="glass-card-yellow p-4 shadow-lg" style={{ width: "350px", border: "1px solid #27E6D6" }}>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <h5 className="text-white mb-0" style={{ fontSize: "1rem" }}>EDIT WORK PACKAGE</h5>
+                            <X size={20} className="text-info" style={{ cursor: "pointer" }} onClick={() => setIsWpEditModalOpen(false)} />
+                        </div>
+                        <input
+                            type="text"
+                            className="form-control bg-dark text-white border-info mb-3 shadow-none"
+                            value={wpEditTitle}
+                            onChange={(e) => setWpEditTitle(e.target.value)}
+                            autoFocus
+                        />
+                        <div className="d-flex justify-content-between align-items-center mt-2">
+                            <button
+                                style={{ background: "transparent", border: "1px solid #ff4d4d", color: "#ff4d4d", borderRadius: "8px", padding: "5px 14px", fontSize: "0.8rem", cursor: "pointer" }}
+                                onClick={handleDeleteWp}
+                                disabled={isWpSaving}
+                            >
+                                Delete
+                            </button>
+                            <div className="d-flex gap-2">
+                                <button
+                                    style={{ background: "transparent", border: "1px solid rgba(39,230,214,0.4)", color: "rgba(39,230,214,0.6)", borderRadius: "8px", padding: "5px 14px", fontSize: "0.8rem", cursor: "pointer" }}
+                                    onClick={() => setIsWpEditModalOpen(false)}
+                                    disabled={isWpSaving}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    className="nav-login-cyber"
+                                    style={{ padding: "5px 14px", fontSize: "0.8rem" }}
+                                    onClick={handleSaveEditWp}
+                                    disabled={isWpSaving}
+                                >
+                                    {isWpSaving ? "Saving..." : "Save"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main >
     );
 };
