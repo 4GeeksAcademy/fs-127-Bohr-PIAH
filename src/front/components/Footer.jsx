@@ -16,9 +16,9 @@ export const Footer = () => {
 				</div>
 
 				<div className="footer-right d-flex gap-4">
-					<Link to="/terminos" className="footer-link-small">Términos</Link>
-					<Link to="/privacidad" className="footer-link-small">Privacidad</Link>
-					<Link to="/contacto" className="footer-link-small">Contacto</Link>
+					<Link to="/terms" className="footer-link-small">Terms</Link>
+					<Link to="/privacy" className="footer-link-small">Privacy</Link>
+					<Link to="/contact" className="footer-link-small">Contact</Link>
 				</div>
 
 			</div>
