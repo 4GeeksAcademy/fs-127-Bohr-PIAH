@@ -34,7 +34,7 @@ def create_project():
 
 # PUT /api/projects/<id> - Edit project
 @project_bp.route('/<int:project_id>', methods=['PUT'])
-@require_permission("projects:udpate")
+@require_permission("projects:update")
 def update_project(project_id):
     body = request.get_json()
     if not body:
