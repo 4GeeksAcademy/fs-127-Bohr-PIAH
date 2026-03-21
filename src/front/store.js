@@ -66,6 +66,27 @@ export default function storeReducer(store, action = {}) {
         ),
       };
 
+    case "edit_work_package":
+      return {
+        ...store,
+        projects: store.projects.map((project) => ({
+          ...project,
+          workPackages: (project.workPackages || []).map((wp) =>
+            wp.id === action.payload.id ? { ...wp, ...action.payload } : wp
+          ),
+        })),
+      };
+
+    case "delete_work_package":
+      return {
+        ...store,
+        projects: store.projects.map((project) => ({
+          ...project,
+          workPackages: (project.workPackages || []).filter((wp) => wp.id !== action.payload),
+        })),
+        tasks: store.tasks.filter((t) => t.wp_id !== action.payload),
+      };
+
     case "add_task":
       return {
         ...store,
@@ -180,6 +201,43 @@ export const useActions = (store, dispatch) => {
         }
       } catch (error) {
         console.error("Error en getProjects", error);
+        return false;
+      }
+    },
+
+    getUserProjects: async (userId) => {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_BACKEND_URL + `/api/users/${userId}/projects`,
+          {
+            headers: { Authorization: `Bearer ${store.token}` },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+
+          const projects = (data.projects || []).map((project) => {
+            const workPackages = (project.work_packages || []).map((wp) => {
+              return { ...wp, projectId: project.id };
+            });
+            return { ...project, workPackages };
+          });
+
+          const tasks = [];
+          (data.projects || []).forEach((project) => {
+            (project.work_packages || []).forEach((wp) => {
+              (wp.tasks || []).forEach((task) => {
+                tasks.push({ ...task, wpId: task.wp_id });
+              });
+            });
+          });
+
+          dispatch({ type: "set_projects", payload: projects });
+          dispatch({ type: "set_tasks", payload: tasks });
+          return true;
+        }
+      } catch (error) {
+        console.error("Error en getUserProjects", error);
         return false;
       }
     },

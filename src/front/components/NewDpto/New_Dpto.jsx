@@ -44,13 +44,20 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
     }));
   };
 
-  const handleSubmit = (e) => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onCreate({
-      department_name: formDpto.department_name.trim(),
-      user_ids: formDpto.user_ids,
-      head_id: formDpto.head_id,
-    });
+    setIsSaving(true);
+    try {
+      await onCreate({
+        department_name: formDpto.department_name.trim(),
+        user_ids: formDpto.user_ids,
+        head_id: formDpto.head_id,
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const chipStyle = {
@@ -125,8 +132,10 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
           )}
 
           <div className="modal-cyber-footer">
-            <button type="button" className="cyber-btn-secondary" onClick={onCancel}>Cancel</button>
-            <button type="submit" className="cyber-btn-success">{isEdit ? "Save" : "Add"}</button>
+            <button type="button" className="cyber-btn-secondary" onClick={onCancel} disabled={isSaving}>Cancel</button>
+            <button type="submit" className="cyber-btn-success" disabled={isSaving}>
+              {isSaving ? "Saving..." : (isEdit ? "Save" : "Add")}
+            </button>
           </div>
         </form>
       </div>

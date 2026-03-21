@@ -7,12 +7,14 @@ export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { dispatch } = useGlobalReducer();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     try {
       const data = await loginService(email, password);
@@ -21,6 +23,8 @@ export const Login = () => {
       navigate("/dashboard");
     } catch (err) {
       setError(err.message || "Login failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -53,8 +57,8 @@ export const Login = () => {
 
           {error && <p style={{ color: "red" }}>{error}</p>}
 
-          <button type="submit" className="cyber-btn-success login-btn">
-            Iniciar sesión
+          <button type="submit" className="cyber-btn-success login-btn" disabled={isLoading}>
+            {isLoading ? "Iniciando..." : "Iniciar sesión"}
           </button>
 
           {/* LINK PARA CREAR USUARIO */}

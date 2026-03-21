@@ -4,7 +4,8 @@ Servicio de usuarios - Logica de negocio para CRUD de User
 
 
 from flask import abort
-from api.models import db, User
+from api.models import db, User, UserProject, WorkPackage
+from api.models.project import Project
 from api.models.user import RoleName
 from sqlalchemy.orm import selectinload
 VALID_ROLES = {role.value for role in RoleName}
@@ -108,8 +109,10 @@ class UserService:
     def get_by_id_with_projects(user_id):
         user = (
             User.query.options(
-                selectinload(User.owned_projects),
                 selectinload(User.user_projects)
+                    .selectinload(UserProject.project)
+                    .selectinload(Project.work_packages)
+                    .selectinload(WorkPackage.tasks)
             )
             .filter(User.id == user_id)
             .first()

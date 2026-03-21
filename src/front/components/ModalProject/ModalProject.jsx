@@ -12,10 +12,12 @@ export default function ModalProject({
   title = "Add New Project",
   initialData,
   isEdit,
-  users = []
+  users = [],
+  onFinalizedChange
 }) {
   const { store, dispatch, actions } = useGlobalReducer();
   const [formData, setFormData] = useState(emptyForm);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -35,6 +37,7 @@ export default function ModalProject({
   const onDeleteUser = (index) => setFormData(prev => ({ ...prev, users: prev.users.filter((_, i) => i !== index) }));
 
   const handleCreate = async () => {
+    setIsSaving(true);
     try {
       const data = await createProject(store.token, {
         name: formData.nombre,
@@ -48,27 +51,35 @@ export default function ModalProject({
       }
     } catch (err) {
       console.error("Error creando proyecto", err);
+    } finally {
+      setIsSaving(false);
     }
     onClose();
   };
 
   const handleUpdate = async () => {
+    setIsSaving(true);
     try {
       await updateProject(store.token, store.currentProjectId, formData);
-      await actions.getProjects();
+      await actions.getUserProjects(store.user.id);
     } catch (err) {
       console.error("Error actualizando proyecto", err);
+    } finally {
+      setIsSaving(false);
     }
     onClose();
   };
 
   const handleDelete = async () => {
+    setIsSaving(true);
     try {
       await deleteProject(store.token, store.currentProjectId);
       dispatch({ type: "set_current_project", payload: null });
-      await actions.getProjects();
+      await actions.getUserProjects(store.user.id);
     } catch (err) {
       console.error("Error eliminando proyecto", err);
+    } finally {
+      setIsSaving(false);
     }
     onClose();
   };
@@ -83,7 +94,7 @@ export default function ModalProject({
   return (
     <div className="modal-cyber-overlay" onClick={onClose}>
       <div className="modal-cyber-container" onClick={(e) => e.stopPropagation()}>
-        <h3 className="modal-cyber-title">{title}</h3>
+        <h3 className="modal-cyber-title">{isEdit ? "Edit Project" : title}</h3>
 
         <label className="cyber-label">Project</label>
         <input
@@ -147,24 +158,50 @@ export default function ModalProject({
           ))}
         </div>
 
-        <div className="modal-cyber-footer mt-4 d-flex justify-content-between align-items-center">
-          <div>
+        <div className="modal-cyber-footer mt-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div className="d-flex gap-2">
             {isEdit && (
-              <button
-                className="cyber-btn-danger"
-                onClick={() => {
-                  if (window.confirm("¿Estás seguro de eliminar este proyecto?")) {
-                    handleDelete();
-                  }
-                }}
-              >
-                Delete Project
-              </button>
+              <>
+                <button
+                  className="cyber-btn-danger"
+                  disabled={isSaving}
+                  onClick={() => {
+                    if (window.confirm("¿Estás seguro de eliminar este proyecto?")) {
+                      handleDelete();
+                    }
+                  }}
+                >
+                  Delete
+                </button>
+                <button
+                  className="cyber-btn"
+                  style={{ background: "rgba(39,230,214,0.15)", borderColor: "#27E6D6" }}
+                  disabled={isSaving}
+                  onClick={async () => {
+                    const newFinalized = !formData.finalized;
+                    setIsSaving(true);
+                    try {
+                      await updateProject(store.token, store.currentProjectId, { finalized: newFinalized });
+                      await actions.getUserProjects(store.user.id);
+                      onFinalizedChange?.(newFinalized);
+                    } catch (err) {
+                      console.error("Error actualizando estado del proyecto", err);
+                    } finally {
+                      setIsSaving(false);
+                    }
+                    onClose();
+                  }}
+                >
+                  {formData.finalized ? "Reactivate" : "Finished"}
+                </button>
+              </>
             )}
           </div>
           <div className="d-flex gap-2">
-            <button className="cyber-btn-outline" onClick={onClose}>Cancel</button>
-            <button className="cyber-btn" onClick={isEdit ? handleUpdate : handleCreate}>Save</button>
+            <button className="cyber-btn-outline" onClick={onClose} disabled={isSaving}>Cancel</button>
+            <button className="cyber-btn" onClick={isEdit ? handleUpdate : handleCreate} disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save"}
+            </button>
           </div>
         </div>
       </div>

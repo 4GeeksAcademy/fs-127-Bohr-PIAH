@@ -10,7 +10,7 @@ export default function ModalTask({
   onChange,
   onSubmit,
   onDelete,
-  users = []   // Añadido por Paty: lista de usuarios para autocompletado
+  users = []
 }) {
   if (!isOpen) return null;
 
@@ -23,18 +23,28 @@ export default function ModalTask({
     status = "to_do"
   } = data;
 
-  // Añadido por Paty: estado local para el texto que escribe el usuario en el buscador
   const [userSearch, setUserSearch] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Filtramos usuarios por lo que escribe
   const filteredUsers = users.filter(u =>
     `${u.first_name} ${u.last_name}`.toLowerCase().includes(userSearch.toLowerCase())
   );
 
-  // Nombre del usuario asignado actualmente (para mostrar en el input)
+  // Busca en el array de usuarios; si no están cargados aún, usa el objeto embebido en la tarea
   const assignedUser = users.find(u => u.id === todo_by);
-  const assignedName = assignedUser ? `${assignedUser.first_name} ${assignedUser.last_name}` : "";
+  const assignedName = assignedUser
+    ? `${assignedUser.first_name} ${assignedUser.last_name}`
+    : (data.todo_by_user ? `${data.todo_by_user.first_name} ${data.todo_by_user.last_name}` : "");
+
+  const handleSubmit = async () => {
+    setIsSaving(true);
+    try {
+      await onSubmit();
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Cuando el usuario hace clic en una sugerencia
   const handleSelectUser = (user) => {
@@ -185,8 +195,10 @@ export default function ModalTask({
               </button>
             ) : null}
           </div>
-          <button type="button" className="cyber-btn-outline" onClick={onClose}>Cancel</button>
-          <button type="button" className="cyber-btn" onClick={onSubmit}>Save Task</button>
+          <button type="button" className="cyber-btn-outline" onClick={onClose} disabled={isSaving}>Cancel</button>
+          <button type="button" className="cyber-btn" onClick={handleSubmit} disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save Task"}
+          </button>
         </div>
       </div>
     </div>

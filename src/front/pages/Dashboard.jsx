@@ -6,15 +6,15 @@ import { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import ModalProject from "../components/ModalProject/ModalProject"
 import { Spinner } from "../components/Spinner";
-import { getUserWithProjects } from "../services/userService.js";
 import { getDepartmentWithUsers } from "../services/departmentService.js";
 
 export const Dashboard = () => {
 
-    const { store, dispatch } = useGlobalReducer();
+    const { store, dispatch, actions } = useGlobalReducer();
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
+    const [sidebarView, setSidebarView] = useState("active");
     const [newProjectData, setNewProjectData] = useState({
         nombre: "",
         wpDeadline: "",
@@ -23,14 +23,14 @@ export const Dashboard = () => {
         users: []
     });
 
+
     useEffect(() => {
         const loadData = async () => {
             if (!store.token || !store.user) return;
             setIsLoading(true);
 
             try {
-                const data = await getUserWithProjects(store.token, store.user.id);
-                dispatch({ type: "set_projects", payload: data.projects });
+                await actions.getUserProjects(store.user.id);
             } catch (err) {
                 console.error("Error cargando proyectos del usuario", err);
             }
@@ -68,11 +68,12 @@ export const Dashboard = () => {
     const openEditModal = (project) => {
         setIsEditing(true);
         setNewProjectData({
-            nombre: project.nombre,
+            nombre: project.name || project.nombre || "",
             wpDeadline: project.workPackages ? project.workPackages[0]?.deadline || "" : "",
             taskDeadline: project.workPackages && project.workPackages[0]?.tasks ? project.workPackages[0].tasks[0]?.deadline || "" : "",
             teamLeader: project.teamLeader || "",
-            users: project.users ? project.users.map(u => u.username) : []
+            users: project.users ? project.users.map(u => u.username) : [],
+            finalized: project.finalized || false
         });
         setIsProjectModalOpen(true);
     };
@@ -86,15 +87,18 @@ export const Dashboard = () => {
 
                     {/* LADO IZQUIERDO */}
                     <Sidebar
-                        activeProjects={store.projects}
+                        activeProjects={store.projects.filter(p => !p.finalized)}
+                        finishedProjects={store.projects.filter(p => p.finalized)}
                         onNewProjectClick={() => openCreateModal()}
                         onProjectSelect={(id) => dispatch({ type: "set_current_project", payload: id })}
                         selectedId={store.currentProjectId}
+                        view={sidebarView}
+                        onViewChange={setSidebarView}
                     />
 
                     {/* LADO DERECHO */}
                     <MainBoard
-                        openProjectModal={() => openEditModal(activeProject)}
+                        openProjectModal={(project) => openEditModal(project)}
                     />
 
                 </div>
@@ -106,6 +110,7 @@ export const Dashboard = () => {
                 isEdit={isEditing}
                 initialData={newProjectData}
                 users={store.users}
+                onFinalizedChange={(isFinalized) => setSidebarView(isFinalized ? "finished" : "active")}
             />
         </div>
     );
