@@ -46,6 +46,12 @@ export default function storeReducer(store, action = {}) {
         currentProjectId: action.payload,
       };
 
+    case "validate_current_project":
+      if (action.payload && !store.projects.find(p => p.id === action.payload)) {
+        return { ...store, currentProjectId: null };
+      }
+      return store;
+
     case "set_projects":
       return {
         ...store,

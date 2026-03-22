@@ -1,42 +1,11 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { UserDropdown } from "./UserDropdown";
 import { ProfileModal } from "../Profile/ProfileModal.jsx";
-import { getAllDepartments, getDepartmentWithUsers } from "../../services/departmentService.js";
-import useGlobalReducer from "../../hooks/useGlobalReducer.jsx";
-
-
 
 export const DashboardNavbar = () => {
 
-    const { store, dispatch } = useGlobalReducer();
     const [showProfile, setShowProfile] = useState(false);
-    const [departments, setDepartments] = useState([]);
-    const token = store.token;
-
-    useEffect(() => {
-        const loadDepartments = async () => {
-            try {
-                if (token) {
-                    const data = await getAllDepartments(token);
-                    setDepartments(data);
-                }
-            } catch (error) {
-                console.error("Error fetching departments:", error);
-            }
-        };
-        loadDepartments();
-    }, [token]);
-
-    const handleSelectDepartment = async (dpto) => {
-        dispatch({ type: "set_current_department", payload: dpto });
-        try {
-            const data = await getDepartmentWithUsers(token, dpto.id);
-            dispatch({ type: "set_users", payload: data.users || [] });
-        } catch (error) {
-            console.error("Error cargando usuarios del departamento:", error);
-        }
-    };
 
     return (
         <>
@@ -45,19 +14,16 @@ export const DashboardNavbar = () => {
 
                 <div className="container d-flex align-items-center justify-content-between">
 
-                    {/* LADO IZQUIERDO LOGO DE BORH */}
+                    {/* LOGO */}
                     <div className="navbar-brand">
                         <Link to="/"
                             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                             style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
 
-                            
                             <div className="atom-nav-container" style={{ width: "80px", height: "80px" }}>
                                 <svg viewBox="0 0 120 120" className="atom-nav" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="60" cy="60" r="10" className="nucleus-glow" />
                                     <circle cx="60" cy="60" r="10" className="nucleus" />
-
-                                    {/* Órbitas Animadas */}
                                     <g className="orbit">
                                         <path id="nav-p1" d="M12,60 a48,25 0 1,0 96,0 a48,25 0 1,0 -96,0" className="orbit-path" strokeWidth="2" fill="none" />
                                         <circle r="4" className="electron" fill="var(--c-nuc)">
@@ -105,40 +71,6 @@ export const DashboardNavbar = () => {
                             <Link to="/menuadmin">
                                 <button className="nav-login-cyber">Admin Panel</button>
                             </Link>
-                        </div>
-
-
-
-                        {/* PDESPLEGABLE DEPARTMENTS*/}
-
-
-
-                        <div className="dropdown">
-                            <button
-                                className="nav-login-cyber dropdown-toggle"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                            >
-                                {store.currentDepartment ? store.currentDepartment.name : "Departments"}
-                            </button>
-
-                            {departments.length > 0 && (
-                                <ul className="dropdown-menu dropdown-menu-dark shadow"
-                                    style={{ backgroundColor: "rgb(19, 22, 37)", border: "1px solid var(--c-nuc)" }}>
-                                    {departments.map((dpto) => (
-                                        <li key={dpto.id}>
-                                            <button
-                                                className="dropdown-item py-2"
-                                                style={store.currentDepartment?.id === dpto.id ? { color: "var(--c-nuc)" } : {}}
-                                                onClick={() => handleSelectDepartment(dpto)}
-                                            >
-                                                {dpto.name}
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-
                         </div>
 
                         {/* PROFILE BUTTON */}

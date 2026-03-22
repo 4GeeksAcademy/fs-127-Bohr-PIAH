@@ -10,7 +10,8 @@ export default function ModalTask({
   onChange,
   onSubmit,
   onDelete,
-  users = []
+  users = [],
+  minDate = ""
 }) {
   if (!isOpen) return null;
 
@@ -162,6 +163,7 @@ export default function ModalTask({
               className="cyber-input"
               type="date"
               value={deadline ? deadline.split("T")[0] : ""}
+              min={minDate}
               onChange={(e) => onChange("deadline", e.target.value)}
             />
           </div>

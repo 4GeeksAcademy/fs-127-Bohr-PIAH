@@ -108,7 +108,8 @@ class User(db.Model):
             "email": self.email,
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "role": self.role.value
+            "role": self.role.value,
+            "department_id": self.department_id
         }
 
     def serialize_with_projects(self):
