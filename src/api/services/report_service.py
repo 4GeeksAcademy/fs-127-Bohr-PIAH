@@ -416,7 +416,7 @@ class ReportService:
             f"{metrics['total_tasks']} tasks, {metrics['done']} completed, "
             f"{metrics['in_progress']} in progress, {metrics['in_review']} in review, "
             f"{metrics['to_do']} to do, {metrics['overdue']} overdue, "
-            f"cmopletion rate {metrics['progress_pct']}%."
+            f"completion rate {metrics['progress_pct']}%."
         )
 
     @staticmethod
@@ -476,7 +476,7 @@ class ReportService:
                     task["status"],
                     str(task.get("todo_by") or "-"),
                     task.get("deadline") or "-",
-                    "Sí" if task.get("alert") else "No",
+                    "Yes" if task.get("alert") else "No",
                 ]
             )
 
@@ -656,6 +656,84 @@ class ReportService:
                   for department_payload in departments_payload]
         return ReportService.comparison_chart(labels, values, title, y_label)
 
+    @staticmethod
+    def wp_status_chart(work_packages: list[dict[str, Any]], title: str = "Tasks by status per work package"):
+        if not work_packages:
+            return Paragraph("No work packages to display.", ReportService.styles()["muted"])
+
+        labels = [ReportService.short_label(
+            wp["name"], 12) for wp in work_packages]
+
+        to_do_data = []
+        in_progress_data = []
+        in_review_data = []
+        done_data = []
+
+        max_value = 0
+
+        for wp in work_packages:
+            by_status = wp["metrics"].get("by_status", {})
+            to_do = by_status.get("to_do", 0)
+            in_progress = by_status.get("in_progress", 0)
+            in_review = by_status.get("in_review", 0)
+            done = by_status.get("done", 0)
+
+            to_do_data.append(to_do)
+            in_progress_data.append(in_progress)
+            in_review_data.append(in_review)
+            done_data.append(done)
+
+            max_value = max(max_value, to_do, in_progress, in_review, done)
+
+        drawing = Drawing(480, 240)
+        drawing.add(
+            String(10, 220, title, fontName="Helvetica-Bold", fontSize=11))
+
+        chart = VerticalBarChart()
+        chart.x = 40
+        chart.y = 40
+        chart.height = 150
+        chart.width = 400
+
+        chart.data = [
+            tuple(to_do_data),
+            tuple(in_progress_data),
+            tuple(in_review_data),
+            tuple(done_data),
+        ]
+
+        chart.categoryAxis.categoryNames = labels
+        chart.categoryAxis.labels.angle = 20
+        chart.categoryAxis.labels.dy = -12
+        chart.categoryAxis.labels.fontName = "Helvetica"
+        chart.categoryAxis.labels.fontSize = 8
+
+        chart.valueAxis.valueMin = 0
+        chart.valueAxis.valueMax = max(max_value + 1, 1)
+        chart.valueAxis.valueStep = 1 if max_value <= 10 else max(
+            1, round(max_value / 5))
+
+        chart.barSpacing = 4
+        chart.groupSpacing = 10
+
+        chart.bars[0].fillColor = colors.HexColor("#9E9E9E")   # to_do
+        chart.bars[1].fillColor = colors.HexColor("#42A5F5")   # in_progress
+        chart.bars[2].fillColor = colors.HexColor("#FFB74D")   # in_review
+        chart.bars[3].fillColor = colors.HexColor("#66BB6A")   # done
+
+        drawing.add(chart)
+
+        drawing.add(String(50, 12, "To do", fontName="Helvetica",
+                    fontSize=8, fillColor=colors.HexColor("#9E9E9E")))
+        drawing.add(String(120, 12, "In progress", fontName="Helvetica",
+                    fontSize=8, fillColor=colors.HexColor("#42A5F5")))
+        drawing.add(String(220, 12, "In review", fontName="Helvetica",
+                    fontSize=8, fillColor=colors.HexColor("#FFB74D")))
+        drawing.add(String(300, 12, "Done", fontName="Helvetica",
+                    fontSize=8, fillColor=colors.HexColor("#66BB6A")))
+
+        return drawing
+
     # Decorators for pages
 
     @staticmethod
@@ -727,6 +805,13 @@ class ReportService:
             )
         )
         story.append(Spacer(1, 8))
+        story.append(
+            ReportService.wp_status_chart(
+                payload["work_packages"],
+                "Tasks by status per work package",
+            )
+        )
+        story.append(Spacer(1, 10))
 
         for wp in payload["work_packages"]:
             story.append(
@@ -1054,7 +1139,8 @@ class ReportService:
             abort(500, description="Generated PDF is empty")
 
         if not pdf_bytes.startswith(b"%PDF"):
-            abort(500, description=f"Generated content is not a valid PDF. Header: {pdf_bytes[:20]!r}")
+            abort(
+                500, description=f"Generated content is not a valid PDF. Header: {pdf_bytes[:20]!r}")
 
         return send_file(
             BytesIO(pdf_bytes),
