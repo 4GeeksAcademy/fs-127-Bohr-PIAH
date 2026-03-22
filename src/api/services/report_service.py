@@ -1006,18 +1006,19 @@ class ReportService:
         department = ReportService.get_department_tree(department_id)
         payload = ReportService.build_department_payload(department)
 
-        if not payload["projects"]:
-            abort(
-                404, description=f"Department with id {department_id} has no active projects")
-
         scope = ReportScope(
             kind="department",
             entity_id=department.id,
-            title=f"Department report: {department.name}",
-            subtitle=f"Departamento #{department.id}",
+            title=f"Department name: {department.name}",
+            subtitle=f"Department #{department.id}",
         )
+
         generated_at = datetime.now(timezone.utc)
         pdf_bytes = ReportService.render_pdf(scope, payload, generated_at)
+
+        print("PDF length:", len(pdf_bytes))
+        print("PDF header:", pdf_bytes[:10])
+
         return ReportService.pdf_response(
             pdf_bytes,
             filename=f"Report_{department.name}.pdf",
@@ -1025,42 +1026,39 @@ class ReportService:
 
     @staticmethod
     def generate_organization_pdf():
-        departments = ReportService.get_organization_tree()
-        payload = ReportService.build_organization_payload(departments)
-
-        active_departments = [
-            department_payload
-            for department_payload in payload["departments"]
-            if department_payload["projects"]
-        ]
-        if not active_departments:
-            abort(404, description="Organization has no active projects")
+        organization = ReportService.get_organization_tree()
+        payload = ReportService.build_organization_payload(organization)
 
         scope = ReportScope(
             kind="organization",
-            entity_id=None,
-            title="General management report",
-            subtitle="General view - Departments, projects and tasks",
+            entity_id=organization.id if getattr(
+                organization, "id", None) else None,
+            title=f"Organization name: {organization.name}",
+            subtitle="Organization report",
         )
+
         generated_at = datetime.now(timezone.utc)
         pdf_bytes = ReportService.render_pdf(scope, payload, generated_at)
+
+        print("PDF length:", len(pdf_bytes))
+        print("PDF header:", pdf_bytes[:10])
+
         return ReportService.pdf_response(
             pdf_bytes,
-            filename="organization_report.pdf",
+            filename=f"Report_{organization.name}.pdf",
         )
 
     @staticmethod
-    def pdf_response(pdf_bytes: bytes, filename: str):
-        if not pdf_bytes:
-            abort(500, description="Generated PDF is empty")
+def pdf_response(pdf_bytes: bytes, filename: str):
+    if not pdf_bytes:
+        abort(500, description="Generated PDF is empty")
 
-        if not pdf_bytes.startswith(b"%PDF"):
-            abort(
-                500, description=f"Generated content is not a valid PDF. Header: {pdf_bytes[:20]!r}")
+    if not pdf_bytes.startswith(b"%PDF"):
+        abort(500, description=f"Generated content is not a valid PDF. Header: {pdf_bytes[:20]!r}")
 
-        return send_file(
-            BytesIO(pdf_bytes),
-            mimetype="application/pdf",
-            as_attachment=True,
-            download_name=filename,
-        )
+    return send_file(
+        BytesIO(pdf_bytes),
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name=filename,
+    )

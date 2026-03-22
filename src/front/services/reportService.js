@@ -1,16 +1,14 @@
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-console.log("BACKEND_URL:", BACKEND_URL);
 
-export const getProjectReport = async (projectId, token) => {
-  const response = await fetch(
-    `${BACKEND_URL}/api/reports/project/${projectId}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+const fetchPdf = async (url, token) => {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
+
+  const contentType = response.headers.get("content-type");
 
   if (!response.ok) {
     const text = await response.text();
@@ -18,7 +16,6 @@ export const getProjectReport = async (projectId, token) => {
     throw new Error("Error generating report");
   }
 
-  const contentType = response.headers.get("content-type");
   if (!contentType || !contentType.includes("application/pdf")) {
     const text = await response.text();
     console.error("Response is not a PDF:", text);
@@ -27,3 +24,12 @@ export const getProjectReport = async (projectId, token) => {
 
   return response.blob();
 };
+
+export const getProjectReport = (projectId, token) =>
+  fetchPdf(`${BACKEND_URL}/api/reports/project/${projectId}`, token);
+
+export const getDepartmentReport = (departmentId, token) =>
+  fetchPdf(`${BACKEND_URL}/api/reports/department/${departmentId}`, token);
+
+export const getOrganizationReport = (token) =>
+  fetchPdf(`${BACKEND_URL}/api/reports/organization`, token);
