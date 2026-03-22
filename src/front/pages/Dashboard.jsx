@@ -26,6 +26,8 @@ export const Dashboard = () => {
     });
 
     const isAdmin = store.user?.role === "admin";
+    const userRole = store.user?.role;
+    const canCreateProject = userRole === "admin" || userRole === "head";
 
     useEffect(() => {
         const loadData = async () => {
@@ -120,7 +122,7 @@ export const Dashboard = () => {
                     <Sidebar
                         activeProjects={[...store.projects.filter(p => !p.finalized)].sort((a, b) => a.id - b.id)}
                         finishedProjects={[...store.projects.filter(p => p.finalized)].sort((a, b) => a.id - b.id)}
-                        onNewProjectClick={() => openCreateModal()}
+                        onNewProjectClick={canCreateProject ? () => openCreateModal() : null}
                         onProjectSelect={(id) => dispatch({ type: "set_current_project", payload: id })}
                         selectedId={store.currentProjectId}
                         view={sidebarView}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../ModalProject/CssModalProject.css";
 import "../ModalProject/CssCard.css";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
 
 export default function ModalTask({
   isOpen,
@@ -13,6 +14,11 @@ export default function ModalTask({
   users = [],
   minDate = ""
 }) {
+  const [userSearch, setUserSearch] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [confirm, setConfirm] = useState({ isOpen: false, message: "", onConfirm: null });
+
   if (!isOpen) return null;
 
   const {
@@ -23,10 +29,6 @@ export default function ModalTask({
     alert = false,
     status = "to_do"
   } = data;
-
-  const [userSearch, setUserSearch] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
   const filteredUsers = users.filter(u =>
     `${u.first_name} ${u.last_name}`.toLowerCase().includes(userSearch.toLowerCase())
@@ -65,6 +67,7 @@ export default function ModalTask({
       <div className="modal-cyber-container" onClick={(e) => e.stopPropagation()}>
         <h3 className="modal-cyber-title">{title}</h3>
 
+        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
         {/* --- CAMPO NOMBRE --- */}
         <label className="cyber-label">Task Name</label>
         <input
@@ -180,28 +183,33 @@ export default function ModalTask({
           <label className="cyber-label mb-0">Urgent Alert</label>
         </div>
 
-        <div className="modal-cyber-footer mt-4 d-flex justify-content-between">
-          <div>
-            {data.id ? (
-              <button
-                type="button"
-                className="cyber-btn-danger"
-                style={{ padding: "8px 15px", fontSize: "0.8rem" }}
-                onClick={() => {
-                  if (window.confirm("Delete task?")) {
-                    onDelete(data.id);
-                  }
-                }}
-              >
-                Delete
-              </button>
-            ) : null}
-          </div>
-          <button type="button" className="cyber-btn-outline" onClick={onClose} disabled={isSaving}>Cancel</button>
-          <button type="button" className="cyber-btn" onClick={handleSubmit} disabled={isSaving}>
+        <div className="modal-cyber-footer mt-4" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          {data.id ? (
+            <button
+              type="button"
+              className="cyber-btn-danger"
+              style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto" }}
+              onClick={() => setConfirm({
+                isOpen: true,
+                message: "Delete this task?",
+                onConfirm: () => { setConfirm(c => ({ ...c, isOpen: false })); onDelete(data.id); }
+              })}
+            >
+              Delete
+            </button>
+          ) : <div style={{ flex: 1 }} />}
+          <button type="button" className="cyber-btn-outline" style={{ flex: 1, height: "44px", fontSize: "0.85rem" }} onClick={onClose} disabled={isSaving}>Cancel</button>
+          <button type="submit" className="cyber-btn" style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto", marginTop: 0 }} disabled={isSaving}>
             {isSaving ? "Saving..." : "Save Task"}
           </button>
         </div>
+        </form>
+        <ConfirmModal
+          isOpen={confirm.isOpen}
+          message={confirm.message}
+          onConfirm={confirm.onConfirm}
+          onCancel={() => setConfirm(c => ({ ...c, isOpen: false }))}
+        />
       </div>
     </div>
   );

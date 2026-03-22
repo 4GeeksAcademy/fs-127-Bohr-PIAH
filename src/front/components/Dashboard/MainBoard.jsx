@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Pencil, X } from "lucide-react";
-import { Link } from "react-router-dom";
 import { KanbanBoard } from "../Kanban/KanbanBoard";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalWorkPackage from "./ModalWorkPackage";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
 import { getProjectReport } from "../../services/reportService";
 import { createWorkPackage, updateWorkPackage, deleteWorkPackage } from "../../services/WorkPackageService";
+import "../ModalProject/CssModalProject.css";
 
 export const MainBoard = ({ openProjectModal }) => {
 
@@ -22,6 +23,7 @@ export const MainBoard = ({ openProjectModal }) => {
     // ESTADOS PARA EL MODAL DE CREAR WP
     const [isWpModalOpen, setIsWpModalOpen] = useState(false);
     const [wpTitleInput, setWpTitleInput] = useState("");
+    const [confirm, setConfirm] = useState({ isOpen: false, message: "", onConfirm: null });
 
     // ESTADOS PARA EL MODAL DE EDITAR/ELIMINAR WP
     const [isWpEditModalOpen, setIsWpEditModalOpen] = useState(false);
@@ -90,17 +92,23 @@ export const MainBoard = ({ openProjectModal }) => {
 
     const handleDeleteWp = async () => {
         if (!editingWp) return;
-        if (!window.confirm(`¿Eliminar "${editingWp.name}" y todas sus tareas?`)) return;
-        setIsWpSaving(true);
-        try {
-            await deleteWorkPackage(editingWp.id, store.token);
-            dispatch({ type: "delete_work_package", payload: editingWp.id });
-            setIsWpEditModalOpen(false);
-        } catch (err) {
-            console.error("Error deleting work package", err);
-        } finally {
-            setIsWpSaving(false);
-        }
+        setConfirm({
+            isOpen: true,
+            message: `Delete "${editingWp.name}" and all its tasks?`,
+            onConfirm: async () => {
+                setConfirm(c => ({ ...c, isOpen: false }));
+                setIsWpSaving(true);
+                try {
+                    await deleteWorkPackage(editingWp.id, store.token);
+                    dispatch({ type: "delete_work_package", payload: editingWp.id });
+                    setIsWpEditModalOpen(false);
+                } catch (err) {
+                    console.error("Error deleting work package", err);
+                } finally {
+                    setIsWpSaving(false);
+                }
+            }
+        });
     };
 
     return (
@@ -272,35 +280,41 @@ export const MainBoard = ({ openProjectModal }) => {
                             onChange={(e) => setWpEditTitle(e.target.value)}
                             autoFocus
                         />
-                        <div className="d-flex justify-content-between align-items-center mt-2">
+                        <div className="modal-cyber-footer mt-3" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                             <button
-                                style={{ background: "transparent", border: "1px solid #ff4d4d", color: "#ff4d4d", borderRadius: "8px", padding: "5px 14px", fontSize: "0.8rem", cursor: "pointer" }}
+                                className="cyber-btn-danger"
+                                style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto" }}
                                 onClick={handleDeleteWp}
                                 disabled={isWpSaving}
                             >
                                 Delete
                             </button>
-                            <div className="d-flex gap-2">
-                                <button
-                                    style={{ background: "transparent", border: "1px solid rgba(39,230,214,0.4)", color: "rgba(39,230,214,0.6)", borderRadius: "8px", padding: "5px 14px", fontSize: "0.8rem", cursor: "pointer" }}
-                                    onClick={() => setIsWpEditModalOpen(false)}
-                                    disabled={isWpSaving}
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    className="nav-login-cyber"
-                                    style={{ padding: "5px 14px", fontSize: "0.8rem" }}
-                                    onClick={handleSaveEditWp}
-                                    disabled={isWpSaving}
-                                >
-                                    {isWpSaving ? "Saving..." : "Save"}
-                                </button>
-                            </div>
+                            <button
+                                className="cyber-btn-outline"
+                                style={{ flex: 1, height: "44px", fontSize: "0.85rem" }}
+                                onClick={() => setIsWpEditModalOpen(false)}
+                                disabled={isWpSaving}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="cyber-btn"
+                                style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto", marginTop: 0 }}
+                                onClick={handleSaveEditWp}
+                                disabled={isWpSaving}
+                            >
+                                {isWpSaving ? "Saving..." : "Save"}
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
+        <ConfirmModal
+            isOpen={confirm.isOpen}
+            message={confirm.message}
+            onConfirm={confirm.onConfirm}
+            onCancel={() => setConfirm(c => ({ ...c, isOpen: false }))}
+        />
         </main >
     );
 };

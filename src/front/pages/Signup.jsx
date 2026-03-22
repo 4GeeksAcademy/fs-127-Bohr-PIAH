@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../components/Signup/Signup.css";
+import { toast } from "react-toastify";
 
 export const Signup = () => {
   const [formData, setFormData] = useState({
@@ -22,17 +23,16 @@ export const Signup = () => {
     e.preventDefault();
 
     if (formData.email !== formData.emailConfirm) {
-      alert("Los correos no coinciden");
+      toast.error("Emails do not match");
       return;
     }
 
     if (formData.password !== formData.passwordConfirm) {
-      alert("Las contraseñas no coinciden");
+      toast.error("Passwords do not match");
       return;
     }
 
-    console.log("Usuario registrado:", formData);
-    alert("Usuario registrado correctamente");
+    toast.success("User registered successfully");
   };
 
   return (

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../ModalProject/CssModalProject.css";
 import { X } from "lucide-react";
 
 const ModalWorkPackage = ({ isOpen, onClose, title, setTitle, onSubmit }) => {
@@ -28,15 +29,18 @@ const ModalWorkPackage = ({ isOpen, onClose, title, setTitle, onSubmit }) => {
                     <X size={20} className="text-info" style={{ cursor: "pointer" }} onClick={onClose} />
                 </div>
 
+                <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
                 <input
                     type="text" className="form-control bg-dark text-white border-info mb-3 shadow-none" placeholder="WP Name (e.g. Design)" value={title}
                     onChange={(e) => setTitle(e.target.value)} autoFocus />
 
-                <div className="d-flex gap-2 justify-content-end">
-                    <button className="nav-login-cyber" style={{ padding: "5px 15px" }} onClick={handleSubmit} disabled={isSaving}>
+                <div className="modal-cyber-footer mt-3" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                    <button type="button" className="cyber-btn-outline" style={{ flex: 1, height: "44px", fontSize: "0.85rem" }} onClick={onClose} disabled={isSaving}>Cancel</button>
+                    <button type="submit" className="cyber-btn" style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto", marginTop: 0 }} disabled={isSaving}>
                         {isSaving ? "Creating..." : "Create"}
                     </button>
                 </div>
+                </form>
             </div>
         </div>
     );

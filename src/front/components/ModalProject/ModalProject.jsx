@@ -3,6 +3,8 @@ import "./CssModalProject.css";
 import "./CssCard.css";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import { createProject, updateProject, deleteProject } from "../../services/projectService.js";
+import { toast } from "react-toastify";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
 
 const emptyForm = { nombre: "", wpDeadline: "", taskDeadline: "", users: [] };
 
@@ -18,10 +20,15 @@ export default function ModalProject({
   const { store, dispatch, actions } = useGlobalReducer();
   const [formData, setFormData] = useState(emptyForm);
   const [isSaving, setIsSaving] = useState(false);
+  const [userSearch, setUserSearch] = useState("");
+  const [showUserSuggestions, setShowUserSuggestions] = useState(false);
+  const [confirm, setConfirm] = useState({ isOpen: false, message: "", onConfirm: null });
 
   useEffect(() => {
     if (isOpen) {
       setFormData(isEdit && initialData ? initialData : emptyForm);
+      setUserSearch("");
+      setShowUserSuggestions(false);
     }
   }, [isOpen, isEdit, initialData]);
 
@@ -42,15 +49,15 @@ export default function ModalProject({
 
   const handleCreate = async () => {
     if (!effectiveDepartmentId) {
-      alert(isAdmin ? "Select a department for this project." : "No department assigned to your user.");
+      toast.error(isAdmin ? "Select a department for this project." : "No department assigned to your user.");
       return;
     }
     if (!formData.nombre?.trim()) {
-      alert("Project name is required.");
+      toast.error("Project name is required.");
       return;
     }
     if (formData.wpDeadline && formData.taskDeadline && formData.taskDeadline < formData.wpDeadline) {
-      alert("End date must be on or after start date.");
+      toast.error("End date must be on or after start date.");
       return;
     }
     setIsSaving(true);
@@ -73,7 +80,7 @@ export default function ModalProject({
       onClose();
     } catch (err) {
       console.error("Error creando proyecto", err);
-      alert(err.message || "Error creating project.");
+      toast.error(err.message || "Error creating project.");
     } finally {
       setIsSaving(false);
     }
@@ -81,7 +88,7 @@ export default function ModalProject({
 
   const handleUpdate = async () => {
     if (formData.wpDeadline && formData.taskDeadline && formData.taskDeadline < formData.wpDeadline) {
-      alert("End date must be on or after start date.");
+      toast.error("End date must be on or after start date.");
       return;
     }
     setIsSaving(true);
@@ -107,7 +114,7 @@ export default function ModalProject({
       onClose();
     } catch (err) {
       console.error("Error actualizando proyecto", err);
-      alert(err.message || "Error updating project.");
+      toast.error(err.message || "Error updating project.");
     } finally {
       setIsSaving(false);
     }
@@ -137,11 +144,18 @@ export default function ModalProject({
 
   const availableUsers = users.filter(u => !selectedUsers.includes(u.id));
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (isEdit) handleUpdate();
+    else handleCreate();
+  };
+
   return (
     <div className="modal-cyber-overlay" onClick={onClose}>
       <div className="modal-cyber-container" onClick={(e) => e.stopPropagation()}>
         <h3 className="modal-cyber-title">{isEdit ? "Edit Project" : title}</h3>
 
+        <form onSubmit={handleFormSubmit}>
         {isAdmin && !isEdit && (
           <>
             <label className="cyber-label">Department</label>
@@ -172,7 +186,15 @@ export default function ModalProject({
           className="cyber-input"
           type="date"
           value={wpDeadline}
-          onChange={(e) => onChange("wpDeadline", e.target.value)}
+          onChange={(e) => {
+            const start = e.target.value;
+            onChange("wpDeadline", start);
+            if (!isEdit && start) {
+              const end = new Date(start);
+              end.setMonth(end.getMonth() + 6);
+              onChange("taskDeadline", end.toISOString().split("T")[0]);
+            }
+          }}
         />
 
         <label className="cyber-label">End Project</label>
@@ -184,24 +206,43 @@ export default function ModalProject({
           onChange={(e) => onChange("taskDeadline", e.target.value)}
         />
 
-        {/* --- USERS DROPDOWN --- */}
+        {/* --- USERS AUTOCOMPLETE --- */}
         <h4 className="cyber-subtitle">Users</h4>
 
-        <select
-          className="cyber-input"
-          value=""
-          onChange={(e) => onAddUser(e.target.value)}
-          disabled={availableUsers.length === 0}
-        >
-          <option value="" disabled>
-            {availableUsers.length === 0 ? "No users available" : "Select a user to add..."}
-          </option>
-          {availableUsers.map(u => (
-            <option key={u.id} value={u.id}>
-              {u.first_name} {u.last_name} — {u.email}
-            </option>
-          ))}
-        </select>
+        <div style={{ position: "relative" }}>
+          <input
+            className="cyber-input"
+            type="text"
+            placeholder="Search user..."
+            value={userSearch}
+            onChange={(e) => { setUserSearch(e.target.value); setShowUserSuggestions(true); }}
+            onFocus={() => setShowUserSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowUserSuggestions(false), 150)}
+          />
+          {showUserSuggestions && userSearch && (
+            <ul style={{
+              position: "absolute", top: "100%", left: 0, right: 0, zIndex: 999,
+              background: "#1a1a2e", border: "1px solid #27E6D6", borderRadius: "4px",
+              listStyle: "none", margin: 0, padding: 0, maxHeight: "150px", overflowY: "auto"
+            }}>
+              {availableUsers
+                .filter(u => `${u.first_name} ${u.last_name} ${u.email}`.toLowerCase().includes(userSearch.toLowerCase()))
+                .map(u => (
+                  <li
+                    key={u.id}
+                    onMouseDown={() => { onAddUser(u.id); setUserSearch(""); setShowUserSuggestions(false); }}
+                    style={{ padding: "8px 12px", cursor: "pointer", color: "#e0e0e0", borderBottom: "1px solid #2a2a4a" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#27E6D620"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    {u.first_name} {u.last_name}
+                    <span style={{ fontSize: "0.75rem", color: "#888", marginLeft: "8px" }}>{u.email}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          )}
+        </div>
 
         <div className="d-flex flex-wrap gap-2 mt-2">
           {selectedUsers.map((userId, i) => (
@@ -222,52 +263,58 @@ export default function ModalProject({
           ))}
         </div>
 
-        <div className="modal-cyber-footer mt-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
-          <div className="d-flex gap-2">
-            {isEdit && (
-              <>
-                <button
-                  className="cyber-btn-danger"
-                  disabled={isSaving}
-                  onClick={() => {
-                    if (window.confirm("¿Estás seguro de eliminar este proyecto?")) {
-                      handleDelete();
-                    }
-                  }}
-                >
-                  Delete
-                </button>
-                <button
-                  className="cyber-btn"
-                  style={{ background: "rgba(39,230,214,0.15)", borderColor: "#27E6D6" }}
-                  disabled={isSaving}
-                  onClick={async () => {
-                    const newFinalized = !formData.finalized;
-                    setIsSaving(true);
-                    try {
-                      await updateProject(store.token, store.currentProjectId, { finalized: newFinalized });
-                      await actions.getUserProjects(store.user.id);
-                      onFinalizedChange?.(newFinalized);
-                    } catch (err) {
-                      console.error("Error actualizando estado del proyecto", err);
-                    } finally {
-                      setIsSaving(false);
-                    }
-                    onClose();
-                  }}
-                >
-                  {formData.finalized ? "Reactivate" : "Finished"}
-                </button>
-              </>
-            )}
-          </div>
-          <div className="d-flex gap-2">
-            <button className="cyber-btn-outline" onClick={onClose} disabled={isSaving}>Cancel</button>
-            <button className="cyber-btn" onClick={isEdit ? handleUpdate : handleCreate} disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save"}
-            </button>
-          </div>
+        <div className="modal-cyber-footer mt-4" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          {isEdit ? (
+            <>
+              <button
+                type="button"
+                className="cyber-btn-danger"
+                style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto" }}
+                disabled={isSaving}
+                onClick={() => setConfirm({
+                  isOpen: true,
+                  message: "Are you sure you want to delete this project?",
+                  onConfirm: () => { setConfirm(c => ({ ...c, isOpen: false })); handleDelete(); }
+                })}
+              >
+                Delete
+              </button>
+              <button
+                type="button"
+                className="cyber-btn-primary"
+                style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto", marginTop: 0 }}
+                disabled={isSaving}
+                onClick={async () => {
+                  const newFinalized = !formData.finalized;
+                  setIsSaving(true);
+                  try {
+                    await updateProject(store.token, store.currentProjectId, { finalized: newFinalized });
+                    await actions.getUserProjects(store.user.id);
+                    onFinalizedChange?.(newFinalized);
+                  } catch (err) {
+                    console.error("Error actualizando estado del proyecto", err);
+                  } finally {
+                    setIsSaving(false);
+                  }
+                  onClose();
+                }}
+              >
+                {formData.finalized ? "Reactivate" : "Finished"}
+              </button>
+            </>
+          ) : <div style={{ flex: 2 }} />}
+          <button type="button" className="cyber-btn-outline" style={{ flex: 1, height: "44px", fontSize: "0.85rem" }} onClick={onClose} disabled={isSaving}>Cancel</button>
+          <button type="submit" className="cyber-btn" style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto", marginTop: 0 }} disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
+          </button>
         </div>
+        </form>
+        <ConfirmModal
+          isOpen={confirm.isOpen}
+          message={confirm.message}
+          onConfirm={confirm.onConfirm}
+          onCancel={() => setConfirm(c => ({ ...c, isOpen: false }))}
+        />
       </div>
     </div>
   );
