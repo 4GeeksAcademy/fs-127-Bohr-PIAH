@@ -1001,6 +1001,13 @@ class ReportService:
             )
         )
         story.append(Spacer(1, 8))
+        story.append(
+            ReportService.wp_status_chart(
+                project_payload["work_packages"],
+                "Tasks by status per work package",
+            )
+        )
+        story.append(Spacer(1, 8))
 
         for wp in project_payload["work_packages"]:
             story.append(
@@ -1130,6 +1137,8 @@ class ReportService:
             filename=f"Report_{department.name}.pdf",
         )
 
+    ORGANIZATION = {"id": None, "name": "BOHR"}
+
     @staticmethod
     def generate_organization_pdf():
         organization = ReportService.get_organization_tree()
@@ -1137,21 +1146,17 @@ class ReportService:
 
         scope = ReportScope(
             kind="organization",
-            entity_id=organization.id if getattr(
-                organization, "id", None) else None,
-            title=f"Organization name: {organization.name}",
+            entity_id=ReportService.ORGANIZATION["id"],
+            title=f"Organization: {ReportService.ORGANIZATION['name']}",
             subtitle="Organization report",
         )
 
         generated_at = datetime.now(timezone.utc)
         pdf_bytes = ReportService.render_pdf(scope, payload, generated_at)
 
-        print("PDF length:", len(pdf_bytes))
-        print("PDF header:", pdf_bytes[:10])
-
         return ReportService.pdf_response(
             pdf_bytes,
-            filename=f"Report_{organization.name}.pdf",
+            filename=f"Report_{ReportService.ORGANIZATION['name']}.pdf",
         )
 
     @staticmethod

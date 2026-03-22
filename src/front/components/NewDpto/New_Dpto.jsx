@@ -29,9 +29,9 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
 
   const availableToAdd = allUsers.filter(u => !formDpto.user_ids.includes(u.id));
   const selectedUsers = allUsers.filter(u => formDpto.user_ids.includes(u.id));
-  const currentHead = selectedUsers.find(u => u.id === formDpto.head_id) || null;
-  // Solo usuarios con role "head" o "admin" (backend requiere uno de los dos)
-  const availableForHead = selectedUsers.filter(u => u.id !== formDpto.head_id && (u.role === "head" || u.role === "admin"));
+  const currentHead = allUsers.find(u => u.id === formDpto.head_id) || null;
+  // Todos los usuarios con role "head" o "admin" disponibles (no solo los ya miembros)
+  const availableForHead = allUsers.filter(u => u.id !== formDpto.head_id && (u.role === "head" || u.role === "admin"));
 
   const addUser = (userId) => {
     const id = Number(userId);
@@ -142,11 +142,18 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
             <select
               className="cyber-input"
               value=""
-              onChange={(e) => setFormDpto(prev => ({ ...prev, head_id: e.target.value ? Number(e.target.value) : null }))}
+              onChange={(e) => {
+                const newHeadId = Number(e.target.value);
+                setFormDpto(prev => ({
+                  ...prev,
+                  head_id: newHeadId,
+                  user_ids: prev.user_ids.includes(newHeadId) ? prev.user_ids : [...prev.user_ids, newHeadId],
+                }));
+              }}
               disabled={availableForHead.length === 0}
             >
               <option value="" disabled>
-                {availableForHead.length === 0 ? "No members with 'head' or 'admin' role available" : "Select a team lead..."}
+                {availableForHead.length === 0 ? "No users with 'head' or 'admin' role available" : "Select a team lead..."}
               </option>
               {availableForHead.map(u => (
                 <option key={u.id} value={u.id}>
@@ -170,10 +177,7 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
                   setFormDpto(prev => ({
                     ...prev,
                     head_id: newHeadId,
-                    // Quitar el team lead anterior de los miembros
-                    user_ids: prev.head_id
-                      ? prev.user_ids.filter(id => id !== prev.head_id)
-                      : prev.user_ids,
+                    user_ids: prev.user_ids.includes(newHeadId) ? prev.user_ids : [...prev.user_ids, newHeadId],
                   }));
                 }}
               >

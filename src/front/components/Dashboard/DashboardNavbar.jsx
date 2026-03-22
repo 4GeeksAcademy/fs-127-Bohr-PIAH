@@ -1,13 +1,13 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { UserDropdown } from "./UserDropdown";
 import { ProfileModal } from "../Profile/ProfileModal.jsx";
 import useGlobalReducer from "../../hooks/useGlobalReducer.jsx";
+import { getDepartmentReport, getOrganizationReport } from "../../services/reportService";
 
 export const DashboardNavbar = () => {
     const { store } = useGlobalReducer();
-    const navigate = useNavigate();
     const [showProfile, setShowProfile] = useState(false);
     const [showReportDropdown, setShowReportDropdown] = useState(false);
     const dropdownRef = useRef(null);
@@ -27,19 +27,34 @@ export const DashboardNavbar = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const handleReportNav = (path) => {
+    const handleReportDownload = async (item) => {
         setShowReportDropdown(false);
-        navigate(path);
+        try {
+            const blob = item.type === "organization"
+                ? await getOrganizationReport(store.token)
+                : await getDepartmentReport(item.id, store.token);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = item.type === "organization"
+                ? "organization_report.pdf"
+                : `department_${item.id}_report.pdf`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error("Error generating report", err);
+            alert("Error al generar el report");
+        }
     };
 
     // Items del dropdown según rol
     const reportItems = isAdmin
         ? [
-            ...(store.departments || []).map(d => ({ label: d.name, path: `/report?department_id=${d.id}` })),
-            { label: "Organization", path: "/report?scope=organization" },
+            ...(store.departments || []).map(d => ({ label: d.name, type: "department", id: d.id })),
+            { label: "Organization", type: "organization" },
           ]
         : isHead && store.currentDepartment
-        ? [{ label: store.currentDepartment.name, path: `/report?department_id=${store.currentDepartment.id}` }]
+        ? [{ label: store.currentDepartment.name, type: "department", id: store.currentDepartment.id }]
         : [];
 
     const dropdownMenuStyle = {
@@ -118,11 +133,11 @@ export const DashboardNavbar = () => {
                                             {reportItems.map((item, i) => (
                                                 <div
                                                     key={i}
-                                                    onClick={() => handleReportNav(item.path)}
+                                                    onClick={() => handleReportDownload(item)}
                                                     style={{
                                                         padding: "9px 16px",
                                                         cursor: "pointer",
-                                                        color: "#27E6D6",
+                                                        color: item.type === "organization" ? "#ffffff" : "#27E6D6",
                                                         fontSize: "0.85rem",
                                                         whiteSpace: "nowrap",
                                                     }}
