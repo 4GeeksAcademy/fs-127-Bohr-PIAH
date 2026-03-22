@@ -6,15 +6,17 @@ import { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import ModalProject from "../components/ModalProject/ModalProject"
 import { Spinner } from "../components/Spinner";
-import { getUserWithProjects } from "../services/userService.js";
 import { getDepartmentWithUsers } from "../services/departmentService.js";
+import { getAllUsers } from "../services/userService.js";
+import { getAllDepartments } from "../services/departmentService.js";
 
 export const Dashboard = () => {
 
-    const { store, dispatch } = useGlobalReducer();
+    const { store, dispatch, actions } = useGlobalReducer();
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
+    const [sidebarView, setSidebarView] = useState("active");
     const [newProjectData, setNewProjectData] = useState({
         nombre: "",
         wpDeadline: "",
@@ -23,28 +25,51 @@ export const Dashboard = () => {
         users: []
     });
 
+    const isAdmin = store.user?.role === "admin";
+    const userRole = store.user?.role;
+    const canCreateProject = userRole === "admin" || userRole === "head";
+
     useEffect(() => {
         const loadData = async () => {
-            if (!store.token || !store.user) return;
+            if (!store.token || !store.user) { setIsLoading(false); return; }
             setIsLoading(true);
 
             try {
-                const data = await getUserWithProjects(store.token, store.user.id);
-                dispatch({ type: "set_projects", payload: data.projects });
-            } catch (err) {
-                console.error("Error cargando proyectos del usuario", err);
-            }
-
-            if (store.currentDepartment && store.users.length === 0) {
                 try {
-                    const deptData = await getDepartmentWithUsers(store.token, store.currentDepartment.id);
-                    dispatch({ type: "set_users", payload: deptData.users || [] });
+                    if (isAdmin) {
+                        await actions.getProjects();
+                    } else {
+                        await actions.getUserProjects(store.user.id);
+                    }
                 } catch (err) {
-                    console.error("Error cargando usuarios del departamento", err);
+                    console.error("Error cargando proyectos", err);
                 }
-            }
 
-            setTimeout(() => setIsLoading(false), 1000);
+                try {
+                    const allUsers = await getAllUsers(store.token);
+                    dispatch({ type: "set_users", payload: allUsers });
+                } catch (err) {
+                    console.error("Error cargando usuarios", err);
+                }
+
+                if (isAdmin) {
+                    try {
+                        const allDepts = await getAllDepartments(store.token);
+                        dispatch({ type: "set_departments", payload: allDepts });
+                    } catch (err) {
+                        console.error("Error cargando departamentos", err);
+                    }
+                } else if (store.user.department_id) {
+                    try {
+                        const deptData = await getDepartmentWithUsers(store.token, store.user.department_id);
+                        dispatch({ type: "set_current_department", payload: { id: deptData.id, name: deptData.name } });
+                    } catch (err) {
+                        console.error("Error cargando departamento del usuario", err);
+                    }
+                }
+            } finally {
+                setIsLoading(false);
+            }
         };
         loadData();
     }, [store.token]);
@@ -66,13 +91,22 @@ export const Dashboard = () => {
     };
 
     const openEditModal = (project) => {
+        if (!project) {
+            openCreateModal();
+            return;
+        }
         setIsEditing(true);
+        const projectUsers = (project.users && project.users.length > 0)
+            ? project.users
+            : store.users.filter(u => project.user_projects?.some(up => up.user_id === u.id));
         setNewProjectData({
-            nombre: project.nombre,
-            wpDeadline: project.workPackages ? project.workPackages[0]?.deadline || "" : "",
-            taskDeadline: project.workPackages && project.workPackages[0]?.tasks ? project.workPackages[0].tasks[0]?.deadline || "" : "",
+            nombre: project.name || project.nombre || "",
+            wpDeadline: project.created_at ? project.created_at.slice(0, 10) : "",
+            taskDeadline: project.deadline ? project.deadline.slice(0, 10) : "",
             teamLeader: project.teamLeader || "",
-            users: project.users ? project.users.map(u => u.username) : []
+            users: projectUsers.map(u => u.id),
+            users_data: projectUsers,
+            finalized: project.finalized || false
         });
         setIsProjectModalOpen(true);
     };
@@ -86,15 +120,18 @@ export const Dashboard = () => {
 
                     {/* LADO IZQUIERDO */}
                     <Sidebar
-                        activeProjects={store.projects}
-                        onNewProjectClick={() => openCreateModal()}
+                        activeProjects={[...store.projects.filter(p => !p.finalized)].sort((a, b) => a.id - b.id)}
+                        finishedProjects={[...store.projects.filter(p => p.finalized)].sort((a, b) => a.id - b.id)}
+                        onNewProjectClick={canCreateProject ? () => openCreateModal() : null}
                         onProjectSelect={(id) => dispatch({ type: "set_current_project", payload: id })}
                         selectedId={store.currentProjectId}
+                        view={sidebarView}
+                        onViewChange={setSidebarView}
                     />
 
                     {/* LADO DERECHO */}
                     <MainBoard
-                        openProjectModal={() => openEditModal(activeProject)}
+                        openProjectModal={(project) => openEditModal(project)}
                     />
 
                 </div>
@@ -106,6 +143,7 @@ export const Dashboard = () => {
                 isEdit={isEditing}
                 initialData={newProjectData}
                 users={store.users}
+                onFinalizedChange={(isFinalized) => setSidebarView(isFinalized ? "finished" : "active")}
             />
         </div>
     );

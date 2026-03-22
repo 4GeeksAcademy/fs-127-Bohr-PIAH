@@ -1,19 +1,50 @@
-import React, { useState } from "react";
-import { Zap, ShieldAlert, Users, FileText, Rocket, ArrowLeft, Pencil } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Pencil, X } from "lucide-react";
 import { KanbanBoard } from "../Kanban/KanbanBoard";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalWorkPackage from "./ModalWorkPackage";
-import { createWorkPackage } from "../../services/WorkPackageService";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
+import { getProjectReport } from "../../services/reportService";
+import { createWorkPackage, updateWorkPackage, deleteWorkPackage } from "../../services/WorkPackageService";
+import "../ModalProject/CssModalProject.css";
 
 export const MainBoard = ({ openProjectModal }) => {
 
     const { store, dispatch } = useGlobalReducer();
     const currentProject = store.projects.find(p => p.id === store.currentProjectId);
+    const role = store.user?.role;
+    const canEditWP = role === "admin" || role === "head";
 
-    // ESTADOS PARA EL MODAL
+    // Nombre del departamento del proyecto actual
+    const currentDeptName =
+        store.departments?.find(d => d.id === currentProject?.department_id)?.name
+        || (store.currentDepartment?.id === currentProject?.department_id ? store.currentDepartment?.name : null);
+
+    // ESTADOS PARA EL MODAL DE CREAR WP
     const [isWpModalOpen, setIsWpModalOpen] = useState(false);
     const [wpTitleInput, setWpTitleInput] = useState("");
+    const [confirm, setConfirm] = useState({ isOpen: false, message: "", onConfirm: null });
+
+    // ESTADOS PARA EL MODAL DE EDITAR/ELIMINAR WP
+    const [isWpEditModalOpen, setIsWpEditModalOpen] = useState(false);
+    const [editingWp, setEditingWp] = useState(null);
+    const [wpEditTitle, setWpEditTitle] = useState("");
+    const [isWpSaving, setIsWpSaving] = useState(false);
+
+    const handleGetReport = async () => {
+        try {
+            const blob = await getProjectReport(store.currentProjectId, store.token);
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `project_${store.currentProjectId}.pdf`;
+            a.click();
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     // FUNCIÓN Guardar
     const handleAddWP = async () => {
@@ -38,6 +69,48 @@ export const MainBoard = ({ openProjectModal }) => {
         setIsWpModalOpen(false);
     };
 
+    const handleOpenEditWp = (e, wp) => {
+        e.stopPropagation();
+        setEditingWp(wp);
+        setWpEditTitle(wp.name);
+        setIsWpEditModalOpen(true);
+    };
+
+    const handleSaveEditWp = async () => {
+        if (!wpEditTitle.trim() || !editingWp) return;
+        setIsWpSaving(true);
+        try {
+            const updated = await updateWorkPackage(editingWp.id, { name: wpEditTitle.toUpperCase() }, store.token);
+            dispatch({ type: "edit_work_package", payload: { ...editingWp, name: updated.name } });
+            setIsWpEditModalOpen(false);
+        } catch (err) {
+            console.error("Error updating work package", err);
+        } finally {
+            setIsWpSaving(false);
+        }
+    };
+
+    const handleDeleteWp = async () => {
+        if (!editingWp) return;
+        setConfirm({
+            isOpen: true,
+            message: `Delete "${editingWp.name}" and all its tasks?`,
+            onConfirm: async () => {
+                setConfirm(c => ({ ...c, isOpen: false }));
+                setIsWpSaving(true);
+                try {
+                    await deleteWorkPackage(editingWp.id, store.token);
+                    dispatch({ type: "delete_work_package", payload: editingWp.id });
+                    setIsWpEditModalOpen(false);
+                } catch (err) {
+                    console.error("Error deleting work package", err);
+                } finally {
+                    setIsWpSaving(false);
+                }
+            }
+        });
+    };
+
     return (
 
         <main className="col-lg-9 col-md-8">
@@ -49,47 +122,61 @@ export const MainBoard = ({ openProjectModal }) => {
                     {/* TÍTULO DEL PROYECTO Y LAPIZ PARA EDITAR PROYECTO */}
 
                     {store.currentProjectId && (
-                        <div className="d-flex align-items-center gap-2" style={{ cursor: "pointer" }}
+                        <div className="d-flex align-items-center gap-2"
+                            style={{ cursor: canEditWP ? "pointer" : "default" }}
                             onClick={() => {
+                                if (!canEditWP) return;
                                 const project = store.projects.find(p => p.id === store.currentProjectId);
                                 openProjectModal(project);
                             }}
                         >
-                            <h2 className="section-sub-title mb-0" style={{ color: "#27E6D6", fontSize: "1 rem", letterSpacing: "1.5px", borderBottom: "2px solid rgba(39, 230, 214, 0.3)", }}>
+                            <h2 className="section-sub-title mb-0" style={{ color: "#27E6D6", fontSize: "1rem", letterSpacing: "1.5px", borderBottom: "2px solid rgba(39, 230, 214, 0.3)" }}>
                                 {store.projects.find(p => p.id === store.currentProjectId)?.name}
+                                {currentDeptName && (
+                                    <span style={{ fontSize: "0.75rem", color: "#27E6D6", opacity: 0.7, fontWeight: 400, marginLeft: "8px" }}>
+                                        — {currentDeptName}
+                                    </span>
+                                )}
                             </h2>
-                            <div style={{ padding: "2px", display: "flex", alignItems: "center" }}>
-                                <Pencil
-                                    size={16}
-                                    color="#27E6D6"
-                                    className="opacity-50 hover-opacity-100"
-                                    style={{ transition: "opacity 0.2s" }}
-                                />
-                            </div>
-
+                            {canEditWP && (
+                                <div style={{ padding: "2px", display: "flex", alignItems: "center" }}>
+                                    <Pencil
+                                        size={16}
+                                        color="#27E6D6"
+                                        className="opacity-50 hover-opacity-100"
+                                        style={{ transition: "opacity 0.2s" }}
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
                     <div className="ms-auto d-flex gap-3">
-                        <Link to="/admin" className="text-decoration-none">
+                        {/* <Link to="/admin" className="text-decoration-none">
                             <button className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>Get Report
                             </button>
-                        </Link>
-
-
+                        </Link> */}
                         <button
-                            onClick={() => {
-
-                                if (!store.currentProjectId) {
-                                    openProjectModal();
-
-                                } else {
-                                    setIsWpModalOpen(true);
-                                }
-                            }}
-
-                            className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>
-                            Add Work Package
+                            onClick={handleGetReport}
+                            className="nav-login-cyber d-flex align-items-center gap-2"
+                            style={{ padding: "8px 15px", fontSize: "0.8rem" }}
+                        >
+                            Get Report
                         </button>
+
+
+                        {canEditWP && (
+                            <button
+                                onClick={() => {
+                                    if (!store.currentProjectId) {
+                                        openProjectModal();
+                                    } else {
+                                        setIsWpModalOpen(true);
+                                    }
+                                }}
+                                className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>
+                                Add Work Package
+                            </button>
+                        )}
 
 
                     </div>
@@ -113,11 +200,12 @@ export const MainBoard = ({ openProjectModal }) => {
                     <div className="accordion accordion-flush" id="projectAccordion">
                         {currentProject?.workPackages?.map((wp) => {
 
-                            const completed = wp.tasks.filter(t =>
+                            const wpTasks = store.tasks.filter(t => t.wp_id === wp.id);
+                            const completed = wpTasks.filter(t =>
                                 t.status?.toLowerCase() === "done"
                             ).length;
 
-                            const total = wp.tasks.length;
+                            const total = wpTasks.length;
                             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
 
@@ -128,7 +216,17 @@ export const MainBoard = ({ openProjectModal }) => {
                                             type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${wp.id}`}>
 
                                             {/* TÍTULO A LA IZQUIERDA */}
-                                            <span className="section-sub-title mb-0" style={{ fontSize: "1.1rem" }}>{wp.name}</span>
+                                            <span className="section-sub-title mb-0 d-flex align-items-center gap-2" style={{ fontSize: "1.1rem" }}>
+                                                {wp.name}
+                                                {canEditWP && (
+                                                    <Pencil
+                                                        size={14}
+                                                        color="#27E6D6"
+                                                        style={{ opacity: 0.6, cursor: "pointer", flexShrink: 0 }}
+                                                        onClick={(e) => handleOpenEditWp(e, wp)}
+                                                    />
+                                                )}
+                                            </span>
 
                                             {/* BARRA A LA DERECHA */}
                                             <div className="ms-auto me-4 d-flex align-items-center" style={{ width: "160px" }}>
@@ -166,6 +264,57 @@ export const MainBoard = ({ openProjectModal }) => {
             <ModalWorkPackage
                 isOpen={isWpModalOpen} onClose={() => setIsWpModalOpen(false)} title={wpTitleInput} setTitle={setWpTitleInput} onSubmit={handleAddWP}
             />
+
+            {/* MODAL EDIT/DELETE WORK PACKAGE */}
+            {isWpEditModalOpen && (
+                <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.4)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, backdropFilter: "blur(4px)" }}>
+                    <div className="glass-card-yellow p-4 shadow-lg" style={{ width: "350px", border: "1px solid #27E6D6" }}>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <h5 className="text-white mb-0" style={{ fontSize: "1rem" }}>EDIT WORK PACKAGE</h5>
+                            <X size={20} className="text-info" style={{ cursor: "pointer" }} onClick={() => setIsWpEditModalOpen(false)} />
+                        </div>
+                        <input
+                            type="text"
+                            className="form-control bg-dark text-white border-info mb-3 shadow-none"
+                            value={wpEditTitle}
+                            onChange={(e) => setWpEditTitle(e.target.value)}
+                            autoFocus
+                        />
+                        <div className="modal-cyber-footer mt-3" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                            <button
+                                className="cyber-btn-danger"
+                                style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto" }}
+                                onClick={handleDeleteWp}
+                                disabled={isWpSaving}
+                            >
+                                Delete
+                            </button>
+                            <button
+                                className="cyber-btn-outline"
+                                style={{ flex: 1, height: "44px", fontSize: "0.85rem" }}
+                                onClick={() => setIsWpEditModalOpen(false)}
+                                disabled={isWpSaving}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="cyber-btn"
+                                style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto", marginTop: 0 }}
+                                onClick={handleSaveEditWp}
+                                disabled={isWpSaving}
+                            >
+                                {isWpSaving ? "Saving..." : "Save"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        <ConfirmModal
+            isOpen={confirm.isOpen}
+            message={confirm.message}
+            onConfirm={confirm.onConfirm}
+            onCancel={() => setConfirm(c => ({ ...c, isOpen: false }))}
+        />
         </main >
     );
 };

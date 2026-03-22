@@ -42,9 +42,6 @@ class TaskService:
                 created_at = parse_dt_utc(data["created_at"], "created_at")
             except ValueError as e:
                 abort(400, description=str(e))
-
-            if created_at > now_utc:
-                abort(400, description="created_at cannot be in the future (UTC)")
         else:
             created_at = now_utc
 
@@ -123,9 +120,6 @@ class TaskService:
                 created_at = parse_dt_utc(data["created_at"], "created_at")
             except ValueError as e:
                 abort(400, description=str(e))
-
-            if created_at > now_utc:
-                abort(400, description="created_at cannot be in the future (UTC)")
 
             current_deadline = task.deadline
             if current_deadline is not None:

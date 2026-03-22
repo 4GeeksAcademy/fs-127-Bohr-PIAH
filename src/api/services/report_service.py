@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from io import BytesIO
 from typing import Any
+import math
 
 from flask import abort, send_file
 from sqlalchemy.orm import selectinload
@@ -15,6 +16,8 @@ from api.models.work_package import WorkPackage
 
 from reportlab.lib import colors
 from reportlab.graphics.charts.barcharts import VerticalBarChart
+from reportlab.graphics.charts.barcharts import HorizontalBarChart
+from reportlab.graphics.charts.legends import Legend
 from reportlab.graphics.shapes import Drawing, String
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT
@@ -114,18 +117,22 @@ class ReportService:
 
     @staticmethod
     def task_to_dict(task: Task):
-        status = task.status.value if hasattr(
-            task.status, "value") else str(task.status)
+        raw_status = getattr(task, "status", None)
+        status = raw_status.value if hasattr(
+            raw_status, "value") else str(raw_status or "to_do")
+
+        deadline = getattr(task, "deadline", None)
+
         return {
-            "id": task.id,
-            "name": task.name,
-            "description": task.task_description,
+            "id": getattr(task, "id", None),
+            "name": getattr(task, "name", ""),
+            "description": getattr(task, "task_description", None),
             "status": status,
             "alert": bool(getattr(task, "alert", False)),
             "todo_by": getattr(task, "todo_by", None),
-            "created_at": ReportService.fmt_dt(task.created_at),
-            "deadline": ReportService.fmt_dt(task.deadline),
-            "is_overdue": ReportService.is_overdue(task.deadline, task.status),
+            "created_at": ReportService.fmt_dt(getattr(task, "created_at", None)),
+            "deadline": ReportService.fmt_dt(deadline),
+            "is_overdue": ReportService.is_overdue(deadline, raw_status),
         }
 
     @staticmethod
@@ -412,7 +419,7 @@ class ReportService:
             f"{metrics['total_tasks']} tasks, {metrics['done']} completed, "
             f"{metrics['in_progress']} in progress, {metrics['in_review']} in review, "
             f"{metrics['to_do']} to do, {metrics['overdue']} overdue, "
-            f"cmopletion rate {metrics['progress_pct']}%."
+            f"completion rate {metrics['progress_pct']}%."
         )
 
     @staticmethod
@@ -472,7 +479,7 @@ class ReportService:
                     task["status"],
                     str(task.get("todo_by") or "-"),
                     task.get("deadline") or "-",
-                    "Sí" if task.get("alert") else "No",
+                    "Yes" if task.get("alert") else "No",
                 ]
             )
 
@@ -652,6 +659,102 @@ class ReportService:
                   for department_payload in departments_payload]
         return ReportService.comparison_chart(labels, values, title, y_label)
 
+    @staticmethod
+    def wp_status_chart(work_packages: list[dict[str, Any]], title: str = "Tasks by status per work package"):
+        styles = ReportService.styles()
+
+        if not work_packages:
+            return Paragraph("No work packages to display.", styles["muted"])
+
+        labels = [ReportService.short_label(
+            wp["name"], 18) for wp in work_packages]
+
+        to_do_data = []
+        in_progress_data = []
+        in_review_data = []
+        done_data = []
+
+        max_value = 0
+
+        for wp in work_packages:
+            by_status = wp["metrics"].get("by_status", {})
+            to_do = by_status.get("to_do", 0)
+            in_progress = by_status.get("in_progress", 0)
+            in_review = by_status.get("in_review", 0)
+            done = by_status.get("done", 0)
+
+            to_do_data.append(to_do)
+            in_progress_data.append(in_progress)
+            in_review_data.append(in_review)
+            done_data.append(done)
+
+            max_value = max(max_value, to_do, in_progress, in_review, done)
+
+        # altura dinámica según número de work packages
+        chart_height = max(120, len(work_packages) * 22)
+        drawing_height = chart_height + 80
+        drawing = Drawing(500, drawing_height)
+
+        drawing.add(String(10, drawing_height - 18, title,
+                    fontName="Helvetica-Bold", fontSize=11))
+
+        chart = HorizontalBarChart()
+        chart.x = 110
+        chart.y = 25
+        chart.height = chart_height
+        chart.width = 300
+
+        chart.data = [
+            tuple(to_do_data),
+            tuple(in_progress_data),
+            tuple(in_review_data),
+            tuple(done_data),
+        ]
+
+        chart.categoryAxis.categoryNames = labels
+        chart.categoryAxis.labels.fontName = "Helvetica"
+        chart.categoryAxis.labels.fontSize = 8
+        chart.categoryAxis.labels.boxAnchor = "e"
+        chart.categoryAxis.labels.dx = -6
+
+        chart.valueAxis.valueMin = 0
+        chart.valueAxis.valueMax = max(max_value + 1, 1)
+        chart.valueAxis.valueStep = 1 if max_value <= 10 else max(
+            1, math.ceil(max_value / 5))
+
+        chart.barSpacing = 3
+        chart.groupSpacing = 8
+
+        chart.bars[0].fillColor = colors.HexColor("#9E9E9E")   # to_do
+        chart.bars[1].fillColor = colors.HexColor("#42A5F5")   # in_progress
+        chart.bars[2].fillColor = colors.HexColor("#FFB74D")   # in_review
+        chart.bars[3].fillColor = colors.HexColor("#66BB6A")   # done
+
+        drawing.add(chart)
+
+        legend = Legend()
+        legend.x = 420
+        legend.y = drawing_height - 28
+        legend.dx = 8
+        legend.dy = 8
+        legend.fontName = "Helvetica"
+        legend.fontSize = 8
+        legend.boxAnchor = "ne"
+        legend.columnMaximum = 4
+        legend.deltax = 55
+        legend.deltay = 10
+
+        legend.colorNamePairs = [
+            (colors.HexColor("#9E9E9E"), "To do"),
+            (colors.HexColor("#42A5F5"), "In progress"),
+            (colors.HexColor("#FFB74D"), "In review"),
+            (colors.HexColor("#66BB6A"), "Done"),
+        ]
+
+        drawing.add(legend)
+
+        return drawing
+
     # Decorators for pages
 
     @staticmethod
@@ -723,6 +826,13 @@ class ReportService:
             )
         )
         story.append(Spacer(1, 8))
+        story.append(
+            ReportService.wp_status_chart(
+                payload["work_packages"],
+                "Tasks by status per work package",
+            )
+        )
+        story.append(Spacer(1, 10))
 
         for wp in payload["work_packages"]:
             story.append(
@@ -891,6 +1001,13 @@ class ReportService:
             )
         )
         story.append(Spacer(1, 8))
+        story.append(
+            ReportService.wp_status_chart(
+                project_payload["work_packages"],
+                "Tasks by status per work package",
+            )
+        )
+        story.append(Spacer(1, 8))
 
         for wp in project_payload["work_packages"]:
             story.append(
@@ -976,6 +1093,7 @@ class ReportService:
     # Report generation
 
     @staticmethod
+    @staticmethod
     def generate_project_pdf(project_id: int):
         project = ReportService.get_project_tree(project_id)
         payload = ReportService.build_project_payload(project)
@@ -987,6 +1105,10 @@ class ReportService:
         )
         generated_at = datetime.now(timezone.utc)
         pdf_bytes = ReportService.render_pdf(scope, payload, generated_at)
+
+        print("PDF length:", len(pdf_bytes))
+        print("PDF header:", pdf_bytes[:10])
+
         return ReportService.pdf_response(
             pdf_bytes,
             filename=f"Report_{project.name}.pdf",
@@ -997,51 +1119,55 @@ class ReportService:
         department = ReportService.get_department_tree(department_id)
         payload = ReportService.build_department_payload(department)
 
-        if not payload["projects"]:
-            abort(
-                404, description=f"Department with id {department_id} has no active projects")
-
         scope = ReportScope(
             kind="department",
             entity_id=department.id,
-            title=f"Department report: {department.name}",
-            subtitle=f"Departamento #{department.id}",
+            title=f"Department name: {department.name}",
+            subtitle=f"Department #{department.id}",
         )
+
         generated_at = datetime.now(timezone.utc)
         pdf_bytes = ReportService.render_pdf(scope, payload, generated_at)
+
+        print("PDF length:", len(pdf_bytes))
+        print("PDF header:", pdf_bytes[:10])
+
         return ReportService.pdf_response(
             pdf_bytes,
             filename=f"Report_{department.name}.pdf",
         )
 
+    ORGANIZATION = {"id": None, "name": "BOHR"}
+
     @staticmethod
     def generate_organization_pdf():
-        departments = ReportService.get_organization_tree()
-        payload = ReportService.build_organization_payload(departments)
-
-        active_departments = [
-            department_payload
-            for department_payload in payload["departments"]
-            if department_payload["projects"]
-        ]
-        if not active_departments:
-            abort(404, description="Organization has no active projects")
+        organization = ReportService.get_organization_tree()
+        payload = ReportService.build_organization_payload(organization)
 
         scope = ReportScope(
             kind="organization",
-            entity_id=None,
-            title="General management report",
-            subtitle="General view - Departments, projects and tasks",
+            entity_id=ReportService.ORGANIZATION["id"],
+            title=f"Organization: {ReportService.ORGANIZATION['name']}",
+            subtitle="Organization report",
         )
+
         generated_at = datetime.now(timezone.utc)
         pdf_bytes = ReportService.render_pdf(scope, payload, generated_at)
+
         return ReportService.pdf_response(
             pdf_bytes,
-            filename="organization_report.pdf",
+            filename=f"Report_{ReportService.ORGANIZATION['name']}.pdf",
         )
 
     @staticmethod
     def pdf_response(pdf_bytes: bytes, filename: str):
+        if not pdf_bytes:
+            abort(500, description="Generated PDF is empty")
+
+        if not pdf_bytes.startswith(b"%PDF"):
+            abort(
+                500, description=f"Generated content is not a valid PDF. Header: {pdf_bytes[:20]!r}")
+
         return send_file(
             BytesIO(pdf_bytes),
             mimetype="application/pdf",

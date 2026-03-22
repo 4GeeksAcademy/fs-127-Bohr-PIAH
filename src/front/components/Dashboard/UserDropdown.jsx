@@ -1,9 +1,23 @@
 import { CircleUser } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 export const UserDropdown = ({ onOpenProfile }) => {
+    const { dispatch } = useGlobalReducer();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("currentDepartment");
+        dispatch({ type: "set_token", payload: null });
+        dispatch({ type: "set_user", payload: null });
+        navigate("/");
+    };
+
     return (
         <div className="dropdown ms-2">
-            <button 
+            <button
                 className="nav-login-cyber d-flex align-items-center justify-content-center"
                 type="button"
                 id="userMenu"
@@ -22,11 +36,7 @@ export const UserDropdown = ({ onOpenProfile }) => {
                         Profile Info</button>
                 </li>
 
-                <li><button className="dropdown-item py-2">
-                        Color Settings</button>
-                </li>
-
-                <li><button className="dropdown-item py-2 text-danger fw-bold">
+                <li><button className="dropdown-item py-2 text-danger fw-bold" onClick={handleLogout}>
                         Log Out</button>
                 </li>
             </ul>

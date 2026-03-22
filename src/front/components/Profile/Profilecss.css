@@ -22,37 +22,48 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 100000;
+  padding-top: 80px;
 }
 
 .modal-content {
   position: relative;
-  width: 90%;
-  max-width: 900px;
-  max-height: 90vh;
+  width: 85%;
+  max-width: 620px;
+  max-height: calc(100vh - 120px);
   overflow-y: auto;
   border-radius: 12px;
-  padding: 25px;
+  padding: 24px 24px 20px;
   animation: fadeIn 0.25s ease;
+  background: #0f1624;
   border: 1px solid rgba(255, 255, 0, 0.4);
   box-shadow: 0 0 20px rgba(255, 255, 0, 0.2);
 }
 
 .modal-close-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 14px;
+  right: 16px;
   background: transparent;
-  border: none;
-  font-size: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
   cursor: pointer;
-  color: var(--nuc);
+  color: white;
   transition: 0.2s ease;
+  z-index: 10;
 }
 
 .modal-close-btn:hover {
-  transform: scale(1.2);
+  transform: scale(1.15);
+  border-color: var(--cyber);
   color: var(--cyber);
+  box-shadow: 0 0 8px var(--cyber);
 }
 
 /* ================================
@@ -68,10 +79,80 @@
 ================================ */
 .profile-layout {
   display: grid;
-  grid-template-columns: minmax(250px, 350px) 1fr;
-  gap: 40px;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
   width: 100%;
   align-items: start;
+  margin-top: 10px;
+}
+
+.profile-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-username {
+  font-size: clamp(0.95rem, 2.5vw, 1.3rem);
+  font-weight: 700;
+  color: var(--c-nuc);
+  text-shadow: 0 0 8px var(--c-nuc);
+  margin-bottom: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-section {
+  background: #131929;
+  border: 1px solid rgba(39, 230, 214, 0.2);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.profile-section-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--c-cyber);
+  margin-bottom: 14px;
+  margin-top: 0;
+}
+
+.profile-info-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 3px;
+  display: block;
+}
+
+.profile-info-value {
+  font-size: 0.9rem;
+  color: white;
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(39, 230, 214, 0.15);
+}
+
+.profile-msg-error {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.profile-msg-success {
+  color: #2ecc71;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Responsivo */
@@ -125,28 +206,36 @@
 /* ================================
    BOTONES
 ================================ */
-.cyber-btn {
-  padding: 8px 10px;
+.cyber-btn,
+.cyber-btn-primary,
+.cyber-btn-secondary,
+.cyber-btn-success {
+  padding: 9px 12px;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.25s ease;
+  transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
   width: 100%;
   margin-top: 10px;
+  font-size: 0.85rem;
 }
 
-/* Primario */
+/* Primario / outline cyan */
+.cyber-btn,
 .cyber-btn-primary {
   background: transparent;
   border: 1px solid var(--cyber);
   color: var(--cyber);
 }
 
+.cyber-btn:hover,
 .cyber-btn-primary:hover {
   background: var(--cyber);
   color: #000;
+  box-shadow: 0 0 20px rgba(39, 230, 214, 0.5);
+  transform: translateY(-2px);
 }
 
 /* Secundario */
@@ -157,10 +246,12 @@
 }
 
 .cyber-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
 }
 
-/* Éxito */
+/* Éxito / azul */
 .cyber-btn-success {
   background: #4da3ff;
   border: none;
@@ -168,23 +259,24 @@
 }
 
 .cyber-btn-success:hover {
-  box-shadow: 0 0 10px #3bb7ff;
+  box-shadow: 0 0 20px rgba(77, 163, 255, 0.6);
+  transform: translateY(-2px);
 }
 
 /* Botón pequeño */
 .btn-small {
-  padding: 3px 6px;
+  padding: 6px 10px;
   font-size: 0.8rem;
   border-radius: 6px;
   background: var(--cyber);
   color: black;
   border: none;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .btn-small:hover {
-  background: var(--nuc);
+  box-shadow: 0 0 15px rgba(39, 230, 214, 0.5);
   transform: translateY(-2px);
 }
 

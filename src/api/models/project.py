@@ -68,6 +68,17 @@ class Project(db.Model):
 
     users = association_proxy("user_projects", "user")
 
+    def _serialize_users(self):
+        return [
+            {
+                "id": up.user.id,
+                "email": up.user.email,
+                "first_name": up.user.first_name,
+                "last_name": up.user.last_name,
+            }
+            for up in self.user_projects
+        ]
+
     def serialize(self):
         return {
             "id": self.id,
@@ -77,7 +88,8 @@ class Project(db.Model):
             "created_by": self.created_by,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "deadline": self.deadline.isoformat() if self.deadline else None,
-            "finalized": self.finalized
+            "finalized": self.finalized,
+            "users": self._serialize_users()
         }
 
     def serialize_with_wps(self):
@@ -91,4 +103,5 @@ class Project(db.Model):
             "deadline": self.deadline.isoformat() if self.deadline else None,
             "finalized": self.finalized,
             "work_packages": [wp.serialize_with_tasks() for wp in self.work_packages],
+            "users": self._serialize_users()
         }

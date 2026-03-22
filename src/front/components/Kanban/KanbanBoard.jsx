@@ -4,12 +4,19 @@ import { useState, useEffect } from "react";
 import { KanbanColumn } from "./KanbanColumn";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalTask from "./ModalTask";
+import { toast } from "react-toastify";
 import { createTask, updateTask, deleteTask, getAllTasks } from "../../services/taskService";
 import { getAllUsers } from "../../services/userService";
 
 export const KanbanBoard = ({ packageId }) => {
     const { store, dispatch } = useGlobalReducer();
+    const isGuest = store.user?.role === "guest";
     const wpTasks = store.tasks?.filter(t => t.wp_id === packageId) || [];
+    const currentProject = store.projects.find(p => p.id === store.currentProjectId);
+    const projectMinDate = currentProject?.created_at ? currentProject.created_at.slice(0, 10) : "";
+    const projectUsers = currentProject?.users?.length
+        ? store.users.filter(u => currentProject.users.some(pu => pu.id === u.id))
+        : store.users;
 
     // Cargamos usuarios al montar el componente — Añadido por Paty
     useEffect(() => {
@@ -20,25 +27,25 @@ export const KanbanBoard = ({ packageId }) => {
         }
     }, [store.token]);
 
-    const handleEnd = (event) => {
-        const { targetData, dragContext } = event;
-        const task = dragContext.item.data;
-        const newStatus = targetData.parent.id;
+    const handleDragend = async (data) => {
+        if (isGuest) return;
+        const task = data.draggedNode.data.value;
+        const newStatus = data.parent.data.config.id;
+        if (task.status === newStatus) return;
         dispatch({ type: "edit_task", payload: { ...task, status: newStatus } });
+        try {
+            await updateTask(store.token, task.id, { status: newStatus });
+        } catch (err) {
+            console.error("Error updating task status:", err);
+        }
     };
 
-    const [todoRef, todoTasks, setTodoTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "to_do"), {
-        group: "bohrTasks", id: "to_do"
-    });
-    const [progressRef, progressTasks, setProgressTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_progress"), {
-        group: "bohrTasks", id: "in_progress"
-    });
-    const [reviewRef, reviewTasks, setReviewTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_review"), {
-        group: "bohrTasks", id: "in_review"
-    });
-    const [doneRef, doneTasks, setDoneTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "done"), {
-        group: "bohrTasks", id: "done"
-    });
+    const dragOptions = (status) => ({ group: "bohrTasks", id: status, onDragend: handleDragend, disabled: isGuest });
+
+    const [todoRef, todoTasks, setTodoTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "to_do"), dragOptions("to_do"));
+    const [progressRef, progressTasks, setProgressTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_progress"), dragOptions("in_progress"));
+    const [reviewRef, reviewTasks, setReviewTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "in_review"), dragOptions("in_review"));
+    const [doneRef, doneTasks, setDoneTasks] = useDragAndDrop(wpTasks.filter(t => t.status === "done"), dragOptions("done"));
 
     // Sincronizamos el estado interno del drag-and-drop cuando cambian las tareas del store
     useEffect(() => {
@@ -60,11 +67,14 @@ export const KanbanBoard = ({ packageId }) => {
     });
 
     const handlePrepareCreateModal = () => {
+        const twoWeeks = new Date();
+        twoWeeks.setDate(twoWeeks.getDate() + 14);
+        const defaultDeadline = twoWeeks.toISOString().split("T")[0];
         setNewTaskData({
             name: "",
             task_description: "",
             todo_by: "",
-            deadline: "",
+            deadline: defaultDeadline,
             alert: false,
             status: "to_do",
             wp_id: packageId,
@@ -102,7 +112,7 @@ export const KanbanBoard = ({ packageId }) => {
             setIsTaskModalOpen(false);
         } catch (err) {
             console.error("Error completo:", err);
-            alert("Error creating task: " + err.message);
+            toast.error("Error creating task: " + err.message);
         }
     };
 
@@ -125,7 +135,7 @@ export const KanbanBoard = ({ packageId }) => {
             setIsTaskModalOpen(false);
         } catch (err) {
             console.error("Error updating task:", err);
-            alert("Error updating task: " + err.message);
+            toast.error("Error updating task: " + err.message);
         }
     };
 
@@ -137,7 +147,7 @@ export const KanbanBoard = ({ packageId }) => {
             setIsTaskModalOpen(false);
         } catch (err) {
             console.error("Error deleting task:", err);
-            alert("Error deleting task: " + err.message);
+            toast.error("Error deleting task: " + err.message);
         }
     };
 
@@ -149,8 +159,8 @@ export const KanbanBoard = ({ packageId }) => {
                 title="TO DO"
                 borderColor="border-info"
                 ledColor="#27E6D6"
-                onAddTask={handlePrepareCreateModal}
-                onEditTask={handlePrepareEditModal}
+                onAddTask={isGuest ? undefined : handlePrepareCreateModal}
+                onEditTask={isGuest ? undefined : handlePrepareEditModal}
             />
             <KanbanColumn
                 columnRef={progressRef}
@@ -158,7 +168,7 @@ export const KanbanBoard = ({ packageId }) => {
                 title="IN PROGRESS"
                 borderColor="border-warning"
                 ledColor="#ffc107"
-                onEditTask={handlePrepareEditModal}
+                onEditTask={isGuest ? undefined : handlePrepareEditModal}
             />
             <KanbanColumn
                 columnRef={reviewRef}
@@ -166,7 +176,7 @@ export const KanbanBoard = ({ packageId }) => {
                 title="IN REVIEW"
                 borderColor="border-primary"
                 ledColor="#0d6efd"
-                onEditTask={handlePrepareEditModal}
+                onEditTask={isGuest ? undefined : handlePrepareEditModal}
             />
             <KanbanColumn
                 columnRef={doneRef}
@@ -174,13 +184,14 @@ export const KanbanBoard = ({ packageId }) => {
                 title="DONE"
                 borderColor="border-success"
                 ledColor="#198754"
-                onEditTask={handlePrepareEditModal}
+                onEditTask={isGuest ? undefined : handlePrepareEditModal}
             />
             <ModalTask
                 isOpen={isTaskModalOpen}
                 onClose={() => setIsTaskModalOpen(false)}
                 data={newTaskData}
-                users={store.users}
+                users={projectUsers}
+                minDate={projectMinDate}
                 onChange={(field, val) => setNewTaskData({ ...newTaskData, [field]: val })}
                 onSubmit={newTaskData?.id ? handleSaveEditedTask : handleSaveNewTask}
                 onDelete={handleDeleteTask}

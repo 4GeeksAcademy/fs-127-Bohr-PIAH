@@ -14,7 +14,7 @@ export const KanbanTask = ({ task, onEdit }) => {
     return (
         <div className="feature-item p-2 text-white small shadow-sm w-100"
             style={{
-                cursor: "grab",
+                cursor: onEdit ? "grab" : "default",
                 background: "rgba(255, 255, 255, 0.05)",
                 border: "1px solid rgba(39, 230, 214, 0.1)",
                 borderRadius: "6px",
@@ -32,10 +32,12 @@ export const KanbanTask = ({ task, onEdit }) => {
                     {alert === true && (
                         <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ff4d4d', boxShadow: '0 0 8px #ff4d4d' }}></div>
                     )}
-                    <div style={{ cursor: "pointer", padding: "2px" }}
-                        onClick={(e) => { e.stopPropagation(); onEdit(task); }}>
-                        <Pencil size={14} color="#27E6D6" className="opacity-50" />
-                    </div>
+                    {onEdit && (
+                        <div style={{ cursor: "pointer", padding: "2px" }}
+                            onClick={(e) => { e.stopPropagation(); onEdit(task); }}>
+                            <Pencil size={14} color="#27E6D6" className="opacity-50" />
+                        </div>
+                    )}
                 </div>
             </div>
 

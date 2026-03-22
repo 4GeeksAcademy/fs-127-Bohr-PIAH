@@ -108,7 +108,8 @@ class User(db.Model):
             "email": self.email,
             "first_name": self.first_name,
             "last_name": self.last_name,
-            "role": self.role.value
+            "role": self.role.value,
+            "department_id": self.department_id
         }
 
     def serialize_with_projects(self):
@@ -118,6 +119,5 @@ class User(db.Model):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "role": self.role.value,
-            "owned_projects": [p.serialize() for p in self.owned_projects],
-            "projects": [p.serialize() for p in self.projects],
+            "projects": [p.serialize_with_wps() for p in self.projects],
         }
