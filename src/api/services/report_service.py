@@ -666,7 +666,8 @@ class ReportService:
         if not work_packages:
             return Paragraph("No work packages to display.", styles["muted"])
 
-        labels = [ReportService.short_label(wp["name"], 18) for wp in work_packages]
+        labels = [ReportService.short_label(
+            wp["name"], 18) for wp in work_packages]
 
         to_do_data = []
         in_progress_data = []
@@ -694,7 +695,8 @@ class ReportService:
         drawing_height = chart_height + 80
         drawing = Drawing(500, drawing_height)
 
-        drawing.add(String(10, drawing_height - 18, title, fontName="Helvetica-Bold", fontSize=11))
+        drawing.add(String(10, drawing_height - 18, title,
+                    fontName="Helvetica-Bold", fontSize=11))
 
         chart = HorizontalBarChart()
         chart.x = 110
@@ -717,7 +719,8 @@ class ReportService:
 
         chart.valueAxis.valueMin = 0
         chart.valueAxis.valueMax = max(max_value + 1, 1)
-        chart.valueAxis.valueStep = 1 if max_value <= 10 else max(1, math.ceil(max_value / 5))
+        chart.valueAxis.valueStep = 1 if max_value <= 10 else max(
+            1, math.ceil(max_value / 5))
 
         chart.barSpacing = 3
         chart.groupSpacing = 8
