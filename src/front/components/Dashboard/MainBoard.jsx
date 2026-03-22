@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Pencil, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { KanbanBoard } from "../Kanban/KanbanBoard";
@@ -10,6 +10,13 @@ export const MainBoard = ({ openProjectModal }) => {
 
     const { store, dispatch } = useGlobalReducer();
     const currentProject = store.projects.find(p => p.id === store.currentProjectId);
+    const role = store.user?.role;
+    const canEditWP = role === "admin" || role === "head";
+
+    // Nombre del departamento del proyecto actual
+    const currentDeptName =
+        store.departments?.find(d => d.id === currentProject?.department_id)?.name
+        || (store.currentDepartment?.id === currentProject?.department_id ? store.currentDepartment?.name : null);
 
     // ESTADOS PARA EL MODAL DE CREAR WP
     const [isWpModalOpen, setIsWpModalOpen] = useState(false);
@@ -91,24 +98,32 @@ export const MainBoard = ({ openProjectModal }) => {
                     {/* TÍTULO DEL PROYECTO Y LAPIZ PARA EDITAR PROYECTO */}
 
                     {store.currentProjectId && (
-                        <div className="d-flex align-items-center gap-2" style={{ cursor: "pointer" }}
+                        <div className="d-flex align-items-center gap-2"
+                            style={{ cursor: canEditWP ? "pointer" : "default" }}
                             onClick={() => {
+                                if (!canEditWP) return;
                                 const project = store.projects.find(p => p.id === store.currentProjectId);
                                 openProjectModal(project);
                             }}
                         >
-                            <h2 className="section-sub-title mb-0" style={{ color: "#27E6D6", fontSize: "1 rem", letterSpacing: "1.5px", borderBottom: "2px solid rgba(39, 230, 214, 0.3)", }}>
+                            <h2 className="section-sub-title mb-0" style={{ color: "#27E6D6", fontSize: "1rem", letterSpacing: "1.5px", borderBottom: "2px solid rgba(39, 230, 214, 0.3)" }}>
                                 {store.projects.find(p => p.id === store.currentProjectId)?.name}
+                                {currentDeptName && (
+                                    <span style={{ fontSize: "0.75rem", color: "#27E6D6", opacity: 0.7, fontWeight: 400, marginLeft: "8px" }}>
+                                        — {currentDeptName}
+                                    </span>
+                                )}
                             </h2>
-                            <div style={{ padding: "2px", display: "flex", alignItems: "center" }}>
-                                <Pencil
-                                    size={16}
-                                    color="#27E6D6"
-                                    className="opacity-50 hover-opacity-100"
-                                    style={{ transition: "opacity 0.2s" }}
-                                />
-                            </div>
-
+                            {canEditWP && (
+                                <div style={{ padding: "2px", display: "flex", alignItems: "center" }}>
+                                    <Pencil
+                                        size={16}
+                                        color="#27E6D6"
+                                        className="opacity-50 hover-opacity-100"
+                                        style={{ transition: "opacity 0.2s" }}
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
                     <div className="ms-auto d-flex gap-3">
@@ -118,20 +133,19 @@ export const MainBoard = ({ openProjectModal }) => {
                         </Link>
 
 
-                        <button
-                            onClick={() => {
-
-                                if (!store.currentProjectId) {
-                                    openProjectModal();
-
-                                } else {
-                                    setIsWpModalOpen(true);
-                                }
-                            }}
-
-                            className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>
-                            Add Work Package
-                        </button>
+                        {canEditWP && (
+                            <button
+                                onClick={() => {
+                                    if (!store.currentProjectId) {
+                                        openProjectModal();
+                                    } else {
+                                        setIsWpModalOpen(true);
+                                    }
+                                }}
+                                className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>
+                                Add Work Package
+                            </button>
+                        )}
 
 
                     </div>
@@ -173,12 +187,14 @@ export const MainBoard = ({ openProjectModal }) => {
                                             {/* TÍTULO A LA IZQUIERDA */}
                                             <span className="section-sub-title mb-0 d-flex align-items-center gap-2" style={{ fontSize: "1.1rem" }}>
                                                 {wp.name}
-                                                <Pencil
-                                                    size={14}
-                                                    color="#27E6D6"
-                                                    style={{ opacity: 0.6, cursor: "pointer", flexShrink: 0 }}
-                                                    onClick={(e) => handleOpenEditWp(e, wp)}
-                                                />
+                                                {canEditWP && (
+                                                    <Pencil
+                                                        size={14}
+                                                        color="#27E6D6"
+                                                        style={{ opacity: 0.6, cursor: "pointer", flexShrink: 0 }}
+                                                        onClick={(e) => handleOpenEditWp(e, wp)}
+                                                    />
+                                                )}
                                             </span>
 
                                             {/* BARRA A LA DERECHA */}

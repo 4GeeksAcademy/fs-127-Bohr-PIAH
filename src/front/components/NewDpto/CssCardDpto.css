@@ -24,7 +24,7 @@
 }
 
 .dpto-rect {
-  width: 300px;
+  width: 100%;
   max-width: 100%;
   background: var(--card-bg);
   border: 2px solid var(--accent-weak);

@@ -29,43 +29,45 @@ export const Dashboard = () => {
 
     useEffect(() => {
         const loadData = async () => {
-            if (!store.token || !store.user) return;
+            if (!store.token || !store.user) { setIsLoading(false); return; }
             setIsLoading(true);
 
             try {
+                try {
+                    if (isAdmin) {
+                        await actions.getProjects();
+                    } else {
+                        await actions.getUserProjects(store.user.id);
+                    }
+                } catch (err) {
+                    console.error("Error cargando proyectos", err);
+                }
+
+                try {
+                    const allUsers = await getAllUsers(store.token);
+                    dispatch({ type: "set_users", payload: allUsers });
+                } catch (err) {
+                    console.error("Error cargando usuarios", err);
+                }
+
                 if (isAdmin) {
-                    await actions.getProjects();
-                } else {
-                    await actions.getUserProjects(store.user.id);
+                    try {
+                        const allDepts = await getAllDepartments(store.token);
+                        dispatch({ type: "set_departments", payload: allDepts });
+                    } catch (err) {
+                        console.error("Error cargando departamentos", err);
+                    }
+                } else if (store.user.department_id) {
+                    try {
+                        const deptData = await getDepartmentWithUsers(store.token, store.user.department_id);
+                        dispatch({ type: "set_current_department", payload: { id: deptData.id, name: deptData.name } });
+                    } catch (err) {
+                        console.error("Error cargando departamento del usuario", err);
+                    }
                 }
-            } catch (err) {
-                console.error("Error cargando proyectos", err);
+            } finally {
+                setIsLoading(false);
             }
-
-            try {
-                const allUsers = await getAllUsers(store.token);
-                dispatch({ type: "set_users", payload: allUsers });
-            } catch (err) {
-                console.error("Error cargando usuarios", err);
-            }
-
-            if (isAdmin) {
-                try {
-                    const allDepts = await getAllDepartments(store.token);
-                    dispatch({ type: "set_departments", payload: allDepts });
-                } catch (err) {
-                    console.error("Error cargando departamentos", err);
-                }
-            } else if (store.user.department_id) {
-                try {
-                    const deptData = await getDepartmentWithUsers(store.token, store.user.department_id);
-                    dispatch({ type: "set_current_department", payload: { id: deptData.id, name: deptData.name } });
-                } catch (err) {
-                    console.error("Error cargando departamento del usuario", err);
-                }
-            }
-
-            setTimeout(() => setIsLoading(false), 1000);
         };
         loadData();
     }, [store.token]);
