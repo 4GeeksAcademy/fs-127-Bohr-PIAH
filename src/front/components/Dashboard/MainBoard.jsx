@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Pencil, X } from "lucide-react";
-import { Link } from "react-router-dom";
 import { KanbanBoard } from "../Kanban/KanbanBoard";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalWorkPackage from "./ModalWorkPackage";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
 import { getProjectReport } from "../../services/reportService";
 import { createWorkPackage, updateWorkPackage, deleteWorkPackage } from "../../services/WorkPackageService";
 
@@ -22,6 +22,7 @@ export const MainBoard = ({ openProjectModal }) => {
     // ESTADOS PARA EL MODAL DE CREAR WP
     const [isWpModalOpen, setIsWpModalOpen] = useState(false);
     const [wpTitleInput, setWpTitleInput] = useState("");
+    const [confirm, setConfirm] = useState({ isOpen: false, message: "", onConfirm: null });
 
     // ESTADOS PARA EL MODAL DE EDITAR/ELIMINAR WP
     const [isWpEditModalOpen, setIsWpEditModalOpen] = useState(false);
@@ -90,17 +91,23 @@ export const MainBoard = ({ openProjectModal }) => {
 
     const handleDeleteWp = async () => {
         if (!editingWp) return;
-        if (!window.confirm(`¿Eliminar "${editingWp.name}" y todas sus tareas?`)) return;
-        setIsWpSaving(true);
-        try {
-            await deleteWorkPackage(editingWp.id, store.token);
-            dispatch({ type: "delete_work_package", payload: editingWp.id });
-            setIsWpEditModalOpen(false);
-        } catch (err) {
-            console.error("Error deleting work package", err);
-        } finally {
-            setIsWpSaving(false);
-        }
+        setConfirm({
+            isOpen: true,
+            message: `Delete "${editingWp.name}" and all its tasks?`,
+            onConfirm: async () => {
+                setConfirm(c => ({ ...c, isOpen: false }));
+                setIsWpSaving(true);
+                try {
+                    await deleteWorkPackage(editingWp.id, store.token);
+                    dispatch({ type: "delete_work_package", payload: editingWp.id });
+                    setIsWpEditModalOpen(false);
+                } catch (err) {
+                    console.error("Error deleting work package", err);
+                } finally {
+                    setIsWpSaving(false);
+                }
+            }
+        });
     };
 
     return (
@@ -301,6 +308,12 @@ export const MainBoard = ({ openProjectModal }) => {
                     </div>
                 </div>
             )}
+        <ConfirmModal
+            isOpen={confirm.isOpen}
+            message={confirm.message}
+            onConfirm={confirm.onConfirm}
+            onCancel={() => setConfirm(c => ({ ...c, isOpen: false }))}
+        />
         </main >
     );
 };

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
+import ConfirmModal from "../components/ConfirmModal/ConfirmModal";
 import NewUser from "../components/NewUser/New_User.jsx";
 import NewDpto from "../components/NewDpto/New_Dpto.jsx";
 import useGlobalReducer from "../hooks/useGlobalReducer";
@@ -17,6 +19,7 @@ export const MenuAdmin = () => {
   const { store, dispatch } = useGlobalReducer();
 
   const [showNewUserForm, setShowNewUserForm] = useState(false);
+  const [confirm, setConfirm] = useState({ isOpen: false, message: "", onConfirm: null });
   const [showNewDpto, setShowNewDpto] = useState(false);
   // Inicializar con store.users si ya están cargados (evita flash vacío al navegar)
   const [allUsers, setAllUsers] = useState(store.users || []);
@@ -94,16 +97,22 @@ export const MenuAdmin = () => {
     reloadAll().catch(err => console.error("Error recargando datos", err));
   };
 
-  const handleDeleteDepartment = async (index) => {
+  const handleDeleteDepartment = (index) => {
     const dpto = store.departments[index];
-    if (!window.confirm(`¿Eliminar el departamento "${dpto.name}"?`)) return;
-    try {
-      await deleteDepartmentService(store.token, dpto.id);
-      dispatch({ type: "set_departments", payload: store.departments.filter((_, i) => i !== index) });
-    } catch (err) {
-      console.error("Error borrando departamento", err);
-      alert(err.message || "Error al eliminar el departamento.");
-    }
+    setConfirm({
+      isOpen: true,
+      message: `Delete department "${dpto.name}"?`,
+      onConfirm: async () => {
+        setConfirm(c => ({ ...c, isOpen: false }));
+        try {
+          await deleteDepartmentService(store.token, dpto.id);
+          dispatch({ type: "set_departments", payload: store.departments.filter((_, i) => i !== index) });
+        } catch (err) {
+          console.error("Error borrando departamento", err);
+          toast.error(err.message || "Error deleting the department.");
+        }
+      }
+    });
   };
 
   const handleEditDpto = async (index) => {
@@ -251,6 +260,12 @@ export const MenuAdmin = () => {
           onCreate={() => setShowNewUserForm(false)}
         />
       )}
+    <ConfirmModal
+      isOpen={confirm.isOpen}
+      message={confirm.message}
+      onConfirm={confirm.onConfirm}
+      onCancel={() => setConfirm(c => ({ ...c, isOpen: false }))}
+    />
     </div>
   );
 };

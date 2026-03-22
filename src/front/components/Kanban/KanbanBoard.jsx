@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { KanbanColumn } from "./KanbanColumn";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalTask from "./ModalTask";
+import { toast } from "react-toastify";
 import { createTask, updateTask, deleteTask, getAllTasks } from "../../services/taskService";
 import { getAllUsers } from "../../services/userService";
 
@@ -64,11 +65,14 @@ export const KanbanBoard = ({ packageId }) => {
     });
 
     const handlePrepareCreateModal = () => {
+        const twoWeeks = new Date();
+        twoWeeks.setDate(twoWeeks.getDate() + 14);
+        const defaultDeadline = twoWeeks.toISOString().split("T")[0];
         setNewTaskData({
             name: "",
             task_description: "",
             todo_by: "",
-            deadline: "",
+            deadline: defaultDeadline,
             alert: false,
             status: "to_do",
             wp_id: packageId,
@@ -106,7 +110,7 @@ export const KanbanBoard = ({ packageId }) => {
             setIsTaskModalOpen(false);
         } catch (err) {
             console.error("Error completo:", err);
-            alert("Error creating task: " + err.message);
+            toast.error("Error creating task: " + err.message);
         }
     };
 
@@ -129,7 +133,7 @@ export const KanbanBoard = ({ packageId }) => {
             setIsTaskModalOpen(false);
         } catch (err) {
             console.error("Error updating task:", err);
-            alert("Error updating task: " + err.message);
+            toast.error("Error updating task: " + err.message);
         }
     };
 
@@ -141,7 +145,7 @@ export const KanbanBoard = ({ packageId }) => {
             setIsTaskModalOpen(false);
         } catch (err) {
             console.error("Error deleting task:", err);
-            alert("Error deleting task: " + err.message);
+            toast.error("Error deleting task: " + err.message);
         }
     };
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./CssAddUser.css";
+import { toast } from "react-toastify";
 
 export default function NewUser({ onCancel, onCreate }) {
     const [formData, setFormData] = useState({
@@ -18,7 +19,7 @@ export default function NewUser({ onCancel, onCreate }) {
         e.preventDefault();
 
         if (formData.password !== formData.confirmPassword) {
-            alert("Las contraseñas no coinciden");
+            toast.error("Passwords do not match");
             return;
         }
 

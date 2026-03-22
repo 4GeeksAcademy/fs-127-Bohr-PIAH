@@ -28,15 +28,17 @@ const ModalWorkPackage = ({ isOpen, onClose, title, setTitle, onSubmit }) => {
                     <X size={20} className="text-info" style={{ cursor: "pointer" }} onClick={onClose} />
                 </div>
 
+                <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
                 <input
                     type="text" className="form-control bg-dark text-white border-info mb-3 shadow-none" placeholder="WP Name (e.g. Design)" value={title}
                     onChange={(e) => setTitle(e.target.value)} autoFocus />
 
                 <div className="d-flex gap-2 justify-content-end">
-                    <button className="nav-login-cyber" style={{ padding: "5px 15px" }} onClick={handleSubmit} disabled={isSaving}>
+                    <button type="submit" className="nav-login-cyber" style={{ padding: "5px 15px" }} disabled={isSaving}>
                         {isSaving ? "Creating..." : "Create"}
                     </button>
                 </div>
+                </form>
             </div>
         </div>
     );

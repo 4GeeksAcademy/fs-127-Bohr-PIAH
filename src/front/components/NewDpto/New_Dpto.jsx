@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import "./CssNewDpto.css";
 import "./CssCardDpto.css";
+import { toast } from "react-toastify";
+import ConfirmModal from "../ConfirmModal/ConfirmModal";
 
 export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdit = false, allUsers = [], currentUser = null }) {
+  const [confirm, setConfirm] = useState({ isOpen: false, message: "", onConfirm: null });
   const [formDpto, setFormDpto] = useState({
     department_name: "",
     user_ids: [],
@@ -42,12 +45,18 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
   const removeUser = (userId) => {
     const u = allUsers.find(u => u.id === userId);
     const name = u ? `${u.first_name} ${u.last_name}` : "este usuario";
-    if (!window.confirm(`¿Quitar a ${name} del departamento?`)) return;
-    setFormDpto(prev => ({
-      ...prev,
-      user_ids: prev.user_ids.filter(id => id !== userId),
-      head_id: prev.head_id === userId ? null : prev.head_id,
-    }));
+    setConfirm({
+      isOpen: true,
+      message: `Remove ${name} from the department?`,
+      onConfirm: () => {
+        setConfirm(c => ({ ...c, isOpen: false }));
+        setFormDpto(prev => ({
+          ...prev,
+          user_ids: prev.user_ids.filter(id => id !== userId),
+          head_id: prev.head_id === userId ? null : prev.head_id,
+        }));
+      }
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -62,7 +71,7 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
       });
     } catch (err) {
       console.error("Error guardando departamento", err);
-      alert(err.message || "Error al guardar el departamento.");
+      toast.error(err.message || "Error saving the department.");
     } finally {
       setIsSaving(false);
     }
@@ -198,6 +207,12 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
             </button>
           </div>
         </form>
+        <ConfirmModal
+          isOpen={confirm.isOpen}
+          message={confirm.message}
+          onConfirm={confirm.onConfirm}
+          onCancel={() => setConfirm(c => ({ ...c, isOpen: false }))}
+        />
       </div>
     </div>
   );

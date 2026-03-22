@@ -100,6 +100,7 @@ export const ProfileModal = ({ show, onHide }) => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Repeat the new password"
+                  onKeyDown={(e) => { if (e.key === "Enter" && !isSavingPassword && currentPassword && !passwordError) handleChangePassword(); }}
                 />
 
                 {passwordMessage && (

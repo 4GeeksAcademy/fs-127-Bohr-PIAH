@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
+import { toast } from "react-toastify";
 import { UserDropdown } from "./UserDropdown";
 import { ProfileModal } from "../Profile/ProfileModal.jsx";
 import useGlobalReducer from "../../hooks/useGlobalReducer.jsx";
@@ -43,7 +44,7 @@ export const DashboardNavbar = () => {
             window.URL.revokeObjectURL(url);
         } catch (err) {
             console.error("Error generating report", err);
-            alert("Error al generar el report");
+            toast.error("Error generating the report");
         }
     };
 
