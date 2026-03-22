@@ -112,7 +112,11 @@ class UserService:
                 selectinload(User.user_projects)
                     .selectinload(UserProject.project)
                     .selectinload(Project.work_packages)
-                    .selectinload(WorkPackage.tasks)
+                    .selectinload(WorkPackage.tasks),
+                selectinload(User.user_projects)
+                    .selectinload(UserProject.project)
+                    .selectinload(Project.user_projects)
+                    .selectinload(UserProject.user)
             )
             .filter(User.id == user_id)
             .first()

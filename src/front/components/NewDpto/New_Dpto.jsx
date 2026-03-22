@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./CssNewDpto.css";
 import "./CssCardDpto.css";
 
@@ -8,6 +8,7 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
     user_ids: [],
     head_id: null,
   });
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (isEdit && initialData) {
@@ -28,7 +29,9 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
 
   const availableToAdd = allUsers.filter(u => !formDpto.user_ids.includes(u.id));
   const selectedUsers = allUsers.filter(u => formDpto.user_ids.includes(u.id));
-  const eligibleLeaders = selectedUsers.filter(u => u.role === "admin" || u.role === "head");
+  const currentHead = selectedUsers.find(u => u.id === formDpto.head_id) || null;
+  // Solo usuarios con role "head" o "admin" (backend requiere uno de los dos)
+  const availableForHead = selectedUsers.filter(u => u.id !== formDpto.head_id && (u.role === "head" || u.role === "admin"));
 
   const addUser = (userId) => {
     const id = Number(userId);
@@ -37,6 +40,9 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
   };
 
   const removeUser = (userId) => {
+    const u = allUsers.find(u => u.id === userId);
+    const name = u ? `${u.first_name} ${u.last_name}` : "este usuario";
+    if (!window.confirm(`¿Quitar a ${name} del departamento?`)) return;
     setFormDpto(prev => ({
       ...prev,
       user_ids: prev.user_ids.filter(id => id !== userId),
@@ -44,10 +50,9 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
     }));
   };
 
-  const [isSaving, setIsSaving] = useState(false);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formDpto.department_name.trim()) return;
     setIsSaving(true);
     try {
       await onCreate({
@@ -55,6 +60,9 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
         user_ids: formDpto.user_ids,
         head_id: formDpto.head_id,
       });
+    } catch (err) {
+      console.error("Error guardando departamento", err);
+      alert(err.message || "Error al guardar el departamento.");
     } finally {
       setIsSaving(false);
     }
@@ -66,10 +74,16 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
     borderRadius: "4px", padding: "4px 10px", color: "#e0e0e0", fontSize: "0.875rem"
   };
 
+  const headChipStyle = {
+    ...chipStyle,
+    border: "1px solid #8be0ff",
+    background: "rgba(116,185,255,0.08)",
+  };
+
   return (
     <div className="modal-overlay-cyber">
       <div className="modal-cyber-box">
-        <button className="modal-cyber-close" onClick={onCancel}>✕</button>
+        <button className="modal-cyber-close" onClick={onCancel} disabled={isSaving}>✕</button>
         <h3 className="modal-cyber-title">{isEdit ? "Edit Department" : "New Department"}</h3>
 
         <form className="cyber-form" onSubmit={handleSubmit}>
@@ -78,7 +92,7 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
             type="text"
             className="cyber-input"
             value={formDpto.department_name}
-            onChange={(e) => setFormDpto({ ...formDpto, department_name: e.target.value })}
+            onChange={(e) => setFormDpto(prev => ({ ...prev, department_name: e.target.value }))}
             required
           />
 
@@ -111,24 +125,66 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
             ))}
           </div>
 
-          <label className="cyber-label mt-3">Team Leader</label>
-          {eligibleLeaders.length === 0 ? (
-            <p style={{ color: "#888", fontSize: "0.85rem", margin: "4px 0" }}>
-              Add members with role admin or head to assign a leader.
-            </p>
+          {/* TEAM LEAD — uno solo */}
+          <label className="cyber-label mt-3">Team Lead</label>
+
+          {currentHead ? (
+            <div className="d-flex align-items-center gap-2 mt-1">
+              <span style={headChipStyle}>
+                {currentHead.first_name} {currentHead.last_name}
+                <span
+                  onClick={() => setFormDpto(prev => ({ ...prev, head_id: null }))}
+                  style={{ cursor: "pointer", color: "#ff4d4d", fontWeight: "bold", lineHeight: 1 }}
+                >✕</span>
+              </span>
+            </div>
           ) : (
             <select
               className="cyber-input"
-              value={formDpto.head_id || ""}
-              onChange={(e) => setFormDpto({ ...formDpto, head_id: e.target.value ? Number(e.target.value) : null })}
+              value=""
+              onChange={(e) => setFormDpto(prev => ({ ...prev, head_id: e.target.value ? Number(e.target.value) : null }))}
+              disabled={availableForHead.length === 0}
             >
-              <option value="">None</option>
-              {eligibleLeaders.map(u => (
+              <option value="" disabled>
+                {availableForHead.length === 0 ? "No members with 'head' or 'admin' role available" : "Select a team lead..."}
+              </option>
+              {availableForHead.map(u => (
                 <option key={u.id} value={u.id}>
-                  {u.first_name} {u.last_name}
+                  {u.first_name} {u.last_name} — {u.email}
                 </option>
               ))}
             </select>
+          )}
+
+          {/* Si hay head asignado, mostrar dropdown para cambiarlo */}
+          {currentHead && availableForHead.length > 0 && (
+            <>
+              <label className="cyber-label mt-2" style={{ fontSize: "0.8rem", color: "#888" }}>
+                Change team lead
+              </label>
+              <select
+                className="cyber-input"
+                value=""
+                onChange={(e) => {
+                  const newHeadId = Number(e.target.value);
+                  setFormDpto(prev => ({
+                    ...prev,
+                    head_id: newHeadId,
+                    // Quitar el team lead anterior de los miembros
+                    user_ids: prev.head_id
+                      ? prev.user_ids.filter(id => id !== prev.head_id)
+                      : prev.user_ids,
+                  }));
+                }}
+              >
+                <option value="" disabled>Select another member...</option>
+                {availableForHead.map(u => (
+                  <option key={u.id} value={u.id}>
+                    {u.first_name} {u.last_name} — {u.email}
+                  </option>
+                ))}
+              </select>
+            </>
           )}
 
           <div className="modal-cyber-footer">

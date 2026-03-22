@@ -23,7 +23,7 @@ export default function ModalProject({
     if (isOpen) {
       setFormData(isEdit && initialData ? initialData : emptyForm);
     }
-  }, [isOpen, isEdit]);
+  }, [isOpen, isEdit, initialData]);
 
   if (!isOpen) return null;
 
@@ -36,38 +36,81 @@ export default function ModalProject({
   };
   const onDeleteUser = (index) => setFormData(prev => ({ ...prev, users: prev.users.filter((_, i) => i !== index) }));
 
+  const today = new Date().toISOString().split("T")[0];
+  const isAdmin = store.user?.role === "admin";
+  const effectiveDepartmentId = isAdmin ? formData.department_id : store.currentDepartment?.id;
+
   const handleCreate = async () => {
+    if (!effectiveDepartmentId) {
+      alert(isAdmin ? "Select a department for this project." : "No department assigned to your user.");
+      return;
+    }
+    if (!formData.nombre?.trim()) {
+      alert("Project name is required.");
+      return;
+    }
+    if (formData.wpDeadline && formData.taskDeadline && formData.taskDeadline < formData.wpDeadline) {
+      alert("End date must be on or after start date.");
+      return;
+    }
     setIsSaving(true);
     try {
+      const user_emails = (formData.users || [])
+        .map(id => users.find(u => u.id === id)?.email)
+        .filter(Boolean);
       const data = await createProject(store.token, {
         name: formData.nombre,
-        department_id: store.currentDepartment?.id || null,
+        department_id: effectiveDepartmentId,
         created_by: store.user.id,
-        deadline: formData.taskDeadline || null,
+        created_at: formData.wpDeadline ? `${formData.wpDeadline}T00:00:00` : null,
+        deadline: formData.taskDeadline ? `${formData.taskDeadline}T23:59:59` : null,
+        user_emails,
       });
       if (data) {
-        dispatch({ type: "add_project", payload: data });
+        dispatch({ type: "add_project", payload: { ...data, workPackages: [] } });
         dispatch({ type: "set_current_project", payload: data.id });
       }
+      onClose();
     } catch (err) {
       console.error("Error creando proyecto", err);
+      alert(err.message || "Error creating project.");
     } finally {
       setIsSaving(false);
     }
-    onClose();
   };
 
   const handleUpdate = async () => {
+    if (formData.wpDeadline && formData.taskDeadline && formData.taskDeadline < formData.wpDeadline) {
+      alert("End date must be on or after start date.");
+      return;
+    }
     setIsSaving(true);
     try {
-      await updateProject(store.token, store.currentProjectId, formData);
+      const selectedEmails = (formData.users || [])
+        .map(id => users.find(u => u.id === id)?.email)
+        .filter(Boolean);
+      // Ensure the current user is never removed from their own project
+      const currentUserEmail = store.user?.email;
+      const user_emails = currentUserEmail && !selectedEmails.includes(currentUserEmail)
+        ? [...selectedEmails, currentUserEmail]
+        : selectedEmails;
+      await updateProject(store.token, store.currentProjectId, {
+        name: formData.nombre,
+        created_at: formData.wpDeadline ? `${formData.wpDeadline}T00:00:00` : null,
+        deadline: formData.taskDeadline ? `${formData.taskDeadline}T23:59:59` : null,
+        finalized: formData.finalized,
+        user_emails,
+      });
+      const savedProjectId = store.currentProjectId;
       await actions.getUserProjects(store.user.id);
+      dispatch({ type: "validate_current_project", payload: savedProjectId });
+      onClose();
     } catch (err) {
       console.error("Error actualizando proyecto", err);
+      alert(err.message || "Error updating project.");
     } finally {
       setIsSaving(false);
     }
-    onClose();
   };
 
   const handleDelete = async () => {
@@ -86,7 +129,10 @@ export default function ModalProject({
 
   const getUserName = (id) => {
     const user = users.find(u => u.id === id);
-    return user ? `${user.first_name} ${user.last_name}` : "";
+    if (user) return `${user.first_name} ${user.last_name}`;
+    // Fallback: search in initialData.users_data if store.users hasn't loaded yet
+    const fromInitial = initialData?.users_data?.find(u => u.id === id);
+    return fromInitial ? `${fromInitial.first_name} ${fromInitial.last_name}` : `User #${id}`;
   };
 
   const availableUsers = users.filter(u => !selectedUsers.includes(u.id));
@@ -96,11 +142,28 @@ export default function ModalProject({
       <div className="modal-cyber-container" onClick={(e) => e.stopPropagation()}>
         <h3 className="modal-cyber-title">{isEdit ? "Edit Project" : title}</h3>
 
+        {isAdmin && !isEdit && (
+          <>
+            <label className="cyber-label">Department</label>
+            <select
+              className="cyber-input"
+              value={formData.department_id || ""}
+              onChange={(e) => onChange("department_id", Number(e.target.value))}
+            >
+              <option value="" disabled>Select a department...</option>
+              {store.departments.map(d => (
+                <option key={d.id} value={d.id}>{d.name}</option>
+              ))}
+            </select>
+          </>
+        )}
+
         <label className="cyber-label">Project</label>
         <input
           className="cyber-input"
           type="text"
           value={nombre}
+          maxLength={255}
           onChange={(e) => onChange("nombre", e.target.value)}
         />
 
@@ -117,6 +180,7 @@ export default function ModalProject({
           className="cyber-input"
           type="date"
           value={taskDeadline}
+          min={wpDeadline || today}
           onChange={(e) => onChange("taskDeadline", e.target.value)}
         />
 

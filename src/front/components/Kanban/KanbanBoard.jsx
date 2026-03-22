@@ -10,6 +10,11 @@ import { getAllUsers } from "../../services/userService";
 export const KanbanBoard = ({ packageId }) => {
     const { store, dispatch } = useGlobalReducer();
     const wpTasks = store.tasks?.filter(t => t.wp_id === packageId) || [];
+    const currentProject = store.projects.find(p => p.id === store.currentProjectId);
+    const projectMinDate = currentProject?.created_at ? currentProject.created_at.slice(0, 10) : "";
+    const projectUsers = currentProject?.users?.length
+        ? store.users.filter(u => currentProject.users.some(pu => pu.id === u.id))
+        : store.users;
 
     // Cargamos usuarios al montar el componente — Añadido por Paty
     useEffect(() => {
@@ -179,7 +184,8 @@ export const KanbanBoard = ({ packageId }) => {
                 isOpen={isTaskModalOpen}
                 onClose={() => setIsTaskModalOpen(false)}
                 data={newTaskData}
-                users={store.users}
+                users={projectUsers}
+                minDate={projectMinDate}
                 onChange={(field, val) => setNewTaskData({ ...newTaskData, [field]: val })}
                 onSubmit={newTaskData?.id ? handleSaveEditedTask : handleSaveNewTask}
                 onDelete={handleDeleteTask}
