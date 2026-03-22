@@ -1,8 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { X } from "lucide-react";
 
 const ModalWorkPackage = ({ isOpen, onClose, title, setTitle, onSubmit }) => {
+    const [isSaving, setIsSaving] = useState(false);
+
     if (!isOpen) return null;
+
+    const handleSubmit = async () => {
+        setIsSaving(true);
+        try {
+            await onSubmit();
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     return (
 
@@ -22,7 +33,9 @@ const ModalWorkPackage = ({ isOpen, onClose, title, setTitle, onSubmit }) => {
                     onChange={(e) => setTitle(e.target.value)} autoFocus />
 
                 <div className="d-flex gap-2 justify-content-end">
-                    <button className="nav-login-cyber" style={{ padding: "5px 15px" }} onClick={onSubmit}>Create</button>
+                    <button className="nav-login-cyber" style={{ padding: "5px 15px" }} onClick={handleSubmit} disabled={isSaving}>
+                        {isSaving ? "Creating..." : "Create"}
+                    </button>
                 </div>
             </div>
         </div>

@@ -118,6 +118,5 @@ class User(db.Model):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "role": self.role.value,
-            "owned_projects": [p.serialize() for p in self.owned_projects],
-            "projects": [p.serialize() for p in self.projects],
+            "projects": [p.serialize_with_wps() for p in self.projects],
         }

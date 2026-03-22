@@ -1,20 +1,23 @@
 import { CircleUser } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 export const UserDropdown = ({ onOpenProfile }) => {
+    const { dispatch } = useGlobalReducer();
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        // Si guardas un token en localStorage, lo borras aquí
         localStorage.removeItem("token");
-
-        // Redirige al home
+        localStorage.removeItem("user");
+        localStorage.removeItem("currentDepartment");
+        dispatch({ type: "set_token", payload: null });
+        dispatch({ type: "set_user", payload: null });
         navigate("/");
     };
 
     return (
         <div className="dropdown ms-2">
-            <button 
+            <button
                 className="nav-login-cyber d-flex align-items-center justify-content-center"
                 type="button"
                 id="userMenu"

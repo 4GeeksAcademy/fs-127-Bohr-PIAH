@@ -21,7 +21,12 @@ sqlalchemy = "*"
 flask-migrate = "*"
 bcrypt = "*"
 resend = "*"
+<<<<<<< HEAD
 flask = "*"
+=======
+reportlab = "*"
+faker = "*"
+>>>>>>> 4222f4f07f12a541e65723a651acb81dfe507fdd
 
 [requires]
 python_version = "3.13"

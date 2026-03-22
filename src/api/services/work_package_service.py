@@ -19,8 +19,8 @@ class WorkPackageService:
 
         data = work_package.serialize()
 
-        completion = WorkPackageService.get_completion_status(work_package_id)
-        data["completion_status"] = completion["completion_status"]
+        # completion = WorkPackageService.get_completion_status(work_package_id)
+        # data["completion_status"] = completion["completion_status"]
 
         return data
 

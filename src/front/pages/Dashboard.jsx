@@ -1,16 +1,12 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import { DashboardNavbar } from "../components/Dashboard/DashboardNavbar";
 import { Sidebar } from "../components/Dashboard/Sidebar";
 import { MainBoard } from "../components/Dashboard/MainBoard"
-import { Orbit, UserCheck, Zap, ShieldAlert, BarChart3, Settings } from "lucide-react";
-import { BohrLogo } from "../components/BohrLogo";
 import { useState } from "react";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import ModalProject from "../components/ModalProject/ModalProject"
-import { useActionState } from "react";
 import { Spinner } from "../components/Spinner";
-import { createProject, updateProject, deleteProject, getAllProjects } from "../services/projectService.js";
+import { getDepartmentWithUsers } from "../services/departmentService.js";
 
 export const Dashboard = () => {
 
@@ -18,9 +14,7 @@ export const Dashboard = () => {
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
-
-
-
+    const [sidebarView, setSidebarView] = useState("active");
     const [newProjectData, setNewProjectData] = useState({
         nombre: "",
         wpDeadline: "",
@@ -30,25 +24,31 @@ export const Dashboard = () => {
     });
 
 
-    const activeProject = store.projects.find(p => p.id === store.currentProjectId);
-
-    const projectsToShow = store.projects || [];
-
-
-
-    // useEffect // MODIFICADO POR PATY//
-
     useEffect(() => {
         const loadData = async () => {
-            if (!store.token) return; // ← espera a que haya token
+            if (!store.token || !store.user) return;
             setIsLoading(true);
-            await actions.getProjects();
+
+            try {
+                await actions.getUserProjects(store.user.id);
+            } catch (err) {
+                console.error("Error cargando proyectos del usuario", err);
+            }
+
+            if (store.currentDepartment && store.users.length === 0) {
+                try {
+                    const deptData = await getDepartmentWithUsers(store.token, store.currentDepartment.id);
+                    dispatch({ type: "set_users", payload: deptData.users || [] });
+                } catch (err) {
+                    console.error("Error cargando usuarios del departamento", err);
+                }
+            }
+
             setTimeout(() => setIsLoading(false), 1000);
         };
         loadData();
     }, [store.token]);
 
-    // SI ESTÁ CARGANDO, MUESTRA EL SPINNER
     if (isLoading) {
         return <Spinner />;
     }
@@ -68,77 +68,15 @@ export const Dashboard = () => {
     const openEditModal = (project) => {
         setIsEditing(true);
         setNewProjectData({
-            nombre: project.nombre,
+            nombre: project.name || project.nombre || "",
             wpDeadline: project.workPackages ? project.workPackages[0]?.deadline || "" : "",
             taskDeadline: project.workPackages && project.workPackages[0]?.tasks ? project.workPackages[0].tasks[0]?.deadline || "" : "",
             teamLeader: project.teamLeader || "",
-            users: project.users ? project.users.map(u => u.username) : []
+            users: project.users ? project.users.map(u => u.username) : [],
+            finalized: project.finalized || false
         });
         setIsProjectModalOpen(true);
-    }
-
-
-
-
-    //MODIFICADO POR PATY//
-    const handleAddProject = async () => {
-        try {
-            const data = await createProject(store.token, {
-                name: newProjectData.nombre,
-                department_id: 4, // temporal - departamento BOHR
-                created_by: store.user.id,
-                deadline: newProjectData.taskDeadline || null,
-            });
-            if (data) {
-                dispatch({ type: "add_project", payload: data });
-                dispatch({ type: "set_current_project", payload: data.id });
-            }
-        } catch (err) {
-            console.error("Error creando proyecto", err);
-        }
-        setIsProjectModalOpen(false);
-        setNewProjectData({ nombre: "", wpDeadline: "", taskDeadline: "", teamLeader: "", users: [] });
     };
-
-
-    const handleUpdateProject = async () => {
-        try {
-            await updateProject(store.token, store.currentProjectId, newProjectData);
-            await actions.getProjects();
-        } catch (err) {
-            console.error("Error actualizando proyecto", err);
-        }
-        setIsProjectModalOpen(false);
-    };
-
-    const handleDeleteProject = async () => {
-        try {
-            await deleteProject(store.token, store.currentProjectId);
-            dispatch({ type: "set_current_project", payload: null });
-            await actions.getProjects();
-        }
-        catch (err) {
-            console.error("Error eliminando proyecto", err);
-        }
-        setIsProjectModalOpen(false);
-    };
-
-
-
-    //DIN MODIFICACION PATY//
-
-
-    // Sacamos sus Work Packages reales. Si no hay, devolvemos un array vacío.
-    const realWPs = activeProject?.workPackages || [];
-
-    // Si hay reales, usamos esos. Si no, usamos tus ejemplos (workModes).
-    const workModesToShow = activeProject ? (activeProject.workPackages || []) : [];
-
-
-
-
-
-
 
     return (
         <div className="home-wrapper v1 dashboard-container">
@@ -148,43 +86,31 @@ export const Dashboard = () => {
                 <div className="row g-4 px-md-4">
 
                     {/* LADO IZQUIERDO */}
-                    <Sidebar 
-                        activeProjects={projectsToShow}
-                        onNewProjectClick={() => openCreateModal()} 
+                    <Sidebar
+                        activeProjects={store.projects.filter(p => !p.finalized)}
+                        finishedProjects={store.projects.filter(p => p.finalized)}
+                        onNewProjectClick={() => openCreateModal()}
                         onProjectSelect={(id) => dispatch({ type: "set_current_project", payload: id })}
-                        selectedId={store.currentProjectId} 
+                        selectedId={store.currentProjectId}
+                        view={sidebarView}
+                        onViewChange={setSidebarView}
                     />
 
-
                     {/* LADO DERECHO */}
-                    <MainBoard workModes={workModesToShow} openProjectModal={() => openEditModal(activeProject)}
-                        projectName={activeProject?.nombre} 
-                        />
+                    <MainBoard
+                        openProjectModal={(project) => openEditModal(project)}
+                    />
 
                 </div>
             </div>
+
             <ModalProject
                 isOpen={isProjectModalOpen}
                 onClose={() => setIsProjectModalOpen(false)}
                 isEdit={isEditing}
-                data={newProjectData}
-                onChange={(field, val) => setNewProjectData({ ...newProjectData, [field]: val })}
-                onAddUser={() => setNewProjectData({ ...newProjectData, users: [...newProjectData.users, ""] })}
-                onChangeUser={(index, val) => {
-                    const updated = [...newProjectData.users];
-                    updated[index] = val;
-                    setNewProjectData({ ...newProjectData, users: updated });
-                }}
-
-            
-
-                onDeleteUser={(index) => {
-                    const filtered = newProjectData.users.filter((_, i) => i !== index);
-                    setNewProjectData({ ...newProjectData, users: filtered });
-                }}
-                onChangeLeader={(val) => setNewProjectData({ ...newProjectData, teamLeader: val })}
-               onSubmit={isEditing ? handleUpdateProject : handleAddProject}
-                onDeleteProject={handleDeleteProject}
+                initialData={newProjectData}
+                users={store.users}
+                onFinalizedChange={(isFinalized) => setSidebarView(isFinalized ? "finished" : "active")}
             />
         </div>
     );

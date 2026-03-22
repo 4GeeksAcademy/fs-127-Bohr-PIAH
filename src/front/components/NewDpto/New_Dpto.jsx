@@ -2,55 +2,68 @@ import React, { useState, useEffect } from "react";
 import "./CssNewDpto.css";
 import "./CssCardDpto.css";
 
-export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdit = false }) {
+export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdit = false, allUsers = [], currentUser = null }) {
   const [formDpto, setFormDpto] = useState({
     department_name: "",
-    leader: [""],
-    staf: [""],
+    user_ids: [],
+    head_id: null,
   });
 
   useEffect(() => {
-    if (initialData) {
+    if (isEdit && initialData) {
       setFormDpto({
         department_name: initialData.department_name || "",
-        leader: Array.isArray(initialData.leader) && initialData.leader.length ? initialData.leader : [""],
-        staf: Array.isArray(initialData.staf) && initialData.staf.length ? initialData.staf : [""],
+        user_ids: Array.isArray(initialData.user_ids) ? initialData.user_ids : [],
+        head_id: initialData.head_id || null,
+      });
+    } else if (!isEdit && currentUser) {
+      const canBeHead = currentUser.role === "admin" || currentUser.role === "head";
+      setFormDpto({
+        department_name: "",
+        user_ids: [currentUser.id],
+        head_id: canBeHead ? currentUser.id : null,
       });
     }
-  }, [initialData]);
+  }, [isEdit, initialData, currentUser]);
 
-  const handleChangeDpto = (e) => {
-    setFormDpto({
-      ...formDpto,
-      department_name: e.target.value
-    });
+  const availableToAdd = allUsers.filter(u => !formDpto.user_ids.includes(u.id));
+  const selectedUsers = allUsers.filter(u => formDpto.user_ids.includes(u.id));
+  const eligibleLeaders = selectedUsers.filter(u => u.role === "admin" || u.role === "head");
+
+  const addUser = (userId) => {
+    const id = Number(userId);
+    if (!id || formDpto.user_ids.includes(id)) return;
+    setFormDpto(prev => ({ ...prev, user_ids: [...prev.user_ids, id] }));
   };
 
-  const handleStafChange = (index, value) => {
-    const newStaf = [...formDpto.staf];
-    newStaf[index] = value;
-    setFormDpto({ ...formDpto, staf: newStaf });
+  const removeUser = (userId) => {
+    setFormDpto(prev => ({
+      ...prev,
+      user_ids: prev.user_ids.filter(id => id !== userId),
+      head_id: prev.head_id === userId ? null : prev.head_id,
+    }));
   };
 
-  const handleLiderChange = (index, value) => {
-    const newLider = [...formDpto.leader];
-    newLider[index] = value;
-    setFormDpto({ ...formDpto, leader: newLider });
-  };
+  const [isSaving, setIsSaving] = useState(false);
 
-  const addStaf = () => {
-    setFormDpto({ ...formDpto, staf: [...formDpto.staf, ""] });
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Opcional: limpiar entradas vacías antes de enviar
-    const cleaned = {
-      department_name: formDpto.department_name.trim(),
-      leader: formDpto.leader.filter(x => x && x.trim() !== "").map(x => x.trim()),
-      staf: formDpto.staf.filter(x => x && x.trim() !== "").map(x => x.trim())
-    };
-    onCreate(cleaned);
+    setIsSaving(true);
+    try {
+      await onCreate({
+        department_name: formDpto.department_name.trim(),
+        user_ids: formDpto.user_ids,
+        head_id: formDpto.head_id,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const chipStyle = {
+    display: "inline-flex", alignItems: "center", gap: "6px",
+    background: "#1a1a2e", border: "1px solid #27E6D6",
+    borderRadius: "4px", padding: "4px 10px", color: "#e0e0e0", fontSize: "0.875rem"
   };
 
   return (
@@ -65,39 +78,64 @@ export default function New_Dpto({ onCancel, onCreate, initialData = null, isEdi
             type="text"
             className="cyber-input"
             value={formDpto.department_name}
-            onChange={handleChangeDpto}
+            onChange={(e) => setFormDpto({ ...formDpto, department_name: e.target.value })}
             required
           />
 
-          <label className="cyber-label">Team leader</label>
-          {formDpto.leader.map((person, index) => (
-            <input
-              key={index}
-              type="text"
-              className="cyber-input mb-2"
-              value={person}
-              onChange={(e) => handleLiderChange(index, e.target.value)}
-              required
-            />
-          ))}
+          <label className="cyber-label">Team members</label>
+          <select
+            className="cyber-input"
+            value=""
+            onChange={(e) => addUser(e.target.value)}
+            disabled={availableToAdd.length === 0}
+          >
+            <option value="" disabled>
+              {availableToAdd.length === 0 ? "No more users available" : "Add a member..."}
+            </option>
+            {availableToAdd.map(u => (
+              <option key={u.id} value={u.id}>
+                {u.first_name} {u.last_name} — {u.email}
+              </option>
+            ))}
+          </select>
 
-          <label className="cyber-label">Team</label>
-          {formDpto.staf.map((person, index) => (
-            <input
-              key={index}
-              type="text"
-              className="cyber-input mb-2"
-              value={person}
-              onChange={(e) => handleStafChange(index, e.target.value)}
-              required
-            />
-          ))}
+          <div className="d-flex flex-wrap gap-2 mt-2">
+            {selectedUsers.map(u => (
+              <span key={u.id} style={chipStyle}>
+                {u.first_name} {u.last_name}
+                <span
+                  onClick={() => removeUser(u.id)}
+                  style={{ cursor: "pointer", color: "#ff4d4d", fontWeight: "bold", lineHeight: 1 }}
+                >✕</span>
+              </span>
+            ))}
+          </div>
 
-          <button type="button" className="cyber-btn-success" onClick={addStaf}>Add member</button>
+          <label className="cyber-label mt-3">Team Leader</label>
+          {eligibleLeaders.length === 0 ? (
+            <p style={{ color: "#888", fontSize: "0.85rem", margin: "4px 0" }}>
+              Add members with role admin or head to assign a leader.
+            </p>
+          ) : (
+            <select
+              className="cyber-input"
+              value={formDpto.head_id || ""}
+              onChange={(e) => setFormDpto({ ...formDpto, head_id: e.target.value ? Number(e.target.value) : null })}
+            >
+              <option value="">None</option>
+              {eligibleLeaders.map(u => (
+                <option key={u.id} value={u.id}>
+                  {u.first_name} {u.last_name}
+                </option>
+              ))}
+            </select>
+          )}
 
           <div className="modal-cyber-footer">
-            <button type="button" className="cyber-btn-secondary" onClick={onCancel}>Cancel</button>
-            <button type="submit" className="cyber-btn-success">{isEdit ? "Save" : "Add"}</button>
+            <button type="button" className="cyber-btn-secondary" onClick={onCancel} disabled={isSaving}>Cancel</button>
+            <button type="submit" className="cyber-btn-success" disabled={isSaving}>
+              {isSaving ? "Saving..." : (isEdit ? "Save" : "Add")}
+            </button>
           </div>
         </form>
       </div>

@@ -2,15 +2,17 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { UserDropdown } from "./UserDropdown";
 import { ProfileModal } from "../Profile/ProfileModal.jsx";
-import { getAllDepartments } from "../../services/departmentService.js";
+import { getAllDepartments, getDepartmentWithUsers } from "../../services/departmentService.js";
+import useGlobalReducer from "../../hooks/useGlobalReducer.jsx";
 
 
 
 export const DashboardNavbar = () => {
 
+    const { store, dispatch } = useGlobalReducer();
     const [showProfile, setShowProfile] = useState(false);
     const [departments, setDepartments] = useState([]);
-    const token = localStorage.getItem("token");
+    const token = store.token;
 
     useEffect(() => {
         const loadDepartments = async () => {
@@ -25,6 +27,16 @@ export const DashboardNavbar = () => {
         };
         loadDepartments();
     }, [token]);
+
+    const handleSelectDepartment = async (dpto) => {
+        dispatch({ type: "set_current_department", payload: dpto });
+        try {
+            const data = await getDepartmentWithUsers(token, dpto.id);
+            dispatch({ type: "set_users", payload: data.users || [] });
+        } catch (error) {
+            console.error("Error cargando usuarios del departamento:", error);
+        }
+    };
 
     return (
         <>
@@ -107,7 +119,7 @@ export const DashboardNavbar = () => {
                                 type="button"
                                 data-bs-toggle="dropdown"
                             >
-                                Departments
+                                {store.currentDepartment ? store.currentDepartment.name : "Departments"}
                             </button>
 
                             {departments.length > 0 && (
@@ -115,13 +127,16 @@ export const DashboardNavbar = () => {
                                     style={{ backgroundColor: "rgb(19, 22, 37)", border: "1px solid var(--c-nuc)" }}>
                                     {departments.map((dpto) => (
                                         <li key={dpto.id}>
-                                            <Link className="dropdown-item py-2" to={`/MenuDptoProjects/${dpto.id}`}>
+                                            <button
+                                                className="dropdown-item py-2"
+                                                style={store.currentDepartment?.id === dpto.id ? { color: "var(--c-nuc)" } : {}}
+                                                onClick={() => handleSelectDepartment(dpto)}
+                                            >
                                                 {dpto.name}
-                                            </Link>
+                                            </button>
                                         </li>
                                     ))}
                                 </ul>
-
                             )}
 
                         </div>

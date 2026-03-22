@@ -47,7 +47,16 @@ export const deleteTask = async (token, taskId) => {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Error deleting task");
-    return data;
+    
+    // Añadido por Paty: algunos endpoints DELETE devuelven 204 sin body
+    if (response.status === 204) return { message: "Deleted" };
+    
+    const text = await response.text();
+    try {
+        const data = JSON.parse(text);
+        if (!response.ok) throw new Error(data.error || "Error deleting task");
+        return data;
+    } catch {
+        throw new Error(`Server error ${response.status}: ${text.slice(0, 100)}`);
+    }
 };
