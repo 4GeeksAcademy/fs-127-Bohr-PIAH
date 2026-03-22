@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from io import BytesIO
 from typing import Any
+import math
 
 from flask import abort, send_file
 from sqlalchemy.orm import selectinload
@@ -15,6 +16,8 @@ from api.models.work_package import WorkPackage
 
 from reportlab.lib import colors
 from reportlab.graphics.charts.barcharts import VerticalBarChart
+from reportlab.graphics.charts.barcharts import HorizontalBarChart
+from reportlab.graphics.charts.legends import Legend
 from reportlab.graphics.shapes import Drawing, String
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT
@@ -658,11 +661,12 @@ class ReportService:
 
     @staticmethod
     def wp_status_chart(work_packages: list[dict[str, Any]], title: str = "Tasks by status per work package"):
-        if not work_packages:
-            return Paragraph("No work packages to display.", ReportService.styles()["muted"])
+        styles = ReportService.styles()
 
-        labels = [ReportService.short_label(
-            wp["name"], 12) for wp in work_packages]
+        if not work_packages:
+            return Paragraph("No work packages to display.", styles["muted"])
+
+        labels = [ReportService.short_label(wp["name"], 18) for wp in work_packages]
 
         to_do_data = []
         in_progress_data = []
@@ -685,15 +689,18 @@ class ReportService:
 
             max_value = max(max_value, to_do, in_progress, in_review, done)
 
-        drawing = Drawing(480, 240)
-        drawing.add(
-            String(10, 220, title, fontName="Helvetica-Bold", fontSize=11))
+        # altura dinámica según número de work packages
+        chart_height = max(120, len(work_packages) * 22)
+        drawing_height = chart_height + 80
+        drawing = Drawing(500, drawing_height)
 
-        chart = VerticalBarChart()
-        chart.x = 40
-        chart.y = 40
-        chart.height = 150
-        chart.width = 400
+        drawing.add(String(10, drawing_height - 18, title, fontName="Helvetica-Bold", fontSize=11))
+
+        chart = HorizontalBarChart()
+        chart.x = 110
+        chart.y = 25
+        chart.height = chart_height
+        chart.width = 300
 
         chart.data = [
             tuple(to_do_data),
@@ -703,18 +710,17 @@ class ReportService:
         ]
 
         chart.categoryAxis.categoryNames = labels
-        chart.categoryAxis.labels.angle = 20
-        chart.categoryAxis.labels.dy = -12
         chart.categoryAxis.labels.fontName = "Helvetica"
         chart.categoryAxis.labels.fontSize = 8
+        chart.categoryAxis.labels.boxAnchor = "e"
+        chart.categoryAxis.labels.dx = -6
 
         chart.valueAxis.valueMin = 0
         chart.valueAxis.valueMax = max(max_value + 1, 1)
-        chart.valueAxis.valueStep = 1 if max_value <= 10 else max(
-            1, round(max_value / 5))
+        chart.valueAxis.valueStep = 1 if max_value <= 10 else max(1, math.ceil(max_value / 5))
 
-        chart.barSpacing = 4
-        chart.groupSpacing = 10
+        chart.barSpacing = 3
+        chart.groupSpacing = 8
 
         chart.bars[0].fillColor = colors.HexColor("#9E9E9E")   # to_do
         chart.bars[1].fillColor = colors.HexColor("#42A5F5")   # in_progress
@@ -723,14 +729,26 @@ class ReportService:
 
         drawing.add(chart)
 
-        drawing.add(String(50, 12, "To do", fontName="Helvetica",
-                    fontSize=8, fillColor=colors.HexColor("#9E9E9E")))
-        drawing.add(String(120, 12, "In progress", fontName="Helvetica",
-                    fontSize=8, fillColor=colors.HexColor("#42A5F5")))
-        drawing.add(String(220, 12, "In review", fontName="Helvetica",
-                    fontSize=8, fillColor=colors.HexColor("#FFB74D")))
-        drawing.add(String(300, 12, "Done", fontName="Helvetica",
-                    fontSize=8, fillColor=colors.HexColor("#66BB6A")))
+        legend = Legend()
+        legend.x = 420
+        legend.y = drawing_height - 28
+        legend.dx = 8
+        legend.dy = 8
+        legend.fontName = "Helvetica"
+        legend.fontSize = 8
+        legend.boxAnchor = "ne"
+        legend.columnMaximum = 4
+        legend.deltax = 55
+        legend.deltay = 10
+
+        legend.colorNamePairs = [
+            (colors.HexColor("#9E9E9E"), "To do"),
+            (colors.HexColor("#42A5F5"), "In progress"),
+            (colors.HexColor("#FFB74D"), "In review"),
+            (colors.HexColor("#66BB6A"), "Done"),
+        ]
+
+        drawing.add(legend)
 
         return drawing
 
