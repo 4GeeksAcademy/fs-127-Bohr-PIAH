@@ -3,7 +3,8 @@ import NewUser from "../components/NewUser/New_User.jsx";
 import NewDpto from "../components/NewDpto/New_Dpto.jsx";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { getAllDepartments, createDepartment, deleteDepartment as deleteDepartmentService } from "../services/departmentService";
-import { NavbarTop } from "../components/NavbarMenu/NavbarMenuTop.jsx"; //
+import { DashboardNavbar } from "../components/Dashboard/DashboardNavbar.jsx";
+import UserListModal from "../components/NewUser/UserListModal.jsx";
 
 export const MenuAdmin = () => {
   const [showNewUserForm, setShowNewUserForm] = useState(false);
@@ -18,6 +19,7 @@ export const MenuAdmin = () => {
 
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingData, setEditingData] = useState(null);
+  const [showUserList, setShowUserList] = useState(false);
 
   const handleCreateUser = () => setShowNewUserForm(true);
 
@@ -76,10 +78,10 @@ export const MenuAdmin = () => {
 
   return (
     <>
-      <NavbarTop />
+      <DashboardNavbar />
 
       {/* Contenedor principal con paddingTop para que no lo tape el fixed-top */}
-      <div className="home-wrapper" style={{ paddingTop: "96px" }}>
+      <div className="home-wrapper" style={{ paddingTop: "150px" }}>
         <h2 className="welcome-text p-3">Menu Admin</h2>
 
         <div className="action-grid d-flex">
@@ -90,6 +92,10 @@ export const MenuAdmin = () => {
           <div className="sub-feature m-1" onClick={handleCreateUser} style={{ cursor: 'pointer' }}>
             <p className="feature-title">Add New User</p>
           </div>
+          <div className="sub-feature m-1" onClick={() => setShowUserList(true)} style={{ cursor: 'pointer' }}>
+            <p className="feature-title">User List</p>
+          </div>
+
         </div>
 
         <div className="dpto-panel">
@@ -149,6 +155,13 @@ export const MenuAdmin = () => {
             }}
           />
         )}
+        {showUserList && (
+          <UserListModal
+            users={store.users}
+            onClose={() => setShowUserList(false)}
+          />
+        )}
+
       </div>
     </>
   );

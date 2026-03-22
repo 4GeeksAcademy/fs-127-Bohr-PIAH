@@ -4,10 +4,12 @@ import { UserDropdown } from "./UserDropdown";
 import { ProfileModal } from "../Profile/ProfileModal.jsx";
 import { getAllDepartments } from "../../services/departmentService.js";
 
+import { ReportModal } from "../CreateReport/ReportModal.jsx";
+
 
 
 export const DashboardNavbar = () => {
-
+    const [showReportModal, setShowReportModal] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
     const [departments, setDepartments] = useState([]);
     const token = localStorage.getItem("token");
@@ -26,6 +28,27 @@ export const DashboardNavbar = () => {
         loadDepartments();
     }, [token]);
 
+    const downloadProjectReport = async (projectId) => {
+        try {
+            const res = await fetch(`/api/reports/project/${projectId}`);
+
+            if (!res.ok) {
+                throw new Error("No se pudo generar el reporte");
+            }
+
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `project_${projectId}_report.pdf`;
+            a.click();
+        } catch (err) {
+            console.error(err);
+            alert("Error generando el reporte");
+        }
+    };
+
     return (
         <>
             <nav className="navbar navbar-dark fixed-top"
@@ -35,11 +58,11 @@ export const DashboardNavbar = () => {
 
                     {/* LADO IZQUIERDO LOGO DE BORH */}
                     <div className="navbar-brand">
-                        <Link to="/"
+                        <Link to="/dashboard"
                             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                             style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
 
-                            
+
                             <div className="atom-nav-container" style={{ width: "80px", height: "80px" }}>
                                 <svg viewBox="0 0 120 120" className="atom-nav" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="60" cy="60" r="10" className="nucleus-glow" />
@@ -78,9 +101,13 @@ export const DashboardNavbar = () => {
                     <div className="d-flex align-items-center gap-3">
 
                         <div className="ms-auto">
-                            <Link to="/report">
-                                <button className="nav-login-cyber">Reports</button>
-                            </Link>
+                            <button
+                                className="nav-login-cyber"
+                                onClick={() => setShowReportModal(true)}
+                            >
+                                Reports
+                            </button>
+
                         </div>
 
                         <div className="ms-auto">
@@ -136,6 +163,8 @@ export const DashboardNavbar = () => {
 
             {/* MODAL DE PERFIL */}
             <ProfileModal show={showProfile} onHide={() => setShowProfile(false)} />
+            <ReportModal show={showReportModal} onClose={() => setShowReportModal(false)} />
+
         </>
     );
 };
