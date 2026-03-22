@@ -263,53 +263,50 @@ export default function ModalProject({
           ))}
         </div>
 
-        <div className="modal-cyber-footer mt-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
-          <div className="d-flex gap-2">
-            {isEdit && (
-              <>
-                <button
-                  type="button"
-                  className="cyber-btn-danger"
-                  disabled={isSaving}
-                  onClick={() => setConfirm({
-                    isOpen: true,
-                    message: "Are you sure you want to delete this project?",
-                    onConfirm: () => { setConfirm(c => ({ ...c, isOpen: false })); handleDelete(); }
-                  })}
-                >
-                  Delete
-                </button>
-                <button
-                  type="button"
-                  className="cyber-btn"
-                  style={{ background: "rgba(39,230,214,0.15)", borderColor: "#27E6D6" }}
-                  disabled={isSaving}
-                  onClick={async () => {
-                    const newFinalized = !formData.finalized;
-                    setIsSaving(true);
-                    try {
-                      await updateProject(store.token, store.currentProjectId, { finalized: newFinalized });
-                      await actions.getUserProjects(store.user.id);
-                      onFinalizedChange?.(newFinalized);
-                    } catch (err) {
-                      console.error("Error actualizando estado del proyecto", err);
-                    } finally {
-                      setIsSaving(false);
-                    }
-                    onClose();
-                  }}
-                >
-                  {formData.finalized ? "Reactivate" : "Finished"}
-                </button>
-              </>
-            )}
-          </div>
-          <div className="d-flex gap-2">
-            <button type="button" className="cyber-btn-outline" onClick={onClose} disabled={isSaving}>Cancel</button>
-            <button type="submit" className="cyber-btn" disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save"}
-            </button>
-          </div>
+        <div className="modal-cyber-footer mt-4" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          {isEdit ? (
+            <>
+              <button
+                type="button"
+                className="cyber-btn-danger"
+                style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto" }}
+                disabled={isSaving}
+                onClick={() => setConfirm({
+                  isOpen: true,
+                  message: "Are you sure you want to delete this project?",
+                  onConfirm: () => { setConfirm(c => ({ ...c, isOpen: false })); handleDelete(); }
+                })}
+              >
+                Delete
+              </button>
+              <button
+                type="button"
+                className="cyber-btn-primary"
+                style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto", marginTop: 0 }}
+                disabled={isSaving}
+                onClick={async () => {
+                  const newFinalized = !formData.finalized;
+                  setIsSaving(true);
+                  try {
+                    await updateProject(store.token, store.currentProjectId, { finalized: newFinalized });
+                    await actions.getUserProjects(store.user.id);
+                    onFinalizedChange?.(newFinalized);
+                  } catch (err) {
+                    console.error("Error actualizando estado del proyecto", err);
+                  } finally {
+                    setIsSaving(false);
+                  }
+                  onClose();
+                }}
+              >
+                {formData.finalized ? "Reactivate" : "Finished"}
+              </button>
+            </>
+          ) : <div style={{ flex: 2 }} />}
+          <button type="button" className="cyber-btn-outline" style={{ flex: 1, height: "44px", fontSize: "0.85rem" }} onClick={onClose} disabled={isSaving}>Cancel</button>
+          <button type="submit" className="cyber-btn" style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto", marginTop: 0 }} disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
+          </button>
         </div>
         </form>
         <ConfirmModal
