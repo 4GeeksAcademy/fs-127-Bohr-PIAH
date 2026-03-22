@@ -1049,16 +1049,16 @@ class ReportService:
         )
 
     @staticmethod
-def pdf_response(pdf_bytes: bytes, filename: str):
-    if not pdf_bytes:
-        abort(500, description="Generated PDF is empty")
+    def pdf_response(pdf_bytes: bytes, filename: str):
+        if not pdf_bytes:
+            abort(500, description="Generated PDF is empty")
 
-    if not pdf_bytes.startswith(b"%PDF"):
-        abort(500, description=f"Generated content is not a valid PDF. Header: {pdf_bytes[:20]!r}")
+        if not pdf_bytes.startswith(b"%PDF"):
+            abort(500, description=f"Generated content is not a valid PDF. Header: {pdf_bytes[:20]!r}")
 
-    return send_file(
-        BytesIO(pdf_bytes),
-        mimetype="application/pdf",
-        as_attachment=True,
-        download_name=filename,
-    )
+        return send_file(
+            BytesIO(pdf_bytes),
+            mimetype="application/pdf",
+            as_attachment=True,
+            download_name=filename,
+        )
