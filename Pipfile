@@ -24,6 +24,7 @@ flask = "*"
 resend = "*"
 reportlab = "*"
 faker = "*"
+apscheduler = "*"
 
 [requires]
 python_version = "3.13"
