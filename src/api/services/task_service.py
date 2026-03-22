@@ -4,6 +4,7 @@ from flask import abort
 from api.models import db, Task, User, WorkPackage
 from api.models.task import Status
 from api.services.common import parse_dt_utc
+from api.services.email_service import send_task_assigned_email
 VALID_STATUSES = {status.value for status in Status}
 
 
@@ -71,6 +72,15 @@ class TaskService:
 
             db.session.add(new_task)
             db.session.commit()
+
+            if new_task.todo_by:
+                try:
+                    assignee = User.query.get(new_task.todo_by)
+                    if assignee:
+                        send_task_assigned_email(assignee, new_task)
+                except Exception:
+                    pass  # Email failure should not block task creation
+
             return new_task.serialize()
         except Exception as error:
             db.session.rollback()
@@ -81,6 +91,8 @@ class TaskService:
         task = Task.query.get(task_id)
         if task is None:
             abort(404, description=f"task with id {task_id} not found")
+
+        previous_todo_by = task.todo_by
 
         if "todo_by" in data:
             if data["todo_by"] is None:
@@ -157,6 +169,16 @@ class TaskService:
 
         try:
             db.session.commit()
+
+            new_todo_by = task.todo_by
+            if new_todo_by and new_todo_by != previous_todo_by:
+                try:
+                    assignee = User.query.get(new_todo_by)
+                    if assignee:
+                        send_task_assigned_email(assignee, task)
+                except Exception:
+                    pass  # Email failure should not block task update
+
             return task.serialize()
         except Exception as error:
             db.session.rollback()
