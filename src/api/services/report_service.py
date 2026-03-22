@@ -114,18 +114,22 @@ class ReportService:
 
     @staticmethod
     def task_to_dict(task: Task):
-        status = task.status.value if hasattr(
-            task.status, "value") else str(task.status)
+        raw_status = getattr(task, "status", None)
+        status = raw_status.value if hasattr(
+            raw_status, "value") else str(raw_status or "to_do")
+
+        deadline = getattr(task, "deadline", None)
+
         return {
-            "id": task.id,
-            "name": task.name,
-            "description": task.task_description,
+            "id": getattr(task, "id", None),
+            "name": getattr(task, "name", ""),
+            "description": getattr(task, "task_description", None),
             "status": status,
             "alert": bool(getattr(task, "alert", False)),
             "todo_by": getattr(task, "todo_by", None),
-            "created_at": ReportService.fmt_dt(task.created_at),
-            "deadline": ReportService.fmt_dt(task.deadline),
-            "is_overdue": ReportService.is_overdue(task.deadline, task.status),
+            "created_at": ReportService.fmt_dt(getattr(task, "created_at", None)),
+            "deadline": ReportService.fmt_dt(deadline),
+            "is_overdue": ReportService.is_overdue(deadline, raw_status),
         }
 
     @staticmethod
@@ -976,6 +980,7 @@ class ReportService:
     # Report generation
 
     @staticmethod
+    @staticmethod
     def generate_project_pdf(project_id: int):
         project = ReportService.get_project_tree(project_id)
         payload = ReportService.build_project_payload(project)
@@ -987,6 +992,10 @@ class ReportService:
         )
         generated_at = datetime.now(timezone.utc)
         pdf_bytes = ReportService.render_pdf(scope, payload, generated_at)
+
+        print("PDF length:", len(pdf_bytes))
+        print("PDF header:", pdf_bytes[:10])
+
         return ReportService.pdf_response(
             pdf_bytes,
             filename=f"Report_{project.name}.pdf",
@@ -1042,6 +1051,13 @@ class ReportService:
 
     @staticmethod
     def pdf_response(pdf_bytes: bytes, filename: str):
+        if not pdf_bytes:
+            abort(500, description="Generated PDF is empty")
+
+        if not pdf_bytes.startswith(b"%PDF"):
+            abort(
+                500, description=f"Generated content is not a valid PDF. Header: {pdf_bytes[:20]!r}")
+
         return send_file(
             BytesIO(pdf_bytes),
             mimetype="application/pdf",

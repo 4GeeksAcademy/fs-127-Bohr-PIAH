@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { KanbanBoard } from "../Kanban/KanbanBoard";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import ModalWorkPackage from "./ModalWorkPackage";
+import { getProjectReport } from "../../services/reportService";
 import { createWorkPackage, updateWorkPackage, deleteWorkPackage } from "../../services/WorkPackageService";
 
 export const MainBoard = ({ openProjectModal }) => {
@@ -20,6 +21,21 @@ export const MainBoard = ({ openProjectModal }) => {
     const [editingWp, setEditingWp] = useState(null);
     const [wpEditTitle, setWpEditTitle] = useState("");
     const [isWpSaving, setIsWpSaving] = useState(false);
+
+    const handleGetReport = async () => {
+        try {
+            const blob = await getProjectReport(store.currentProjectId, store.token);
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `project_${store.currentProjectId}.pdf`;
+            a.click();
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     // FUNCIÓN Guardar
     const handleAddWP = async () => {
@@ -112,10 +128,17 @@ export const MainBoard = ({ openProjectModal }) => {
                         </div>
                     )}
                     <div className="ms-auto d-flex gap-3">
-                        <Link to="/admin" className="text-decoration-none">
+                        {/* <Link to="/admin" className="text-decoration-none">
                             <button className="nav-login-cyber d-flex align-items-center gap-2" style={{ padding: "8px 15px", fontSize: "0.8rem" }}>Get Report
                             </button>
-                        </Link>
+                        </Link> */}
+                        <button
+                            onClick={handleGetReport}
+                            className="nav-login-cyber d-flex align-items-center gap-2"
+                            style={{ padding: "8px 15px", fontSize: "0.8rem" }}
+                        >
+                            Get Report
+                        </button>
 
 
                         <button
