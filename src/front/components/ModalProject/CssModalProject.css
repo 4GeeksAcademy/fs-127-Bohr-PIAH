@@ -98,49 +98,95 @@
 
 
 /* BOTONES */
-.cyber-btn {
-    background: #4da3ff;
-    color: black;
+.cyber-btn,
+.cyber-btn-outline,
+.cyber-btn-danger {
     padding: 10px 20px;
     border-radius: 10px;
-    border: none;
-    font-weight: 700;
+    font-weight: 600;
+    font-size: 0.85rem;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cyber-btn {
+    background: #4da3ff;
+    color: #000;
+    border: none;
 }
 
 .cyber-btn:hover {
-    box-shadow: 0 0 15px #3bb7ff;
+    box-shadow: 0 0 20px rgba(77, 163, 255, 0.6);
+    transform: translateY(-2px);
 }
 
 .cyber-btn-outline {
     background: transparent;
     border: 1px solid #4da3ff;
     color: #4da3ff;
-    padding: 10px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.3s;
 }
 
 .cyber-btn-outline:hover {
-    background: rgba(77, 163, 255, 0.1);
-    box-shadow: 0 0 10px #3bb7ff;
+    background: #4da3ff;
+    color: #000;
+    box-shadow: 0 0 20px rgba(77, 163, 255, 0.6);
+    transform: translateY(-2px);
 }
 
 .cyber-btn-danger {
     background: transparent;
     border: 1px solid #ff4d4d;
     color: #ff4d4d;
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
 }
 
 .cyber-btn-danger:hover {
-    background: rgba(255, 77, 77, 0.1);
-    box-shadow: 0 0 10px rgba(255, 77, 77, 0.4);
+    background: #ff4d4d;
+    color: #000;
+    box-shadow: 0 0 20px rgba(255, 77, 77, 0.6);
+    transform: translateY(-2px);
+}
+
+.cyber-btn-primary {
+    background: transparent;
+    border: 1px solid #27E6D6;
+    color: #27E6D6;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cyber-btn-primary:hover {
+    background: #27E6D6;
+    color: #000;
+    box-shadow: 0 0 20px rgba(39, 230, 214, 0.5);
+    transform: translateY(-2px);
+}
+
+.cyber-btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cyber-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
 }
 
 /* FOOTER */

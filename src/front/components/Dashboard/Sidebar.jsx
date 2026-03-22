@@ -41,12 +41,14 @@ export const Sidebar = ({ activeProjects, finishedProjects, onNewProjectClick, o
             <div className="glass-card-yellow p-4 d-flex flex-column gap-3 h-100">
 
                 {/* NEW PROJECT */}
-                <div className="feature-item w-100 d-flex align-items-center gap-3 py-3 px-4"
-                    style={{ cursor: "pointer", minHeight: "80px" }}
-                    onClick={onNewProjectClick}>
-                    <UserCheck size={32} strokeWidth={1.5} color="#27E6D6" />
-                    <p className="feature-title mb-0" style={{ fontSize: "0.9rem" }}>NEW PROJECT</p>
-                </div>
+                {onNewProjectClick && (
+                    <div className="feature-item w-100 d-flex align-items-center gap-3 py-3 px-4"
+                        style={{ cursor: "pointer", minHeight: "80px" }}
+                        onClick={onNewProjectClick}>
+                        <UserCheck size={32} strokeWidth={1.5} color="#27E6D6" />
+                        <p className="feature-title mb-0" style={{ fontSize: "0.9rem" }}>NEW PROJECT</p>
+                    </div>
+                )}
 
                 {/* MY PROJECTS */}
                 <div className="feature-item w-100 d-flex align-items-center gap-3 py-3 px-4"

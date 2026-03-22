@@ -41,6 +41,7 @@ export const createUser = async (token, userData) => {
     },
     body: JSON.stringify(userData),
   });
+  if (response.status === 409) throw new Error("USER_ALREADY_EXISTS");
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Error creating user");
   return data;

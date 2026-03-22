@@ -183,25 +183,23 @@ export default function ModalTask({
           <label className="cyber-label mb-0">Urgent Alert</label>
         </div>
 
-        <div className="modal-cyber-footer mt-4 d-flex justify-content-between">
-          <div>
-            {data.id ? (
-              <button
-                type="button"
-                className="cyber-btn-danger"
-                style={{ padding: "8px 15px", fontSize: "0.8rem" }}
-                onClick={() => setConfirm({
-                  isOpen: true,
-                  message: "Delete this task?",
-                  onConfirm: () => { setConfirm(c => ({ ...c, isOpen: false })); onDelete(data.id); }
-                })}
-              >
-                Delete
-              </button>
-            ) : null}
-          </div>
-          <button type="button" className="cyber-btn-outline" onClick={onClose} disabled={isSaving}>Cancel</button>
-          <button type="submit" className="cyber-btn" disabled={isSaving}>
+        <div className="modal-cyber-footer mt-4" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          {data.id ? (
+            <button
+              type="button"
+              className="cyber-btn-danger"
+              style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto" }}
+              onClick={() => setConfirm({
+                isOpen: true,
+                message: "Delete this task?",
+                onConfirm: () => { setConfirm(c => ({ ...c, isOpen: false })); onDelete(data.id); }
+              })}
+            >
+              Delete
+            </button>
+          ) : <div style={{ flex: 1 }} />}
+          <button type="button" className="cyber-btn-outline" style={{ flex: 1, height: "44px", fontSize: "0.85rem" }} onClick={onClose} disabled={isSaving}>Cancel</button>
+          <button type="submit" className="cyber-btn" style={{ flex: 1, height: "44px", fontSize: "0.85rem", width: "auto", marginTop: 0 }} disabled={isSaving}>
             {isSaving ? "Saving..." : "Save Task"}
           </button>
         </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import "../components/ModalProject/CssModalProject.css";
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import ConfirmModal from "../components/ConfirmModal/ConfirmModal";
@@ -13,7 +14,7 @@ import {
   deleteDepartment as deleteDepartmentService,
   getDepartmentWithUsers,
 } from "../services/departmentService";
-import { getAllUsers, updateUser } from "../services/userService";
+import { getAllUsers, updateUser, createUser, deleteUser } from "../services/userService";
 
 export const MenuAdmin = () => {
   const { store, dispatch } = useGlobalReducer();
@@ -21,10 +22,13 @@ export const MenuAdmin = () => {
   const [showNewUserForm, setShowNewUserForm] = useState(false);
   const [confirm, setConfirm] = useState({ isOpen: false, message: "", onConfirm: null });
   const [showNewDpto, setShowNewDpto] = useState(false);
-  // Inicializar con store.users si ya están cargados (evita flash vacío al navegar)
   const [allUsers, setAllUsers] = useState(store.users || []);
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingData, setEditingData] = useState(null);
+  const [userSearch, setUserSearch] = useState("");
+  const [editingUserId, setEditingUserId] = useState(null);
+  const [editingUserData, setEditingUserData] = useState(null);
+  const [savingUserId, setSavingUserId] = useState(null);
 
   const reloadAll = async () => {
     const [depts, users] = await Promise.all([
@@ -40,6 +44,21 @@ export const MenuAdmin = () => {
     if (!store.token) return;
     reloadAll().catch(err => console.error("Error cargando datos", err));
   }, [store.token]);
+
+  const handleCreateUser = async (data) => {
+    try {
+      await createUser(store.token, data);
+      setShowNewUserForm(false);
+      await reloadAll();
+      toast.success("User created successfully");
+    } catch (err) {
+      if (err.message === "USER_ALREADY_EXISTS") {
+        toast.error("This user already exists.");
+      } else {
+        toast.error(err.message || "Error creating user");
+      }
+    }
+  };
 
   const handleCancelNewDpto = () => {
     setShowNewDpto(false);
@@ -90,11 +109,10 @@ export const MenuAdmin = () => {
       ),
     });
 
-    // Cerrar modal primero (el botón desaparece) y luego recargar datos
     setEditingIndex(null);
     setEditingData(null);
     setShowNewDpto(false);
-    reloadAll().catch(err => console.error("Error recargando datos", err));
+    await reloadAll();
   };
 
   const handleDeleteDepartment = (index) => {
@@ -131,6 +149,73 @@ export const MenuAdmin = () => {
       setShowNewDpto(true);
     } catch (err) {
       console.error("Error cargando departamento", err);
+    }
+  };
+
+  const handleDeleteUser = (u) => {
+    setConfirm({
+      isOpen: true,
+      message: `Delete user "${u.first_name} ${u.last_name}"?`,
+      onConfirm: async () => {
+        setConfirm(c => ({ ...c, isOpen: false }));
+        try {
+          await deleteUser(store.token, u.id);
+          setEditingUserId(null);
+          setEditingUserData(null);
+          await reloadAll();
+          toast.success("User deleted successfully");
+        } catch (err) {
+          toast.error(err.message || "Error deleting user");
+        }
+      }
+    });
+  };
+
+  const handleEditUser = (u) => {
+    setEditingUserId(u.id);
+    setEditingUserData({ first_name: u.first_name, last_name: u.last_name, email: u.email, role: u.role, department_id: u.department_id ?? null });
+  };
+
+  const handleSaveUser = async () => {
+    setSavingUserId(editingUserId);
+    try {
+      const originalUser = allUsers.find(u => u.id === editingUserId);
+      await updateUser(store.token, editingUserId, editingUserData);
+
+      const newDeptId = editingUserData.department_id || null;
+      const oldDeptId = originalUser?.department_id || null;
+      const newRole = editingUserData.role;
+      const oldRole = originalUser?.role;
+
+      // Si ahora es head con departamento → asignarlo como team lead
+      if (newRole === "head" && newDeptId) {
+        await updateDepartment(store.token, newDeptId, { head_id: editingUserId });
+      }
+
+      // Si antes era head de otro departamento → limpiar ese head_id
+      if (oldRole === "head" && oldDeptId && oldDeptId !== newDeptId) {
+        const oldDept = store.departments.find(d => d.id === oldDeptId);
+        if (oldDept?.head_id === editingUserId) {
+          await updateDepartment(store.token, oldDeptId, { head_id: null });
+        }
+      }
+
+      // Si dejó de ser head en su mismo departamento → limpiar head_id
+      if (oldRole === "head" && newRole !== "head" && oldDeptId) {
+        const oldDept = store.departments.find(d => d.id === oldDeptId);
+        if (oldDept?.head_id === editingUserId) {
+          await updateDepartment(store.token, oldDeptId, { head_id: null });
+        }
+      }
+
+      await reloadAll();
+      setEditingUserId(null);
+      setEditingUserData(null);
+      toast.success("User updated successfully");
+    } catch (err) {
+      toast.error(err.message || "Error updating user");
+    } finally {
+      setSavingUserId(null);
     }
   };
 
@@ -186,60 +271,160 @@ export const MenuAdmin = () => {
       </nav>
 
       {/* CONTENIDO */}
-      <div className="container-fluid px-md-4" style={{ paddingTop: "120px", paddingBottom: "60px" }}>
+      <div className="container-fluid px-md-4" style={{ paddingTop: "90px", paddingBottom: "60px" }}>
 
-        <h2 className="section-sub-title text-center mb-4" style={{ color: "#27E6D6", letterSpacing: "3px", fontSize: "1.6rem" }}>
+        <h2 className="section-sub-title text-center" style={{ color: "#27E6D6", letterSpacing: "3px", fontSize: "1.6rem", marginBottom: "32px" }}>
           MENU ADMIN
         </h2>
 
-        <div className="d-flex justify-content-center gap-3 mb-5">
-          <button className="nav-login-cyber" onClick={() => { setEditingIndex(null); setEditingData(null); setShowNewDpto(true); }}>
-            Add New Department
-          </button>
-          <button className="nav-login-cyber" onClick={() => setShowNewUserForm(true)}>
-            Add New User
-          </button>
-        </div>
+        {/* DOS COLUMNAS */}
+        <div className="row g-4" style={{ alignItems: "flex-start" }}>
 
-        {/* GRID — 4 por fila */}
-        <div className="row g-4">
-          {store.departments.map((dpto, index) => {
-            const headName = getHeadName(dpto);
-            return (
-              <div key={dpto.id} className="col-lg-3 col-md-4 col-sm-6">
-                <div className="dpto-rect h-100 position-relative">
-
-                  <div className="position-absolute d-flex gap-2" style={{ top: "12px", right: "12px" }}>
-                    <button
-                      title="Editar"
-                      onClick={() => handleEditDpto(index)}
-                      style={{ background: "transparent", border: "none", cursor: "pointer", padding: "2px", lineHeight: 1 }}
-                    >
-                      <Pencil size={15} color="#27E6D6" style={{ opacity: 0.7 }} />
-                    </button>
-                    <button
-                      title="Eliminar"
-                      onClick={() => handleDeleteDepartment(index)}
-                      style={{ background: "transparent", border: "none", cursor: "pointer", padding: "2px", lineHeight: 1 }}
-                    >
-                      <Trash2 size={15} color="#ff4d4d" style={{ opacity: 0.7 }} />
-                    </button>
-                  </div>
-
-                  <h3 className="dpto-title" style={{ paddingRight: "48px" }}>{dpto.name}</h3>
-
-                  <div className="personal-section mt-2">
-                    <p className="section-label" style={{ color: "#8be0ff", fontSize: "0.8rem", marginBottom: "4px" }}>Team Lead</p>
-                    {headName
-                      ? <p className="item-section mb-0">• {headName}</p>
-                      : <span style={{ color: "#888", fontSize: "0.85rem" }}>No team lead assigned</span>
-                    }
-                  </div>
-
-                </div>
+          {/* IZQUIERDA — Usuarios (1/3) */}
+          <div className="col-4">
+            <div className="d-flex justify-content-center mb-3">
+              <button className="nav-login-cyber" onClick={() => setShowNewUserForm(true)}>
+                Add New User
+              </button>
+            </div>
+            <div className="glass-card-yellow p-3" style={{ height: "65vh", display: "flex", flexDirection: "column" }}>
+              <h3 className="section-sub-title mb-3" style={{ fontSize: "0.85rem", letterSpacing: "2px", color: "#27E6D6", flexShrink: 0 }}>
+                USERS
+              </h3>
+              <input
+                type="text"
+                className="cyber-input"
+                placeholder="Search user..."
+                value={userSearch}
+                onChange={e => setUserSearch(e.target.value)}
+                style={{ width: "100%", padding: "6px 10px", fontSize: "0.82rem", marginBottom: "10px", flexShrink: 0 }}
+              />
+              <div style={{ overflowY: "auto", flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
+                {[...allUsers]
+                  .sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`))
+                  .filter(u => `${u.first_name} ${u.last_name} ${u.email}`.toLowerCase().includes(userSearch.toLowerCase()))
+                  .map(u => {
+                    const dept = store.departments.find(d => d.id === u.department_id);
+                    const deptName = dept ? dept.name : "No department";
+                    const roleName = u.role ? u.role.charAt(0).toUpperCase() + u.role.slice(1) : "—";
+                    const isEditing = editingUserId === u.id;
+                    const isSaving = savingUserId === u.id;
+                    return (
+                      <div key={u.id} style={{ borderBottom: "1px solid rgba(39,230,214,0.1)", padding: "8px 4px" }}>
+                        {isEditing ? (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                            <div style={{ display: "flex", gap: "6px" }}>
+                              <input className="cyber-input" style={{ flex: 1, fontSize: "0.78rem", padding: "4px 8px" }}
+                                value={editingUserData.first_name}
+                                onChange={e => setEditingUserData({ ...editingUserData, first_name: e.target.value })}
+                                placeholder="Name" />
+                              <input className="cyber-input" style={{ flex: 1, fontSize: "0.78rem", padding: "4px 8px" }}
+                                value={editingUserData.last_name}
+                                onChange={e => setEditingUserData({ ...editingUserData, last_name: e.target.value })}
+                                placeholder="Last name" />
+                            </div>
+                            <input className="cyber-input" style={{ fontSize: "0.78rem", padding: "4px 8px" }}
+                              value={editingUserData.email}
+                              onChange={e => setEditingUserData({ ...editingUserData, email: e.target.value })}
+                              placeholder="Email" />
+                            <div style={{ display: "flex", gap: "6px" }}>
+                              <select className="cyber-input" style={{ flex: 1, fontSize: "0.78rem", padding: "4px 8px" }}
+                                value={editingUserData.role}
+                                onChange={e => setEditingUserData({ ...editingUserData, role: e.target.value })}>
+                                <option value="admin">Admin</option>
+                                <option value="head">Head</option>
+                                <option value="staff">Staff</option>
+                                <option value="guest">Guest</option>
+                              </select>
+                              <select className="cyber-input" style={{ flex: 1, fontSize: "0.78rem", padding: "4px 8px" }}
+                                value={editingUserData.department_id ?? ""}
+                                onChange={e => setEditingUserData({ ...editingUserData, department_id: e.target.value ? Number(e.target.value) : null })}>
+                                <option value="">No department</option>
+                                {store.departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                              </select>
+                            </div>
+                            <div style={{ display: "flex", gap: "6px" }}>
+                              <button className="cyber-btn-primary" style={{ flex: 1, marginTop: 0 }}
+                                onClick={handleSaveUser} disabled={isSaving}>
+                                {isSaving ? "Saving..." : "Save"}
+                              </button>
+                              <button className="cyber-btn-secondary" style={{ flex: 1, marginTop: 0 }}
+                                onClick={() => { setEditingUserId(null); setEditingUserData(null); }}>
+                                Cancel
+                              </button>
+                              <button className="cyber-btn-danger" style={{ flex: 1, marginTop: 0 }}
+                                onClick={() => handleDeleteUser(u)}>
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <span style={{ fontSize: "0.82rem", color: "white", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {u.first_name} {u.last_name}
+                              <span style={{ color: "rgba(255,255,255,0.35)" }}> — </span>
+                              <span style={{ color: "#8be0ff" }}>{deptName}</span>
+                              <span style={{ color: "rgba(255,255,255,0.35)" }}> — </span>
+                              <span style={{ color: "#27E6D6" }}>{roleName}</span>
+                            </span>
+                            <button onClick={() => handleEditUser(u)}
+                              style={{ background: "transparent", border: "none", cursor: "pointer", padding: "2px", lineHeight: 1, flexShrink: 0, marginLeft: "6px" }}>
+                              <Pencil size={13} color="#27E6D6" style={{ opacity: 0.6 }} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                {allUsers.length === 0 && (
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.8rem" }}>No users found.</p>
+                )}
               </div>
-            );
-          })}
+            </div>
+          </div>
+
+          {/* DERECHA — Departamentos (2/3) */}
+          <div className="col-8">
+            <div className="d-flex justify-content-center mb-3">
+              <button className="nav-login-cyber" onClick={() => { setEditingIndex(null); setEditingData(null); setShowNewDpto(true); }}>
+                Add New Department
+              </button>
+            </div>
+            <div className="glass-card-yellow p-3" style={{ minHeight: "65vh" }}>
+              <h3 className="section-sub-title mb-3" style={{ fontSize: "0.85rem", letterSpacing: "2px", color: "#27E6D6" }}>
+                DEPARTMENTS
+              </h3>
+              <div className="row g-3">
+                {store.departments.map((dpto, index) => {
+                  const headName = getHeadName(dpto);
+                  return (
+                    <div key={dpto.id} className="col-4">
+                      <div className="dpto-rect h-100 position-relative">
+                        <div className="position-absolute d-flex gap-2" style={{ top: "12px", right: "12px" }}>
+                          <button title="Editar" onClick={() => handleEditDpto(index)}
+                            style={{ background: "transparent", border: "none", cursor: "pointer", padding: "2px", lineHeight: 1 }}>
+                            <Pencil size={15} color="#27E6D6" style={{ opacity: 0.7 }} />
+                          </button>
+                          <button title="Eliminar" onClick={() => handleDeleteDepartment(index)}
+                            style={{ background: "transparent", border: "none", cursor: "pointer", padding: "2px", lineHeight: 1 }}>
+                            <Trash2 size={15} color="#ff4d4d" style={{ opacity: 0.7 }} />
+                          </button>
+                        </div>
+                        <h3 className="dpto-title" style={{ paddingRight: "48px" }}>{dpto.name}</h3>
+                        <div className="personal-section mt-2">
+                          <p className="section-label" style={{ color: "#8be0ff", fontSize: "0.8rem", marginBottom: "4px" }}>Team Lead</p>
+                          {headName
+                            ? <p className="item-section mb-0">• {headName}</p>
+                            : <span style={{ color: "#888", fontSize: "0.85rem" }}>No team lead assigned</span>}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -257,7 +442,7 @@ export const MenuAdmin = () => {
       {showNewUserForm && (
         <NewUser
           onCancel={() => setShowNewUserForm(false)}
-          onCreate={() => setShowNewUserForm(false)}
+          onCreate={handleCreateUser}
         />
       )}
     <ConfirmModal
