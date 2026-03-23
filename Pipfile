@@ -25,6 +25,7 @@ resend = "*"
 reportlab = "*"
 faker = "*"
 apscheduler = "*"
+tomli = "*"
 
 [requires]
 python_version = "3.13"
