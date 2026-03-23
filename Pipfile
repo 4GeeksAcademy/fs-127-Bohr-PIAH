@@ -28,7 +28,7 @@ apscheduler = "*"
 tomli = "*"
 
 [requires]
-python_version = "3.13"
+python_full_version = "3.13.12"
 
 [scripts]
 start="flask run -p 3001 -h 0.0.0.0"
@@ -39,4 +39,5 @@ upgrade="flask db upgrade"
 downgrade="flask db downgrade"
 insert-test-data="flask insert-test-data"
 reset_db="bash ./docs/assets/reset_migrations.bash"
+seed_db="pipenv run python src/api/db_populate/seed.py"
 deploy="echo 'Please follow this 3 steps to deploy: https://github.com/4GeeksAcademy/flask-rest-hello/blob/master/README.md#deploy-your-website-to-heroku' "
