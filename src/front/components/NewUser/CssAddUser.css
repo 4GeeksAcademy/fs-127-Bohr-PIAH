@@ -1,0 +1,130 @@
+/* OVERLAY DEL MODAL */
+.modal-cyber-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+/* VENTANA DEL MODAL */
+.modal-cyber-window {
+  background: rgba(15, 23, 42, 0.9);
+  border: 2px solid #4da3ff;
+  border-radius: 12px;
+  padding: 25px;
+  width: 420px;
+  max-width: 90%;
+  box-shadow: 0 0 25px rgba(77, 163, 255, 0.35);
+  animation: cyber-pop 0.25s ease-out;
+  position: relative;
+}
+
+/* ANIMACIÓN */
+@keyframes cyber-pop {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* CAMPOS DEL FORMULARIO */
+.cyber-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.cyber-field label {
+  font-size: 0.9rem;
+  color: #4da3ff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+/* INPUTS */
+.cyber-field input,
+.cyber-field select {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 2px solid #4da3ff;
+  background: rgba(186, 239, 234, 0.05);
+  color: white;
+  outline: none;
+  transition: 0.3s;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234da3ff' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+}
+
+.cyber-field select option {
+  background: #0f172a;
+  color: white;
+}
+
+.cyber-field input:focus,
+.cyber-field select:focus {
+  border-color: #4da3ff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.97);
+}
+
+/* BOTONES */
+.cyber-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.btn-cyber-primary,
+.btn-cyber-secondary {
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+  font-size: 0.85rem;
+}
+
+/* BOTÓN PRINCIPAL */
+.btn-cyber-primary {
+  background: #4da3ff;
+  border: none;
+  color: #000;
+}
+
+.btn-cyber-primary:hover {
+  box-shadow: 0 0 20px rgba(77, 163, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+/* BOTÓN SECUNDARIO */
+.btn-cyber-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.btn-cyber-secondary:hover {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}

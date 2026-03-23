@@ -1,0 +1,165 @@
+/* OVERLAY */
+.modal-overlay-cyber {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+/* CONTENEDOR */
+.modal-cyber-box {
+  position: relative;
+  background: rgba(15, 23, 42, 0.9);
+  border: 2px solid #4da3ff;
+  border-radius: 12px;
+  width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 25px;
+  box-shadow: 0 0 25px rgba(178, 108, 108, 0.4);
+  animation: cyber-pop 0.25s ease-out;
+}
+
+/* ANIMACIÓN */
+@keyframes cyber-pop {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* TITULO */
+.modal-cyber-title {
+  color: #4da3ff;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgb(255, 255, 255);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* BOTÓN CERRAR */
+.modal-cyber-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s ease;
+  z-index: 10;
+}
+
+.modal-cyber-close:hover {
+  border-color: #4da3ff;
+  color: #4da3ff;
+  box-shadow: 0 0 8px #4da3ff;
+}
+
+/* LABELS */
+.cyber-label {
+  color: white;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* INPUTS */
+.cyber-input {
+  width: 100%;
+  padding: 5px;
+  background: rgba(186, 239, 234, 0.05);
+  border: 2px solid #4da3ff;
+  border-radius: 8px;
+  color: white;
+  margin-bottom: 15px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.cyber-input:focus {
+  border-color: #4da3ff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.97);
+}
+
+/* BOTONES */
+.cyber-btn-primary,
+.cyber-btn-secondary,
+.cyber-btn-success {
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.cyber-btn-primary {
+  background: transparent;
+  border: 1px solid var(--c-cyber);
+  color: var(--c-cyber);
+}
+
+.cyber-btn-primary:hover {
+  background: var(--c-cyber);
+  color: #000;
+  box-shadow: 0 0 20px rgba(39, 230, 214, 0.5);
+  transform: translateY(-2px);
+}
+
+.cyber-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.cyber-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.cyber-btn-success {
+  background: #4da3ff;
+  border: none;
+  color: #000;
+}
+
+.cyber-btn-success:hover {
+  box-shadow: 0 0 20px rgba(77, 163, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+/* FOOTER */
+.modal-cyber-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+

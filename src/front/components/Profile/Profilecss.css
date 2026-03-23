@@ -1,0 +1,308 @@
+/* ================================
+   VARIABLES (opcional pero útil)
+================================ */
+:root {
+  --cyber: var(--c-cyber);
+  --nuc: var(--c-nuc);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-hover: rgba(255, 255, 255, 0.12);
+}
+
+/* ================================
+   MODAL GENERAL
+================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100000;
+  padding-top: 80px;
+}
+
+.modal-content {
+  position: relative;
+  width: 85%;
+  max-width: 620px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 24px 24px 20px;
+  animation: fadeIn 0.25s ease;
+  background: #0f1624;
+  border: 1px solid rgba(255, 255, 0, 0.4);
+  box-shadow: 0 0 20px rgba(255, 255, 0, 0.2);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  color: white;
+  transition: 0.2s ease;
+  z-index: 10;
+}
+
+.modal-close-btn:hover {
+  transform: scale(1.15);
+  border-color: var(--cyber);
+  color: var(--cyber);
+  box-shadow: 0 0 8px var(--cyber);
+}
+
+/* ================================
+   ANIMACIÓN
+================================ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ================================
+   LAYOUT DEL PERFIL
+================================ */
+.profile-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+  align-items: start;
+  margin-top: 10px;
+}
+
+.profile-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-username {
+  font-size: clamp(0.95rem, 2.5vw, 1.3rem);
+  font-weight: 700;
+  color: var(--c-nuc);
+  text-shadow: 0 0 8px var(--c-nuc);
+  margin-bottom: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-section {
+  background: #131929;
+  border: 1px solid rgba(39, 230, 214, 0.2);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.profile-section-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--c-cyber);
+  margin-bottom: 14px;
+  margin-top: 0;
+}
+
+.profile-info-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 3px;
+  display: block;
+}
+
+.profile-info-value {
+  font-size: 0.9rem;
+  color: white;
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(39, 230, 214, 0.15);
+}
+
+.profile-msg-error {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.profile-msg-success {
+  color: #2ecc71;
+  font-size: 0.8rem;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsivo */
+@media (max-width: 900px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 10px;
+  }
+
+  .profile-left {
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: center;
+  }
+}
+
+/* ================================
+   COLUMNA IZQUIERDA
+================================ */
+.profile-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.profile-left section {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* ================================
+   INPUTS
+================================ */
+.cyber-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--cyber);
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  margin-top: 5px;
+  transition: 0.2s ease;
+}
+
+.cyber-input:focus {
+  outline: none;
+  box-shadow: 0 0 8px var(--cyber);
+}
+
+/* ================================
+   BOTONES
+================================ */
+.cyber-btn,
+.cyber-btn-primary,
+.cyber-btn-secondary,
+.cyber-btn-success {
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+  margin-top: 10px;
+  font-size: 0.85rem;
+}
+
+/* Primario / outline cyan */
+.cyber-btn,
+.cyber-btn-primary {
+  background: transparent;
+  border: 1px solid var(--cyber);
+  color: var(--cyber);
+}
+
+.cyber-btn:hover,
+.cyber-btn-primary:hover {
+  background: var(--cyber);
+  color: #000;
+  box-shadow: 0 0 20px rgba(39, 230, 214, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Secundario */
+.cyber-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  color: white;
+}
+
+.cyber-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Éxito / azul */
+.cyber-btn-success {
+  background: #4da3ff;
+  border: none;
+  color: #000;
+}
+
+.cyber-btn-success:hover {
+  box-shadow: 0 0 20px rgba(77, 163, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Botón pequeño */
+.btn-small {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  background: var(--cyber);
+  color: black;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-small:hover {
+  box-shadow: 0 0 15px rgba(39, 230, 214, 0.5);
+  transform: translateY(-2px);
+}
+
+/* ================================
+   PROYECTOS
+================================ */
+.features-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.project-rect {
+  background: var(--glass-bg);
+  border: 1px solid rgba(39, 230, 214, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  color: var(--cyber);
+  font-size: 1rem;
+  transition: 0.25s ease;
+  cursor: pointer;
+}
+
+.project-rect:hover {
+  background: rgba(39, 230, 214, 0.2);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 0 15px rgba(39, 230, 214, 0.5);
+}

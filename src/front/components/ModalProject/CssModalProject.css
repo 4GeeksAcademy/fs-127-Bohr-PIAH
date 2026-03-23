@@ -1,0 +1,198 @@
+/* OVERLAY */
+.modal-cyber-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+}
+
+/* CONTENEDOR */
+.modal-cyber-container {
+    background: rgba(15, 23, 42, 0.9);
+    border: 2px solid #4da3ff;
+    border-radius: 12px;
+    padding: 25px;
+    width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 0 25px rgba(77, 163, 255, 0.35);
+    animation: cyber-pop 0.25s ease-out;
+}
+
+/* ANIMACIÓN */
+@keyframes cyber-pop {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* TITULOS */
+.modal-cyber-title {
+    color: #4da3ff;
+    text-align: center;
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+}
+
+.cyber-subtitle {
+    color: #4da3ff;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 6px rgba(77, 163, 255, 0.4);
+}
+
+/* LABELS */
+.cyber-label {
+    color: white;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* INPUTS */
+.cyber-input {
+    width: 100%;
+    padding: 10px;
+    background: rgba(186, 239, 234, 0.05);
+    border: 2px solid #4da3ff;
+    border-radius: 8px;
+    color: white;
+    margin-bottom: 15px;
+    transition: 0.3s;
+}
+
+.cyber-input:focus {
+    outline: none;
+    border-color: #4da3ff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.97);
+}
+.cyber-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* LISTA DE USUARIOS */
+.cyber-user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cyber-user-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+
+/* BOTONES */
+.cyber-btn,
+.cyber-btn-outline,
+.cyber-btn-danger {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cyber-btn {
+    background: #4da3ff;
+    color: #000;
+    border: none;
+}
+
+.cyber-btn:hover {
+    box-shadow: 0 0 20px rgba(77, 163, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+.cyber-btn-outline {
+    background: transparent;
+    border: 1px solid #4da3ff;
+    color: #4da3ff;
+}
+
+.cyber-btn-outline:hover {
+    background: #4da3ff;
+    color: #000;
+    box-shadow: 0 0 20px rgba(77, 163, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+.cyber-btn-danger {
+    background: transparent;
+    border: 1px solid #ff4d4d;
+    color: #ff4d4d;
+}
+
+.cyber-btn-danger:hover {
+    background: #ff4d4d;
+    color: #000;
+    box-shadow: 0 0 20px rgba(255, 77, 77, 0.6);
+    transform: translateY(-2px);
+}
+
+.cyber-btn-primary {
+    background: transparent;
+    border: 1px solid #27E6D6;
+    color: #27E6D6;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cyber-btn-primary:hover {
+    background: #27E6D6;
+    color: #000;
+    box-shadow: 0 0 20px rgba(39, 230, 214, 0.5);
+    transform: translateY(-2px);
+}
+
+.cyber-btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cyber-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+/* FOOTER */
+.modal-cyber-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
