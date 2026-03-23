@@ -143,19 +143,22 @@ class AuthService:
         # del .env y los emails llegarán al email real de cada usuario.
         to_email = os.getenv("RESEND_TEST_EMAIL", user.email)
 
-        resend.Emails.send({
-            "from": "onboarding@resend.dev",
-            "to": to_email,
-            "subject": "Password Recovery - Bohr PIAH",
-            "html": f"""
-                <h2>Password Recovery</h2>
-                <p>Hi {user.first_name},</p>
-                <p>Click the link below to reset your password:</p>
-                <a href="{reset_link}">Reset Password</a>
-                <p>This link expires in 60 minutes.</p>
-                <p>If you did not request this, please ignore this email.</p>
-            """
-        })
+        try:
+            resend.Emails.send({
+                "from": "onboarding@resend.dev",
+                "to": to_email,
+                "subject": "Password Recovery - Bohr PIAH",
+                "html": f"""
+                    <h2>Password Recovery</h2>
+                    <p>Hi {user.first_name},</p>
+                    <p>Click the link below to reset your password:</p>
+                    <a href="{reset_link}">Reset Password</a>
+                    <p>This link expires in 60 minutes.</p>
+                    <p>If you did not request this, please ignore this email.</p>
+                """
+            })
+        except Exception:
+            abort(503, description="Email service unavailable. Please try again later.")
 
         return {"message": "Password recovery email sent successfully"}
 
