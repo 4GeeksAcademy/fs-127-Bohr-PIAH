@@ -3,6 +3,8 @@ import resend
 
 
 def send_task_assigned_email(user, task):
+    if os.getenv("SEED_MODE"):
+        return
     resend.api_key = os.getenv("RESEND_API_KEY")
     to_email = os.getenv("RESEND_TEST_EMAIL", user.email)
     deadline_str = task.deadline.strftime("%d/%m/%Y") if task.deadline else "No deadline set"
