@@ -6,7 +6,8 @@ export const loginService = async (email, password) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
     });
-    const data = await response.json();
+    let data;
+    try { data = await response.json(); } catch { throw new Error("Could not connect to the server"); }
     if (!response.ok) throw new Error(data.error || "Login failed");
     return data;
 };
@@ -17,8 +18,13 @@ export const forgotPasswordService = async (email) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Ha ocurrido un error");
+    let data;
+    try {
+        data = await response.json();
+    } catch {
+        throw new Error("Server error. Please try again later.");
+    }
+    if (!response.ok) throw new Error(data.error || "Something went wrong");
     return data;
 };
 

@@ -8,6 +8,7 @@ from flask import abort
 from flask_jwt_extended import create_access_token, decode_token
 from api.models import db, User
 from api.models.user import RoleName
+from api.services.email_service import send_password_changed_email
 
 
 class AuthService:
@@ -52,13 +53,13 @@ class AuthService:
 
         user = User.query.filter_by(email=data["email"]).first()
         if user is None:
-            abort(401, description="Invalid email or password")
+            abort(401, description="No account found with that email address")
 
         if not user.is_active:
             abort(401, description="Account is disabled")
 
         if not user.check_password(data["password"]):
-            abort(401, description="Invalid email or password")
+            abort(401, description="Incorrect password")
 
         access_token = create_access_token(identity=str(user.id))
         return {
@@ -130,7 +131,7 @@ class AuthService:
             additional_claims={"type": "password_reset"}
         )
 
-        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
         reset_link = f"{frontend_url}/reset-password?token={reset_token}"
 
         # Configuramos la API key de Resend leyéndola del archivo .env
@@ -143,19 +144,22 @@ class AuthService:
         # del .env y los emails llegarán al email real de cada usuario.
         to_email = os.getenv("RESEND_TEST_EMAIL", user.email)
 
-        resend.Emails.send({
-            "from": "onboarding@resend.dev",
-            "to": to_email,
-            "subject": "Password Recovery - Bohr PIAH",
-            "html": f"""
-                <h2>Password Recovery</h2>
-                <p>Hi {user.first_name},</p>
-                <p>Click the link below to reset your password:</p>
-                <a href="{reset_link}">Reset Password</a>
-                <p>This link expires in 60 minutes.</p>
-                <p>If you did not request this, please ignore this email.</p>
-            """
-        })
+        try:
+            resend.Emails.send({
+                "from": "onboarding@resend.dev",
+                "to": to_email,
+                "subject": "Password Recovery - Bohr PIAH",
+                "html": f"""
+                    <h2>Password Recovery</h2>
+                    <p>Hi {user.first_name},</p>
+                    <p>Click the link below to reset your password:</p>
+                    <a href="{reset_link}">Reset Password</a>
+                    <p>This link expires in 60 minutes.</p>
+                    <p>If you did not request this, please ignore this email.</p>
+                """
+            })
+        except Exception:
+            abort(503, description="Email service unavailable. Please try again later.")
 
         return {"message": "Password recovery email sent successfully"}
 
@@ -199,6 +203,10 @@ class AuthService:
         user.set_password(data["new_password"])
         try:
             db.session.commit()
+            try:
+                send_password_changed_email(user)
+            except Exception:
+                pass
             return {"message": "Password changed successfully"}
         except Exception as error:
             db.session.rollback()
