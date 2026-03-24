@@ -24,7 +24,14 @@ export const Login = () => {
       dispatch({ type: "set_user", payload: data.user });
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message || "Login failed");
+      const msg = err.message || "Login failed";
+      if (msg.toLowerCase().includes("email")) {
+        setError("No account found with that email address");
+      } else if (msg.toLowerCase().includes("password")) {
+        setError("Incorrect password");
+      } else {
+        setError(msg);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +65,7 @@ export const Login = () => {
             className="cyber-input"
             placeholder="email@example.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => { setEmail(e.target.value); setError(""); }}
           />
 
           <label className="cyber-label">Password</label>
