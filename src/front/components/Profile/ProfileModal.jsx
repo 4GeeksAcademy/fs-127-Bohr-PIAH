@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import "./Profilecss.css";
 import { changePasswordService } from "../../services/authService";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 
 export const ProfileModal = ({ show, onHide }) => {
-  const { store } = useGlobalReducer();
+  const { store, dispatch } = useGlobalReducer();
+  const navigate = useNavigate();
   const user = store.user || {};
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -12,6 +15,10 @@ export const ProfileModal = ({ show, onHide }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState(null);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
+
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   if (!show) return null;
 
@@ -31,10 +38,15 @@ export const ProfileModal = ({ show, onHide }) => {
     setPasswordMessage(null);
     try {
       await changePasswordService(currentPassword, newPassword, store.token);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setPasswordMessage({ type: "success", text: "Password updated successfully." });
+      setPasswordMessage({ type: "success", text: "Password updated. Redirecting to login..." });
+      setTimeout(() => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("currentDepartment");
+        dispatch({ type: "set_token", payload: null });
+        dispatch({ type: "set_user", payload: null });
+        navigate("/login");
+      }, 1500);
     } catch (err) {
       setPasswordMessage({ type: "error", text: err.message || "Error updating the password." });
     } finally {
@@ -43,6 +55,20 @@ export const ProfileModal = ({ show, onHide }) => {
   };
 
   const passwordError = validatePassword();
+
+  const eyeStyle = {
+    position: "absolute",
+    right: "10px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    color: "rgba(255,255,255,0.5)",
+    padding: 0,
+    display: "flex",
+    alignItems: "center",
+  };
 
   return (
     <div className="modal-overlay" onClick={onHide}>
@@ -79,35 +105,53 @@ export const ProfileModal = ({ show, onHide }) => {
               <p className="profile-section-title">Change Password</p>
 
               <label className="profile-info-label">Current Password</label>
-              <input
-                type="password"
-                className="cyber-input"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Old password"
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showCurrent ? "text" : "password"}
+                  className="cyber-input"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Old password"
+                  style={{ paddingRight: "36px" }}
+                />
+                <button type="button" style={eyeStyle} onClick={() => setShowCurrent(v => !v)}>
+                  {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
 
               <label className="profile-info-label" style={{ marginTop: "10px" }}>New Password</label>
-              <input
-                type="password"
-                className="cyber-input"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="New password"
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showNew ? "text" : "password"}
+                  className="cyber-input"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="New password"
+                  style={{ paddingRight: "36px" }}
+                />
+                <button type="button" style={eyeStyle} onClick={() => setShowNew(v => !v)}>
+                  {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
 
               <label className="profile-info-label" style={{ marginTop: "10px" }}>Confirm New Password</label>
-              <input
-                type="password"
-                className="cyber-input"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Repeat new password"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !isSavingPassword && currentPassword && !passwordError)
-                    handleChangePassword();
-                }}
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  className="cyber-input"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repeat new password"
+                  style={{ paddingRight: "36px" }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !isSavingPassword && currentPassword && !passwordError)
+                      handleChangePassword();
+                  }}
+                />
+                <button type="button" style={eyeStyle} onClick={() => setShowConfirm(v => !v)}>
+                  {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
 
               {passwordMessage && (
                 <p className={passwordMessage.type === "error" ? "profile-msg-error" : "profile-msg-success"}>

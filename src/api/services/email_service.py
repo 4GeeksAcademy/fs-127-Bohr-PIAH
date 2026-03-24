@@ -22,6 +22,22 @@ def send_task_assigned_email(user, task):
     })
 
 
+def send_password_changed_email(user):
+    resend.api_key = os.getenv("RESEND_API_KEY")
+    to_email = os.getenv("RESEND_TEST_EMAIL", user.email)
+    resend.Emails.send({
+        "from": "onboarding@resend.dev",
+        "to": to_email,
+        "subject": "Password changed - Bohr PIAH",
+        "html": f"""
+            <h2>Password Changed</h2>
+            <p>Hi {user.first_name},</p>
+            <p>Your password has been successfully changed.</p>
+            <p>If you did not make this change, please contact support immediately.</p>
+        """
+    })
+
+
 def send_deadline_reminder_email(user, task):
     resend.api_key = os.getenv("RESEND_API_KEY")
     to_email = os.getenv("RESEND_TEST_EMAIL", user.email)

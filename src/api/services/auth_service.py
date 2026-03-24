@@ -8,6 +8,7 @@ from flask import abort
 from flask_jwt_extended import create_access_token, decode_token
 from api.models import db, User
 from api.models.user import RoleName
+from api.services.email_service import send_password_changed_email
 
 
 class AuthService:
@@ -199,6 +200,10 @@ class AuthService:
         user.set_password(data["new_password"])
         try:
             db.session.commit()
+            try:
+                send_password_changed_email(user)
+            except Exception:
+                pass
             return {"message": "Password changed successfully"}
         except Exception as error:
             db.session.rollback()
