@@ -125,7 +125,10 @@ export default function ModalProject({
     try {
       await deleteProject(store.token, store.currentProjectId);
       dispatch({ type: "set_current_project", payload: null });
-      await actions.getUserProjects(store.user.id);
+      dispatch({
+        type: "set_projects",
+        payload: store.projects.filter(p => p.id !== store.currentProjectId)
+      });
     } catch (err) {
       console.error("Error eliminando proyecto", err);
     } finally {
