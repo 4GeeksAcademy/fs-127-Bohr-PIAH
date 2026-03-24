@@ -75,7 +75,7 @@ export const Login = () => {
               className="cyber-input"
               placeholder="********"
               value={password}
-              onChange={(e) => { setPassword(e.target.value); setError(""); }}
+              onChange={(e) => setPassword(e.target.value)}
               style={{ paddingRight: "36px" }}
             />
             <button type="button" style={eyeStyle} onClick={() => setShowPassword(v => !v)}>
@@ -83,15 +83,11 @@ export const Login = () => {
             </button>
           </div>
 
+          {error && <p style={{ color: "red" }}>{error}</p>}
+
           <button type="submit" className="cyber-btn-success login-btn" disabled={isLoading}>
             {isLoading ? "Logging in..." : "Log In"}
           </button>
-
-          {error && (
-            <p style={{ color: "#ff4d4d", textAlign: "center", margin: "8px 0 0", fontSize: "0.875rem" }}>
-              {error}
-            </p>
-          )}
 
           <p className="signup-link">
             <Link to="/forgot-password">Forgot your password?</Link>
