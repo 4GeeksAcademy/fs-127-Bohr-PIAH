@@ -59,7 +59,7 @@ export const ResetPassword = () => {
                     <div className="reset-btn-group">
                         <button
                             type="button"
-                            className="cyber-btn-outline login-btn"
+                            className="cyber-btn-success login-btn"
                             onClick={() => navigate("/login")}
                         >
                             Cancel

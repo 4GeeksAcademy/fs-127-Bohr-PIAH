@@ -130,7 +130,7 @@ class AuthService:
             additional_claims={"type": "password_reset"}
         )
 
-        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
         reset_link = f"{frontend_url}/reset-password?token={reset_token}"
 
         # Configuramos la API key de Resend leyéndola del archivo .env
