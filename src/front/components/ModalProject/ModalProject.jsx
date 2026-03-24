@@ -289,7 +289,12 @@ export default function ModalProject({
                   setIsSaving(true);
                   try {
                     await updateProject(store.token, store.currentProjectId, { finalized: newFinalized });
-                    await actions.getUserProjects(store.user.id);
+                    dispatch({
+                      type: "set_projects",
+                      payload: store.projects.map(p =>
+                        p.id === store.currentProjectId ? { ...p, finalized: newFinalized } : p
+                      )
+                    });
                     onFinalizedChange?.(newFinalized);
                   } catch (err) {
                     console.error("Error actualizando estado del proyecto", err);

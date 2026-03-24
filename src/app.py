@@ -59,6 +59,13 @@ app.register_blueprint(api, url_prefix='/api')
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
+@app.errorhandler(Exception)
+def handle_http_exception(error):
+    from werkzeug.exceptions import HTTPException
+    if isinstance(error, HTTPException):
+        return jsonify({"error": error.description}), error.code
+    return jsonify({"error": "Internal server error"}), 500
+
 # generate sitemap with all your endpoints
 
 

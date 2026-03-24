@@ -52,13 +52,13 @@ class AuthService:
 
         user = User.query.filter_by(email=data["email"]).first()
         if user is None:
-            abort(401, description="Invalid email or password")
+            abort(401, description="No account found with that email address")
 
         if not user.is_active:
             abort(401, description="Account is disabled")
 
         if not user.check_password(data["password"]):
-            abort(401, description="Invalid email or password")
+            abort(401, description="Incorrect password")
 
         access_token = create_access_token(identity=str(user.id))
         return {
