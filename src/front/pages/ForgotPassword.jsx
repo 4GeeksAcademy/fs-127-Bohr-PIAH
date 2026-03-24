@@ -13,29 +13,29 @@ export const ForgotPassword = () => {
 
         try {
             await forgotPasswordService(email);
-            setMessage("Te hemos enviado un correo con las instrucciones");
+            setMessage("We have sent you an email with the instructions");
         } catch (err) {
-            setError(err.message || "Ha ocurrido un error");
+            setError(err.message || "An error occurred");
         }
     };
 
     return (
         <div className="home-wrapper">
-            <h2 className="view-title">Recuperar contraseña</h2>
+            <h2 className="view-title">Forgot Password</h2>
             <div className="login-box">
                 <form className="cyber-form" onSubmit={handleSubmit}>
                     <label className="cyber-label">Email</label>
                     <input
                         type="email"
                         className="cyber-input"
-                        placeholder="correo@ejemplo.com"
+                        placeholder="email@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
                     {message && <p style={{ color: "green" }}>{message}</p>}
                     {error && <p style={{ color: "red" }}>{error}</p>}
                     <button type="submit" className="cyber-btn-success login-btn">
-                        Enviar correo
+                        Send Email
                     </button>
                 </form>
             </div>
