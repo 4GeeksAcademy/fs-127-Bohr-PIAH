@@ -195,6 +195,12 @@ export const MainBoard = ({ openProjectModal }) => {
                             Create your first PROJECT </p>
 
                     </div>
+                ) : currentProject?.workPackages?.length === 0 ? (
+                    <div className="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-center animate__animated animate__fadeIn"
+                        style={{ marginTop: "-50px" }}>
+                        <h2 className="section-sub-title" style={{ color: "#27E6D6" }}>Ready to start?</h2>
+                        <p className="text-white opacity-75 max-w-md">Create your first WORK PACKAGE</p>
+                    </div>
                 ) : (
 
                     <div className="accordion accordion-flush" id="projectAccordion">
